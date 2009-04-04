@@ -29,5 +29,5 @@ class Ventana(wx.Frame):
 
 app = wx.App()
 Ventana(id = 0, title = "Lineas con Bresenham", algoritmos = bresenham)
-#Ventana(id = 1, title = "Lineas con DDA", algoritmos = dda)
+Ventana(id = 1, title = "Lineas con DDA", algoritmos = dda)
 app.MainLoop()
