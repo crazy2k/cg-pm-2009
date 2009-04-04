@@ -22,9 +22,12 @@ class Ventana(wx.Frame):
         self.algoritmos.dibujar_segmento(400, 500, 10, 10, dc.DrawPoint)
         self.algoritmos.dibujar_segmento(100, 500, 400, 10, dc.DrawPoint)
         self.algoritmos.dibujar_segmento(400, 10, 10, 500, dc.DrawPoint)
+
+        self.algoritmos.dibujar_segmento(20, 20, 20, 500, dc.DrawPoint)
+
         scan.scan_triangle(10,10,400,100,450,500,self.algoritmos.dibujar_segmento, dc.DrawPoint)
 
 app = wx.App()
 Ventana(id = 0, title = "Lineas con Bresenham", algoritmos = bresenham)
-Ventana(id = 1, title = "Lineas con DDA", algoritmos = dda)
+#Ventana(id = 1, title = "Lineas con DDA", algoritmos = dda)
 app.MainLoop()
