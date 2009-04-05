@@ -1,7 +1,6 @@
 
-# Comentario de prueba
 def scan_triangle(x1,y1,x2,y2,x3,y3,dibujar_linea,put_pixel):
-    ancho_pantalla, alto_pantalla = 10000, 10000
+    ancho_pantalla, alto_pantalla = 501, 601
     global maxx
     maxx = [-1]*alto_pantalla
     global minx
