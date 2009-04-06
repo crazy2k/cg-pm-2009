@@ -3,7 +3,6 @@ import wx
 import bresenham
 import dda
 import scan
-import time
 
 import random
 
@@ -71,25 +70,46 @@ class Ventana(wx.Frame):
 
         dc.SetPen(pen)
 
-        scan.scan_triangle(200 + self.x,300 + self.y,250 + self.x,200 + self.y,300 + self.x,300 + self.y,self.algoritmos.dibujar_segmento, dc.DrawPoint)
+        scan_triangle(200 + self.x,300 + self.y,250 + self.x,200 + self.y,300 + self.x,300 + self.y,self.algoritmos.dibujar_segmento, dc.DrawPoint)
+
 
         if 200 + self.y == 0:
             self.dy = 1
-            print time.time()
         if 300 + self.x == 500:
             self.dx = -1
-            print time.time()
         if 200 + self.x == 0:
             self.dx = 1
-            print time.time()
         if 300 + self.y == 600:
             self.dy = -1
-            print time.time()
 
         self.x = self.x + self.dx
         self.y = self.y + self.dy
 
         self.Refresh()
+
+def scan_triangle(x1,y1,x2,y2,x3,y3,dibujar_linea,put_pixel):
+    ancho_pantalla = max(x1, x2, x3) +1
+    alto_pantalla = max(y1, y2, y3) +1
+    global maxx
+    maxx = [-1]*alto_pantalla
+    global minx
+    minx = [ancho_pantalla]*alto_pantalla
+    dibujar_linea(x1,y1,x2,y2,funcion_scan)
+    dibujar_linea(x2,y2,x3,y3,funcion_scan)
+    dibujar_linea(x1,y1,x3,y3,funcion_scan)
+    for y in range (0,alto_pantalla):
+        if maxx[y] != -1:
+            dibujar_linea(minx[y],y,maxx[y],y,put_pixel)
+
+
+def funcion_scan(x,y):
+    x, y = int(round(x)),int(round(y))
+    if x > maxx[y]:
+        maxx[y] = x
+    if x < minx[y]:
+        minx[y] = x
+
+
 
 
 app = wx.App()

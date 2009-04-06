@@ -3,44 +3,66 @@ import wx
 import bresenham
 import dda
 import scan
-import time
 
 import random
 
+class Triangle:
 
-class Ventana(wx.Frame):
+    self.algorithm = bresenham
+    def __init__(self, vertex1, vertex2, vertex3, colour = wx.Colour(0, 0, 0)):
+        self.vertex1 = vertex1
+        self.vertex2 = vertex2
+        self.vertex3 = vertex3
 
-    def __init__(self, id, title, algoritmos):
-        wx.Frame.__init__(self, None, id, title, size=(500, 600))
+        self.animated = False
 
-        self.algoritmos = algoritmos
+    def repaint(self, dc):
+        scan.scan_triangle(vertex1, vertex2, vertex3, self.algorithm.draw_line_segment, dc.DrawPoint)
 
-        self.Bind(wx.EVT_PAINT, self.dibujar_linea)
+class BouncingTriangle(Triangle):
+    def __init__(self, vertex1, vertex2, vertex3, box, colour = wx.Colour(0, 0, 0)):
+        Triangle.__init__(vertex1, vertex2, vertex3, colour)
+
+
+
+class SceneWindow(wx.Frame):
+
+    SCENE_WIDTH = 500
+    SCENE_HEIGHT = 600
+
+    def __init__(self, title, algorithm):
+        wx.Frame.__init__(self, None, id = 0, title = title,
+            size=(SCENE_WIDTH, SCENE_HEIGHT))
+
+        self.objects = []
+        t = BouncingTriangle((200, 300), (250, 200), (300,300), (0, 0, SCENE_WIDTH, SCENE_HEIGHT))
+        self.objects.add(t)
+
+        self.Bind(wx.EVT_PAINT, self.repaint)
 
         self.Centre()
         self.Show(True)
 
-        self.x = 0
-        self.y = 0
+        #self.x = 0
+        #self.y = 0
 
-        self.r = 0
-        self.g = 0
-        self.b = 0
+        #self.r = 0
+        #self.g = 0
+        #self.b = 0
 
-        self.dr = 1
-        self.dg = -1
-        self.db = 1
+        #self.dr = 1
+        #self.dg = -1
+        #self.db = 1
 
-        self.dx = 1
-        self.dy = -1
+        #self.dx = 1
+        #self.dy = -1
 
 
-    def dibujar_linea(self, event):
+    def repaint(self, event):
+        for o in objects:
+            o.repaint(wx.ClientDC(self))
+
         dc = wx.ClientDC(self)
-        #self.algoritmos.dibujar_segmento(10, 10, 400, 100, dc.DrawPoint)
-        #self.algoritmos.dibujar_segmento(400, 500, 10, 10, dc.DrawPoint)
-        #self.algoritmos.dibujar_segmento(100, 500, 400, 10, dc.DrawPoint)
-        #self.algoritmos.dibujar_segmento(400, 10, 10, 500, dc.DrawPoint)
 
         pen = dc.GetPen()
 
@@ -75,16 +97,12 @@ class Ventana(wx.Frame):
 
         if 200 + self.y == 0:
             self.dy = 1
-            print time.time()
         if 300 + self.x == 500:
             self.dx = -1
-            print time.time()
         if 200 + self.x == 0:
             self.dx = 1
-            print time.time()
         if 300 + self.y == 600:
             self.dy = -1
-            print time.time()
 
         self.x = self.x + self.dx
         self.y = self.y + self.dy
