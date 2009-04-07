@@ -7,6 +7,7 @@ import dda
 import time
 import scan
 
+from PIL import Image
 
 
 
@@ -14,6 +15,7 @@ import random
 
 
 class Ventana(wx.Frame):
+
 
     def __init__(self, id, title, algoritmos):
         wx.Frame.__init__(self, None, id, title, size=(500, 600))
@@ -34,49 +36,36 @@ class Ventana(wx.Frame):
         self.dx = 1
         self.dy = -1
 
-        self._buffer = wx.EmptyBitmap(500, 600)
+        self._buff = [[(255,255,255)]*600]*500
 
         self.Bind(wx.EVT_PAINT, self.on_paint)
 
         self.Centre()
         self.Show(True)
 
-    def empty_bitmap(self):
-        bmp = wx.EmptyBitmap(500, 600)
-        dc = wx.MemoryDC()
-        dc.SelectObject(bmp)
-        #pen = dc.GetPen()
-        #pen.SetColour(wx.Colour(255, 255, 255))
-        #dc.SetPen(pen)
-        #for x in range(501):
-        #	for y in range(601):
-        #		dc.DrawPoint(x, y)
-        dc.Clear()
-       	dc.SelectObject(wx.NullBitmap)
 
-        return bmp
-
-
+    def add_to_buffer(self, x, y):
+        self._buff[x, y] = (0, 0, 0)
+       
     def on_paint(self, event):
+        # creo una imagen
+        im = Image.new('RGB', (500,600), (255, 255, 255))
+        # voy a acceder a sus pixels a traves de esta variable
+        self._buff = im.load()
+        # escribo en sus pixels
+        self.draw(self.add_to_buffer)
+        # me genero un bitmap
+        bmp = pilToBitmap(im)
 
-        self._buffer = self.empty_bitmap()
-        #self._buffer = wx.EmptyBitmap(500, 600)
-
-        dc = wx.MemoryDC()
-        dc.SelectObject(self._buffer)
-        self.draw(dc)
-        dc.SelectObject(wx.NullBitmap)
-	
-        #wx.ClientDC(self).Blit(0, 0, 500, 600, dc, 0, 0)
-
+        # pinto el bitmap
         pdc = wx.PaintDC(self)
-        pdc.DrawBitmap(self._buffer, 0, 0)
+        pdc.DrawBitmap(bmp, 0, 0)
 
         self.Refresh()
 
-            
-    def draw(self, dc):
-        pen = dc.GetPen()
+
+    def draw(self, putpixel):
+        """pen = dc.GetPen()
 
         if self.r == 255:
             self.dr = -1
@@ -91,7 +80,7 @@ class Ventana(wx.Frame):
             self.dg = 1
         if self.b == 0:
             self.db = 1
-
+        """
         v = random.randint(0, 2)
         if v == 0:
             self.r = self.r + self.dr
@@ -100,109 +89,59 @@ class Ventana(wx.Frame):
         elif v == 2:
             self.b = self.b + self.db
 
-        pen.SetColour(wx.Colour(self.r, self.g, self.b))
+        #pen.SetColour(wx.Colour(self.r, self.g, self.b))
 
-        dc.SetPen(pen)
+        #dc.SetPen(pen)
 
-        scan.scan_triangle(200 + self.x,300 + self.y,250 + self.x,200 + self.y,300 + self.x,300 + self.y,self.algoritmos.dibujar_segmento, dc.DrawPoint)
+        scan.scan_triangle(200 + self.x,300 + self.y,250 + self.x,200 + self.y,300 + self.x,300 + self.y,self.algoritmos.dibujar_segmento, putpixel)
 
         if 200 + self.y == 0:
             self.dy = 1
             print time.time()
-        if 300 + self.x == 500:
+        if 300 + self.x == 499:
             self.dx = -1
             print time.time()
         if 200 + self.x == 0:
             self.dx = 1
             print time.time()
-        if 300 + self.y == 600:
+        if 300 + self.y == 599:
             self.dy = -1
             print time.time()
 
         self.x = self.x + self.dx
         self.y = self.y + self.dy
 
-    def dibujar_linea(self, event):
-        dc = wx.MemoryDC(self)
-        #self.algoritmos.dibujar_segmento(10, 10, 400, 100, dc.DrawPoint)
-        #self.algoritmos.dibujar_segmento(400, 500, 10, 10, dc.DrawPoint)
-        #self.algoritmos.dibujar_segmento(100, 500, 400, 10, dc.DrawPoint)
-        #self.algoritmos.dibujar_segmento(400, 10, 10, 500, dc.DrawPoint)
+def pilToBitmap(pil):
+    return imageToBitmap(pilToImage(pil))
 
-        pen = dc.GetPen()
+def imageToBitmap(image):
+    return image.ConvertToBitmap()
 
-        if self.r == 255:
-            self.dr = -1
-            print time.time()
-        if self.g == 255:
-            self.dg = -1
-            print time.time()
-        if self.b == 255:
-            self.db = -1
-            print time.time()
+def pilToImage(pil):
+    image = wx.EmptyImage(pil.size[0], pil.size[1])
+    image.SetData(pil.convert('RGB').tostring())
+    return image
 
-        if self.r == 0:
-            self.dr = 1
-            print time.time()
-        if self.g == 0:
-            self.dg = 1
-            print time.time()
-        if self.b == 0:
-            self.db = 1
-            print time.time()
+def flatten(l):
+    """flatten(sequence) -> list
 
+    Returns a single, flat list which contains all elements retrieved
+    from the sequence and all recursively contained sub-sequences
+    (iterables).
 
-        v = random.randint(0, 2)
-        if v == 0:
-            self.r = self.r + self.dr
-        elif v == 1:
-            self.g = self.g + self.dg
-        elif v == 2:
-            self.b = self.b + self.db
+    Examples:
+    >>> [1, 2, [3,4], (5,6)]
+    [1, 2, [3, 4], (5, 6)]
+    >>> flatten([[[1,2,3], (42,None)], [4,5], [6], 7, MyVector(8,9,10)])
+    [1, 2, 3, 42, None, 4, 5, 6, 7, 8, 9, 10]"""
 
-        pen.SetColour(wx.Colour(self.r, self.g, self.b))
+    result = []
+    for x in l:
+        for y in x:
+            result.append(y)
 
-        dc.SetPen(pen)
-
-        scan.scan_triangle(200 + self.x,300 + self.y,250 + self.x,200 + self.y,300 + self.x,300 + self.y,self.algoritmos.dibujar_segmento, dc.DrawPoint)
-
-        if 200 + self.y == 0:
-            self.dy = 1
-        if 300 + self.x == 500:
-            self.dx = -1
-        if 200 + self.x == 0:
-            self.dx = 1
-        if 300 + self.y == 600:
-            self.dy = -1
-
-        self.x = self.x + self.dx
-        self.y = self.y + self.dy
-
-        self.Refresh()
-if False:
-    def scan_triangle(x1,y1,x2,y2,x3,y3,dibujar_linea,put_pixel):
-        ancho_pantalla = max(x1, x2, x3) +1
-        alto_pantalla = max(y1, y2, y3) +1
-        global maxx
-        maxx = [-1]*alto_pantalla
-        global minx
-        minx = [ancho_pantalla]*alto_pantalla
-        dibujar_linea(x1,y1,x2,y2,funcion_scan)
-        dibujar_linea(x2,y2,x3,y3,funcion_scan)
-        dibujar_linea(x1,y1,x3,y3,funcion_scan)
-        for y in range (0,alto_pantalla):
-            if maxx[y] != -1:
-                dibujar_linea(minx[y],y,maxx[y],y,put_pixel)
-
-
-    def funcion_scan(x,y):
-        x, y = int(round(x)),int(round(y))
-        if x > maxx[y]:
-            maxx[y] = x
-        if x < minx[y]:
-            minx[y] = x
-
-
+    return result
+       
 
 
 app = wx.App()
