@@ -9,6 +9,7 @@ class GenericWindow(wx.Frame):
     def __init__(self, id, title, size, type):
         wx.Frame.__init__(self, None, id, title, size)
 
+        self.__mysize = size
         #self.draw = draw_function
         self.type = type
        
@@ -16,6 +17,8 @@ class GenericWindow(wx.Frame):
         width = size[0]
         height = size[1]
         self.__buff = [[(255,255,255)]*height]*width
+
+        self.__drawing_generator = self.draw(self.add_to_buffer)
 
         # el metodo on_paint se encargara de repintar
         self.Bind(wx.EVT_PAINT, self.on_paint)
@@ -25,7 +28,7 @@ class GenericWindow(wx.Frame):
 
     def on_paint(self, event):
 
-        size = self.GetSize().Get()
+        size = self.__mysize
         # creo una imagen de PIL, en blanco
         im = Image.new('RGB', size, (255, 255, 255))
 
@@ -33,10 +36,8 @@ class GenericWindow(wx.Frame):
         self.__buff = im.load()
 
         # escribo en sus pixels, segun la funcion de dibujado
-        print self.draw
-        self.draw(self.add_to_buffer)
+        self.__drawing_generator.next()
 
-        print "wow"
         # me genero un bitmap a partir de la imagen creada
         bmp = convert.pilToBitmap(im)
 
@@ -48,8 +49,10 @@ class GenericWindow(wx.Frame):
             self.Refresh()
 
     def add_to_buffer(self, x, y):
-        print x, y
         self.__buff[x, y] = (0, 0, 0)
+
+    def draw(self, x, y):
+        yield
  
     
 

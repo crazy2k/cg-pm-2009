@@ -6,10 +6,10 @@ def draw_segment(endpoint1, endpoint2, putpixel):
     como extremos del segmento. Utiliza la funcion putpixel(x, y) para
     dibujar los puntos."""
 
-    x1 = endpoint1(0)
-    y1 = endpoint1(1)
-    x2 = endpoint2(0)
-    y2 = endpoint2(1)
+    x1 = endpoint1[0]
+    y1 = endpoint1[1]
+    x2 = endpoint2[0]
+    y2 = endpoint2[1]
 
     # si la pendiente tiene modulo mayor que 1, lo que vamos a hacer es
     # calcular la ubicacion para los puntos reflejados del otro lado de la

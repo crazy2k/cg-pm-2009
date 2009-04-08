@@ -2,7 +2,9 @@ import wx
 from windows import GenericWindow
 
 import random
-import scenes
+from scenes import CompositeScene, Triangle
+
+import time
 
 class OurWindow(GenericWindow):
     def __init__(self, size):
@@ -10,7 +12,6 @@ class OurWindow(GenericWindow):
             GenericWindow.AUTO_REFRESHING)
 
     def draw(self, putpixel):
-        print "llega"
         x, y = 0, 0
 
         r, g, b = 0, 0, 0
@@ -51,12 +52,11 @@ class OurWindow(GenericWindow):
 
             tr.colour = (r, g, b)
             move = lambda vertex, offsets: (vertex[0] + offsets[0], vertex[1] + offsets[1])
-            tr.vertex1 = move(tr.vertex1, (x, y))
-            tr.vertex2 = move(tr.vertex2, (x, y))
-            tr.vertex3 = move(tr.vertex3, (x, y))
+            tr.vertex1 = move(tr.vertex1, (dx, dy))
+            tr.vertex2 = move(tr.vertex2, (dx, dy))
+            tr.vertex3 = move(tr.vertex3, (dx, dy))
 
             scene.draw(putpixel)
-            print "Ahh!"
 
             yield
 
@@ -73,7 +73,6 @@ class OurWindow(GenericWindow):
                 dy = -1
                 print time.time()
 
-            x = x + dx
 
 if __name__ == "__main__":
     app = wx.App()
