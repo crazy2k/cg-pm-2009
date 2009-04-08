@@ -6,7 +6,7 @@ class CompositeScene:
         self.__children = []
 
     def draw(self, putpixel):
-        for s in __children:
+        for s in self.__children:
             s.draw(putpixel)
 
     def add_child(self, child):
