@@ -7,7 +7,7 @@ class GenericWindow(wx.Frame):
     AUTO_REFRESHING = 0
 
     def __init__(self, id, title, size, type):
-        wx.Frame.__init__(self, None, id, title, size)
+        wx.Frame.__init__(self, None, id, title, size = size)
 
         self.__mysize = size
         #self.draw = draw_function
@@ -28,7 +28,7 @@ class GenericWindow(wx.Frame):
 
     def on_paint(self, event):
 
-        size = self.__mysize
+        size = self.GetSize().Get()
         # creo una imagen de PIL, en blanco
         im = Image.new('RGB', size, (255, 255, 255))
 
