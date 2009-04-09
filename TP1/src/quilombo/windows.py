@@ -9,8 +9,6 @@ class GenericWindow(wx.Frame):
     def __init__(self, id, title, size, type):
         wx.Frame.__init__(self, None, id, title, size = size)
 
-        self.__mysize = size
-        #self.draw = draw_function
         self.type = type
        
         # realizaremos double buffering
@@ -22,6 +20,11 @@ class GenericWindow(wx.Frame):
 
         # el metodo on_paint se encargara de repintar
         self.Bind(wx.EVT_PAINT, self.on_paint)
+
+        if self.type == self.AUTO_REFRESHING:
+            self.timer = wx.Timer(self, id=1)
+            self.timer.Start(1)
+            self.Bind(wx.EVT_TIMER, self.on_paint, id=1)
 
         self.Centre()
         self.Show(True)
@@ -45,8 +48,6 @@ class GenericWindow(wx.Frame):
         pdc = wx.PaintDC(self)
         pdc.DrawBitmap(bmp, 0, 0)
 
-        if self.type == self.AUTO_REFRESHING:
-            self.Refresh()
 
     def add_to_buffer(self, x, y):
         self.__buff[x, y] = (0, 0, 0)
