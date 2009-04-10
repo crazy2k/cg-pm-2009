@@ -7,9 +7,24 @@ class Scene:
     def transform(self, transformation):
         raise NotImplementedError
 
+    def get_colour(self):
+        return self.colour
+
+    def set_colour(self, colour):
+        self.colour = colour
+
 class CompositeScene(Scene):
+    
     def __init__(self):
         self.__children = []
+        # si el color es None, entonces el color dependera de las
+        # escenas children
+        self.colour = None
+
+    def set_colour(self, colour):
+        Scene.set_colour(self, colour)
+        for s in self.__children:
+            s.colour = colour
 
     def add_child(self, child):
         self.__children.append(child)
@@ -27,24 +42,25 @@ class LineSegment(Scene):
     def __init__(self, endpoint1, endpoint2):
         self.endpoint1 = endpoint1
         self.endpoint2 = endpoint2
+        self.colour = (0, 0, 0)
+        
 
     def draw(self, putpixel):
         endpoint1 = self.endpoint1
         endpoint2 = self.endpoint2
 
-        draw_segment(endpoint1, endpoint2, putpixel)
+        draw_segment(endpoint1, endpoint2, putpixel, self.colour)
 
     def transform(self, transformation):
         self.endpoint1 = transformed_point(self.endpoint1, transformation)
         self.endpoint2 = transformed_point(self.endpoint2, transformation)
 
 class Triangle(Scene):
-    def __init__(self, vertex1, vertex2, vertex3):
+    def __init__(self, vertex1, vertex2, vertex3, colour = (0, 0, 0)):
         self.vertex1 = vertex1
         self.vertex2 = vertex2
         self.vertex3 = vertex3
-
-        self.colour = (0, 0, 0)
+        self.colour = colour
 
     def draw(self, putpixel):
         algorithm = TriangleScanAlgorithm()
