@@ -14,9 +14,7 @@ class GenericWindow(wx.Frame):
         # realizaremos double buffering
         width = size[0]
         height = size[1]
-        self.__buff = [[(255,255,255)]*height]*width
-
-        self.__drawing_generator = self.draw(self.add_to_buffer)
+        #self.__buff = [[(255,255,255)]*height]*width
 
         # el metodo on_paint se encargara de repintar
         self.Bind(wx.EVT_PAINT, self.on_paint)
@@ -39,7 +37,7 @@ class GenericWindow(wx.Frame):
         self.__buff = im.load()
 
         # escribo en sus pixels, segun la funcion de dibujado
-        self.__drawing_generator.next()
+        self.draw(self.add_to_buffer)
 
         # me genero un bitmap a partir de la imagen creada
         bmp = convert.pilToBitmap(im)
@@ -49,12 +47,8 @@ class GenericWindow(wx.Frame):
         pdc.DrawBitmap(bmp, 0, 0)
 
 
-    def add_to_buffer(self, x, y):
-        self.__buff[x, y] = (0, 0, 0)
+    def add_to_buffer(self, x, y, colour = (0, 0, 0)):
+        self.__buff[x, y] = colour
 
     def draw(self, x, y):
-        yield
- 
-    
-
-
+        raise NotImplementedError
