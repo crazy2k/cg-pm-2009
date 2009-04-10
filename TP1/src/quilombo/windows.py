@@ -21,7 +21,7 @@ class GenericWindow(wx.Frame):
 
         if self.type == self.AUTO_REFRESHING:
             self.timer = wx.Timer(self, id=1)
-            self.timer.Start(1)
+            self.timer.Start(50)
             self.Bind(wx.EVT_TIMER, self.on_paint, id=1)
 
         self.Centre()

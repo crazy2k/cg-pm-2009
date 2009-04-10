@@ -11,6 +11,6 @@ def transformed_point(point, transformation):
     return result[:2]
 
 def multiply_vectors(v1, v2):
-     return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2] 
+     return int(round(v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2])) 
 
 
