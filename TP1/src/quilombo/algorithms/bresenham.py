@@ -1,6 +1,6 @@
 
 
-def draw_segment(endpoint1, endpoint2, putpixel):
+def draw_segment(endpoint1, endpoint2, putpixel, colour):
     """Dibuja en el plano el segmento de una recta que pasa por los puntos
     endpoint1 y endpoint2, usando el algoritmo de Bresenham. Usa dichos puntos
     como extremos del segmento. Utiliza la funcion putpixel(x, y) para
@@ -49,9 +49,9 @@ def draw_segment(endpoint1, endpoint2, putpixel):
     for x in range(x1, x2 + 1):
 
         if steep:
-            putpixel(y,x)
+            putpixel(y, x, colour)
         else:
-            putpixel(x,y)
+            putpixel(x, y, colour)
 
         # elijo el punto en la diagonal
         if e > 0:

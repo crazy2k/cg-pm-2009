@@ -17,9 +17,9 @@ class OurWindow(GenericWindow):
         self.__g = 0
         self.__b = 0
 
-        self.__dr = 0
-        self.__dg = 0
-        self.__db = 0
+        self.__dr = 1
+        self.__dg = -1
+        self.__db = 1
 
         self.__tr = Triangle((200, 300), (250, 200), (300, 300))
         self.__t = [[1, 0, 1], [0, 1, -1], [0, 0, 1]]
@@ -30,10 +30,7 @@ class OurWindow(GenericWindow):
 
         t = self.__t
 
-        self.__dr = 1
-        self.__dg = -1
-        self.__db = 1
-
+        
         scene = CompositeScene()
 
         scene.add_child(tr)
@@ -60,6 +57,7 @@ class OurWindow(GenericWindow):
         elif v == 2:
             self.__b = self.__b + self.__db
 
+        
         tr.colour = (self.__r, self.__g, self.__b)
         tr.transform(self.__t)
 

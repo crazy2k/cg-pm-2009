@@ -4,7 +4,7 @@ class TriangleScanAlgorithm:
         self.__maxx = 0
         self.__maxy = 0
 
-    def scan(self, vertex1, vertex2, vertex3, draw_segment, putpixel):
+    def scan(self, vertex1, vertex2, vertex3, draw_segment, putpixel, colour):
         x1 = vertex1[0]
         y1 = vertex1[1]
         x2 = vertex2[0]
@@ -18,16 +18,17 @@ class TriangleScanAlgorithm:
         self.__maxx = [-1]*fig_maxheight
         self.__minx = [fig_maxwidth]*fig_maxheight
 
-        draw_segment((x1, y1), (x2, y2), self.__max_setter)
-        draw_segment((x2, y2), (x3, y3), self.__max_setter)
-        draw_segment((x1, y1), (x3, y3), self.__max_setter)
+        draw_segment((x1, y1), (x2, y2), self.__max_setter, None)
+        draw_segment((x2, y2), (x3, y3), self.__max_setter, None)
+        draw_segment((x1, y1), (x3, y3), self.__max_setter, None)
 
         for y in range(fig_maxheight):
             if self.__maxx[y] != -1:
-                draw_segment((self.__minx[y], y), (self.__maxx[y], y), putpixel)
+                draw_segment((self.__minx[y], y), (self.__maxx[y], y),
+                    putpixel, colour)
 
 
-    def __max_setter(self, x,y):
+    def __max_setter(self, x, y, colour = None):
         if x > self.__maxx[y]:
             self.__maxx[y] = x
         if x < self.__minx[y]:
