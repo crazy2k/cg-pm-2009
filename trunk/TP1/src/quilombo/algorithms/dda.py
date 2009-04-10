@@ -1,4 +1,4 @@
-def draw_segment(endpoint1, endpoint2, putpixel):
+def draw_segment(endpoint1, endpoint2, putpixel, colour):
     """Dibuja en el plano el segmento de una recta que pasa por los puntos
     endpoint1 y endpoint2, usando el algoritmo de DDA. Usa dichos puntos
     como extremos del segmento. Utiliza la funcion putpixel(x, y) para
@@ -17,7 +17,7 @@ def draw_segment(endpoint1, endpoint2, putpixel):
             y1, y2 = y2, y1
 
         for y in range(y1, y2 + 1):
-            putpixel(x1, y)
+            putpixel(x1, y, colour)
 
         return
 
@@ -34,7 +34,7 @@ def draw_segment(endpoint1, endpoint2, putpixel):
     y = y1
 
     for x in range(x1, x2 -1):
-        putpixel(x, round(y))
+        putpixel(x, round(y), colour)
 
         y = y + m
 

@@ -50,7 +50,7 @@ class Triangle(Scene):
         algorithm = TriangleScanAlgorithm()
 
         algorithm.scan(self.vertex1, self.vertex2, self.vertex3,
-            draw_segment, putpixel)
+            draw_segment, putpixel, self.colour)
 
     def transform(self, transformation):
         self.vertex1 = transformed_point(self.vertex1, transformation)
