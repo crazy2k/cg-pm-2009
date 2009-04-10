@@ -4,6 +4,8 @@ from windows import GenericWindow
 import random
 from scenes import CompositeScene, Triangle
 
+from utils import transformations
+
 import time
 
 class OurWindow(GenericWindow):
@@ -11,67 +13,70 @@ class OurWindow(GenericWindow):
         GenericWindow.__init__(self, 0, "Nuestra escena", size,
             GenericWindow.AUTO_REFRESHING)
 
+        self.__r = 0
+        self.__g = 0
+        self.__b = 0
+
+        self.__dr = 0
+        self.__dg = 0
+        self.__db = 0
+
+        self.__tr = Triangle((200, 300), (250, 200), (300, 300))
+        self.__t = [[1, 0, 1], [0, 1, -1], [0, 0, 1]]
+
     def draw(self, putpixel):
-        x, y = 0, 0
 
-        r, g, b = 0, 0, 0
+        tr = self.__tr
 
-        dx = 1
-        dy = -1
+        t = self.__t
 
-        dr = 1
-        dg = -1
-        db = 1
+        self.__dr = 1
+        self.__dg = -1
+        self.__db = 1
 
         scene = CompositeScene()
-        tr = Triangle((200, 300), (250, 200), (300, 300))
+
         scene.add_child(tr)
 
-        while True:
-            if r == 255:
-                dr = -1
-            if g == 255:
-                dg = -1
-            if b == 255:
-                db = -1
+        if self.__r == 255:
+            self.__dr = -1
+        if self.__g == 255:
+            self.__dg = -1
+        if self.__b == 255:
+            self.__db = -1
 
-            if r == 0:
-                dr = 1
-            if g == 0:
-                dg = 1
-            if b == 0:
-                db = 1
+        if self.__r == 0:
+            self.__dr = 1
+        if self.__g == 0:
+            self.__dg = 1
+        if self.__b == 0:
+            self.__db = 1
 
-            v = random.randint(0, 2)
-            if v == 0:
-                r = r + dr
-            elif v == 1:
-                g = g + dg
-            elif v == 2:
-                b = b + db
+        v = random.randint(0, 2)
+        if v == 0:
+            self.__r = self.__r + self.__dr
+        elif v == 1:
+            self.__g = self.__g + self.__dg
+        elif v == 2:
+            self.__b = self.__b + self.__db
 
-            tr.colour = (r, g, b)
-            move = lambda vertex, offsets: (vertex[0] + offsets[0], vertex[1] + offsets[1])
-            tr.vertex1 = move(tr.vertex1, (dx, dy))
-            tr.vertex2 = move(tr.vertex2, (dx, dy))
-            tr.vertex3 = move(tr.vertex3, (dx, dy))
+        tr.colour = (self.__r, self.__g, self.__b)
+        tr.transform(self.__t)
 
-            scene.draw(putpixel)
+        if tr.vertex2[1] == 0:
+            self.__t[1] = [0, 1, 1]
+            print time.time()
+        if tr.vertex3[0] == self.GetSize().Get()[0] - 1:
+            self.__t[0] = [1, 0, -1]
+            print time.time()
+        if tr.vertex1[0] == 0:
+            self.__t[0] = [1, 0, 1]
+            print time.time()
+        if tr.vertex3[1] == self.GetSize().Get()[1] - 1:
+            self.__t[1] = [0, 1, -1]
+            print time.time()
 
-            yield
-
-            if tr.vertex2[1] == 0:
-                dy = 1
-                print time.time()
-            if tr.vertex3[0] == 499:
-                dx = -1
-                print time.time()
-            if tr.vertex1[0] == 0:
-                dx = 1
-                print time.time()
-            if tr.vertex3[1] == 599:
-                dy = -1
-                print time.time()
+        scene.draw(putpixel)
 
 
 if __name__ == "__main__":

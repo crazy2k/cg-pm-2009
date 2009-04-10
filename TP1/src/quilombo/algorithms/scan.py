@@ -28,9 +28,6 @@ class TriangleScanAlgorithm:
 
 
     def __max_setter(self, x,y):
-        x = int(round(x))
-        y = int(round(y))
-
         if x > self.__maxx[y]:
             self.__maxx[y] = x
         if x < self.__minx[y]:
