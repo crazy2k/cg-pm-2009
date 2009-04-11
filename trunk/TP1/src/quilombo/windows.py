@@ -21,11 +21,22 @@ class GenericWindow(wx.Frame):
 
         if self.type == self.AUTO_REFRESHING:
             self.timer = wx.Timer(self, id=1)
-            self.timer.Start(50)
+            self.timer.Start(1)
             self.Bind(wx.EVT_TIMER, self.on_paint, id=1)
+
+        self.Bind(wx.EVT_CLOSE, self.on_close, id=1)
+
+
 
         self.Centre()
         self.Show(True)
+
+    def on_close(self, event):
+        if self.type == self.AUTO_REFRESHING:
+            self.timer.Stop()
+        self.Destroy()
+
+
 
     def on_paint(self, event):
 
@@ -48,6 +59,10 @@ class GenericWindow(wx.Frame):
 
 
     def add_to_buffer(self, x, y, colour = (0, 0, 0)):
+        size = self.GetSize().Get()
+        #print size
+        x = x % size[0]
+        y = y % size[1]
         self.__buff[x, y] = colour
 
     def draw(self, x, y):
