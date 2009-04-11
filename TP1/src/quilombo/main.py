@@ -10,10 +10,14 @@ import time
 import copy
 
 class SnowWindow(GenericWindow):
+
+    BALLS = 30
+    
     def __init__(self, size):
         GenericWindow.__init__(self, 0, "Nieve", size,
             GenericWindow.AUTO_REFRESHING)
             
+        # creacion de la bola
         self.__ball = CompositeScene()
         
         small_ball = CompositeScene()
@@ -36,50 +40,63 @@ class SnowWindow(GenericWindow):
         self.__ball.add_child(big_ball)
         self.__ball.add_child(small_ball)
         
-        #balls = []
-        #for x in range(20):
-        #    balls.append(copy.deepcopy(self.__ball))
-        
-        #t_pos = [[1, 0, 30], [0, 1, 0], [0, 0, 1]]
-        #self.scene = CompositeScene()
-        #for b in balls:
-        #    t_pos[0][2] = t_pos[0][2] + 30
-        #    b.transform(t_pos)
-        #    self.scene.add_child(b)
+        # fin
+
+        self.__yes = [random.randint(0, 500) for x in range(self.BALLS)]
         
         self.__t_down = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
         
-        self.__p = 0  
-        self.__a = 0     
+        self.__history = [transformations.IDENTITY]*self.BALLS
+        #print transformations.IDENTITY
+        #print self.__history
+        
+        self.__p = 0       
         self.__y = 0
+        self.__a = 0
 
     def draw(self, putpixel):
-        
-        t_rotate = [[0.866025404, 0.5, 0], [-0.5, 0.866025404, 0], [0, 0, 1]]
+        t_rotate = [[0.866025403784439, 0.5, 0], [-0.5, 0.866025403784439, 0], [0, 0, 1]]
         self.__ball.transform(t_rotate)
         ball = copy.deepcopy(self.__ball)
-        t_bigger = [[3, 0, 0], [0, 3, 0], [0, 0, 1]]
-        ball.transform(t_bigger)
         t_move = [[1, 0, 80], [0, 1, 80], [0, 0, 1]]
         ball.transform(t_move)
         self.__t_down = [[1, 0, 0], [0, 1, self.__y], [0, 0, 1]] 
         ball.transform(self.__t_down)
         
-        if True: #self.__p == 0:
-            #self.__a = (self.__a + 1) % 5
+        balls = []
+        for x in range(self.BALLS):
+            balls.append(copy.deepcopy(ball))
+        
+        t_pos = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+        self.scene = CompositeScene()
+        i = 0
+        for b in balls:
+            b.transform(t_pos)
+
+            t_pos[0][2] = t_pos[0][2] + 35
+            t_pos[1][2] = self.__yes[i]
+            
             if self.__a == 0:
                 r = random.randint(0,1)
                 if r == 0:
-                    self.__t_dance = [[1, 0, 1], [0, 1, 0], [0, 0, 1]]
+                    t_dance = [[1, 0, 1], [0, 1, 0], [0, 0, 1]]
                 else:
-                    self.__t_dance = [[1, 0, -1], [0, 1, 0], [0, 0, 1]]
+                    t_dance = [[1, 0, -1], [0, 1, 0], [0, 0, 1]]
             else:           
-                self.__t_dance = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-
-        ball.transform(self.__t_dance)
-        self.__p = (self.__p + 1) % 50
-        
-        ball.draw(putpixel)
+                 t_dance = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+                 
+            self.__history[i] = transformations.multiply_matrices(t_dance,
+                self.__history[i])
+                
+            b.transform(self.__history[i])
+            self.__p = (self.__p + 1) % 50
+            self.scene.add_child(b)
+            i = i + 1
+        scene_big_balls = copy.deepcopy(self.scene)
+        t_bigger = [[2, 0, 0], [0, 2, 0], [0, 0, 1]]
+        scene_big_balls.transform(t_bigger)
+        self.scene.add_child(scene_big_balls)
+        self.scene.draw(putpixel)
         self.__y = self.__y + 1
         
 class OurWindow(GenericWindow):
@@ -154,5 +171,5 @@ class OurWindow(GenericWindow):
 if __name__ == "__main__":
     app = wx.App()
     #OurWindow((500, 600))
-    SnowWindow((800, 600))
+    SnowWindow((500, 300))
     app.MainLoop()
