@@ -8,6 +8,20 @@ from utils import transformations
 
 import time
 import copy
+from algorithms import scan
+from algorithms import bresenham
+
+class PolygonWindow(GenericWindow):
+    
+    def __init__(self, size):
+        GenericWindow.__init__(self, 0, "Poligono", size,
+            GenericWindow.AUTO_REFRESHING)
+    
+    def draw(self, putpixel):
+        algorithm = scan.TriangleScanAlgorithm()
+        algorithm.scan([(10,10), (100,50), (120,70), (120,100)], bresenham.draw_segment, putpixel, (0, 0, 0))
+        
+
 
 class SnowWindow(GenericWindow):
 
@@ -171,5 +185,6 @@ class OurWindow(GenericWindow):
 if __name__ == "__main__":
     app = wx.App()
     #OurWindow((500, 600))
-    SnowWindow((500, 300))
+    #SnowWindow((500, 300))
+    PolygonWindow((800, 600))
     app.MainLoop()
