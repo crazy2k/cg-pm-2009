@@ -80,5 +80,9 @@ class Polygon(Scene):
 
     def draw(self, putpixel):
         algorithm = PolygonScanAlgorithm()
-        algorithm.scan(vertices, draw_segment, putpixel, self.colour)
+        algorithm.scan(self.vertices, draw_segment, putpixel, self.colour)
 
+    def transform(self, transformation):
+        for i in range(len(self.vertices)):
+            self.vertices[i] = transformed_point(self.vertices[i],
+                transformation)
