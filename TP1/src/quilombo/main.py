@@ -16,6 +16,20 @@ class SnowWindow(GenericWindow):
     # frame a partir del cual se comienza a mostrar el poligono que se
     # recorta
     POLYGON_START_AT = 10
+    
+    def __init__(self, size):
+        GenericWindow.__init__(self, 0, "Nieve", size,
+            GenericWindow.AUTO_REFRESHING)
+
+        self.__ball = CompositeScene()
+        
+        small_ball = self.__create_small_ball()
+        big_ball = self.__create_big_ball(small_ball)
+
+        self.__ball.add_child(big_ball)
+        self.__ball.add_child(small_ball)
+        
+        self.__initialize_variables()
 
     def __create_small_ball(self):
         small_ball = CompositeScene()
@@ -39,26 +53,8 @@ class SnowWindow(GenericWindow):
         t_bigger = [[2, 0, 0], [0, 2, 0], [0, 0, 1]]
         big_ball.transform(t_bigger)
         return big_ball
-
-    
-    def __init__(self, size):
-        GenericWindow.__init__(self, 0, "Nieve", size,
-            GenericWindow.AUTO_REFRESHING)
-            
-        # creacion de la bola/estrella compuesta (la que se ve cayendo por
-        # toda la pantalla); consta de dos bolas/estrellas: una chica, y una
-        # grande
-        self.__ball = CompositeScene()
         
-        small_ball = self.__create_small_ball()
-        big_ball = self.__create_big_ball(small_ball)
-
-        # ambas bolas forman la bola compuesta
-        self.__ball.add_child(big_ball)
-        self.__ball.add_child(small_ball)
-        
-
-        # valores de y en los que se ubicaran las bolas
+    def __initialize_variables(self):
         self.__yes = [random.randint(0, 500) for x in range(self.BALLS)]
         
         self.__t_down = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
@@ -77,26 +73,39 @@ class SnowWindow(GenericWindow):
         self.__pdg = -2
         self.__pdb = -1
 
-        self.__clip_height = 65
-
+        self.__clip = 80
+        self.__h = 0
 
         self.__frames = 1
 
     def draw(self, putpixel):
-        t_rotate = [[0.866025403784439, 0.5, 0], [-0.5, 0.866025403784439, 0], [0, 0, 1]]
+        self.__prepare_winter_scene()
+        self.__prepare_clipping_scene()        
+        self.__scene.draw(putpixel)
+
+    def __prepare_winter_scene(self):
+        ball = self.__rotate_original_ball()
+        self.__multiply_and_dance_original_ball(ball)
+        self.__add_bigger_balls()
+
+    def __rotate_original_ball(self):
+        t_rotate = [[0.866025403784439, 0.5, 0], [-0.5, 0.866025403784439, 0],
+            [0, 0, 1]]
         self.__ball.transform(t_rotate)
         ball = copy.deepcopy(self.__ball)
         t_move = [[1, 0, 80], [0, 1, 80], [0, 0, 1]]
         ball.transform(t_move)
         self.__t_down = [[1, 0, 0], [0, 1, self.__y], [0, 0, 1]] 
         ball.transform(self.__t_down)
-        
+        return ball
+
+    def __multiply_and_dance_original_ball(self, ball):
         balls = []
         for x in range(self.BALLS):
             balls.append(copy.deepcopy(ball))
         
         t_pos = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-        self.scene = CompositeScene()
+        self.__scene = CompositeScene()
         i = 0
         for b in balls:
             b.transform(t_pos)
@@ -118,52 +127,66 @@ class SnowWindow(GenericWindow):
                 
             b.transform(self.__history[i])
             self.__p = (self.__p + 1) % 50
-            self.scene.add_child(b)
+            self.__scene.add_child(b)
             i = i + 1
-        scene_big_balls = copy.deepcopy(self.scene)
+        self.__y = self.__y + 1
+        
+    def __add_bigger_balls(self):
+        scene_big_balls = copy.deepcopy(self.__scene)
         t_bigger = [[2, 0, 0], [0, 2, 0], [0, 0, 1]]
         scene_big_balls.transform(t_bigger)
-        self.scene.add_child(scene_big_balls)
+        self.__scene.add_child(scene_big_balls)
 
+    def __prepare_clipping_scene(self):
         if self.__frames > self.POLYGON_START_AT:
-            pol_colour = (self.__pr, self.__pg, self.__pb)
-
-            self.__polv = [(-2, -1), (-0.75, -1), (0, -2), (0.75, -1),
-                (2, -1), (1.25, 0), (2, 1), (0.75, 1), (0, 2), (-0.75, 1),
-                (-2, 1), (-1.25, 0)]
-            pol = Polygon(self.__polv, pol_colour)
-
-            t_bigger = [[20, 0, 0], [0, 20, 0], [0, 0, 1]]
-            pol.transform(t_bigger)
-
-            size = self.GetSize().Get()
-            t_move = [[1, 0, size[0]/2], [0, 1, size[1]/2], [0, 0, 1]]
-            pol.transform(t_move)
-
-            self.scene.add_child(pol)
+            star = self.__prepare_star()
 
             if self.__pb > 200:
-                self.__pr = self.__pr + self.__pdr
-                self.__pg = self.__pg + self.__pdg
-                self.__pb = self.__pb + self.__pdb
+                self.__change_star_color()
 
-            elif self.__clip_height > 0:
-                pol.vertices = clipping.clip(clipping.ViewPort((210, 110), 200,
-                    self.__clip_height), self.__polv)
-                self.__clip_height = self.__clip_height - 1
-
-                if self.__clip_height == 1:
-                    self.__pr = 255
-                    self.__pg = 255
-                    self.__pb = 255
-                    self.__clip_height = 65
-
-        self.scene.draw(putpixel)
-
-        self.__y = self.__y + 1
-        self.__frames = self.__frames + 1
+            elif self.__clip > 0:
+                self.__clip_star(star)
         
+        self.__frames = self.__frames + 1
+    
+    def __prepare_star(self):
+        pol_colour = (self.__pr, self.__pg, self.__pb)
 
+        self.__polv = [(-2, -1), (-0.75, -1), (0, -2), (0.75, -1),
+            (2, -1), (1.25, 0), (2, 1), (0.75, 1), (0, 2), (-0.75, 1),
+            (-2, 1), (-1.25, 0)]
+        pol = Polygon(self.__polv, pol_colour)
+
+        t_bigger = [[20, 0, 0], [0, 20, 0], [0, 0, 1]]
+        pol.transform(t_bigger)
+
+        size = self.GetSize().Get()
+        t_move = [[1, 0, size[0]/2], [0, 1, size[1]/2], [0, 0, 1]]
+        pol.transform(t_move)
+
+        self.__scene.add_child(pol)
+        return pol
+            
+    def __change_star_color(self):
+        self.__pr = self.__pr + self.__pdr
+        self.__pg = self.__pg + self.__pdg
+        self.__pb = self.__pb + self.__pdb
+    
+    def __clip_star(self, pol):
+        vp = clipping.ViewPort((210 + self.__h, 110 + self.__h), self.__clip,
+            self.__clip)
+        pol.vertices = clipping.clip(vp, self.__polv)
+        
+        self.__clip = self.__clip - 2
+        self.__h = self.__h + 1
+
+        if self.__clip == 2:
+            self.__pr = 255
+            self.__pg = 255
+            self.__pb = 255
+            self.__clip = 80
+            self.__h = 0
+            
 if __name__ == "__main__":
     app = wx.App()
     SnowWindow((500, 300))
