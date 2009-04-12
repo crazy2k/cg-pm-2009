@@ -5,6 +5,11 @@ def dibujar_segmento(x1, y1, x2, y2, putpixel):
     (x1, y1) y (x2, y2), usando el algoritmo de Bresenham. Usa dichos puntos
     como extremos del segmento. Utiliza la funcion putpixel(x, y) para
     dibujar los puntos."""
+    
+    l = [x1, y1, x2, y2]
+    for i in l:
+        if not isinstance(i, int):
+            raise Exception('Los puntos deben ser enteros.')
 
     # si la pendiente tiene modulo mayor que 1, lo que vamos a hacer es
     # calcular la ubicacion para los puntos reflejados del otro lado de la

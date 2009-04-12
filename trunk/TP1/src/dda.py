@@ -5,6 +5,11 @@ def dibujar_segmento(x1, y1, x2, y2, putpixel):
     (x1, y1) y (x2, y2), usando el algoritmo de DDA. Usa dichos puntos
     como extremos del segmento. Utiliza la funcion putpixel(x, y) para
     dibujar los puntos."""
+    
+    l = [x1, y1, x2, y2]
+    for i in l:
+        if not isinstance(i, int):
+            raise Exception('Los puntos deben ser enteros.')
 
     # tratamos el caso de las lineas verticales aparte
     if x1 == x2:
@@ -18,15 +23,14 @@ def dibujar_segmento(x1, y1, x2, y2, putpixel):
 
         return
 
-
     if x1 > x2:
         x1, x2 = x2, x1
         y1, y2 = y2, y1
 
     dx = x2 - x1
     dy = y2 - y1
-
-    m = float((y2 - y1))/(x2 - x1)
+    
+    m = float(dy)/dx
 
     y = y1
 

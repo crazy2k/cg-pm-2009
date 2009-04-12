@@ -11,6 +11,8 @@ import copy
 from algorithms import scan
 from algorithms import bresenham
 
+import clipping
+
 class PolygonWindow(GenericWindow):
     
     def __init__(self, size):
@@ -18,8 +20,10 @@ class PolygonWindow(GenericWindow):
             GenericWindow.AUTO_REFRESHING)
     
     def draw(self, putpixel):
-        algorithm = scan.TriangleScanAlgorithm()
+        algorithm = scan.PolygonScanAlgorithm()
         algorithm.scan([(10,10), (100,50), (120,70), (120,100)], bresenham.draw_segment, putpixel, (0, 0, 0))
+        
+        clipping.clip(clipping.ViewPort((10,10), 20, 20), [(10,10), (100,50), (120,70), (120,100)])
         
 
 
