@@ -1,5 +1,5 @@
 from algorithms.bresenham import draw_segment
-from algorithms.scan import TriangleScanAlgorithm
+from algorithms.scan import PolygonScanAlgorithm
 from utils.transformations import transformed_point
 
 class Scene:
@@ -63,9 +63,9 @@ class Triangle(Scene):
         self.colour = colour
 
     def draw(self, putpixel):
-        algorithm = TriangleScanAlgorithm()
+        algorithm = PolygonScanAlgorithm()
 
-        algorithm.scan(self.vertex1, self.vertex2, self.vertex3,
+        algorithm.scan([self.vertex1, self.vertex2, self.vertex3],
             draw_segment, putpixel, self.colour)
 
     def transform(self, transformation):

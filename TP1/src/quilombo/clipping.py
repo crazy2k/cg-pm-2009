@@ -1,8 +1,8 @@
 
 class ViewPort:
-    def __init__(self, refpointx, refpointy, width, height):
-        self.refpointx = refpointx
-        self.refpointy = refpointy
+    def __init__(self, refpoint, width, height):
+        self.refpointx = refpoint[0]
+        self.refpointy = refpoint[1]
         self.width = width
         self.height = height
 
@@ -46,6 +46,6 @@ def intersection(px1, py1, px2, py2, px3, py3, px4, py4):
     return (x, y) 
 
 def is_in_viewport(viewport, px, py):
-    return px > refpointx and px < refpointx + width and py > refpointy and \
-        py < refpointy + height
+    return px > viewport.refpointx and px < viewport.refpointx + viewport.width and py > viewport.refpointy and \
+        py < viewport.refpointy + viewport.height
 

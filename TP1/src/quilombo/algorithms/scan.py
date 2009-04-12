@@ -1,4 +1,4 @@
-class TriangleScanAlgorithm:
+class PolygonScanAlgorithm:
 
     def __init__(self):
         self.__maxx = 0
