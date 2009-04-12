@@ -2,7 +2,7 @@ import wx
 from windows import GenericWindow
 
 import random
-from scenes import CompositeScene, Triangle
+from scenes import CompositeScene, Triangle, Polygon
 
 from utils import transformations
 
@@ -31,6 +31,7 @@ class PolygonWindow(GenericWindow):
 class SnowWindow(GenericWindow):
 
     BALLS = 30
+    POLYGON_START_AT = 10
     
     def __init__(self, size):
         GenericWindow.__init__(self, 0, "Nieve", size,
@@ -70,6 +71,17 @@ class SnowWindow(GenericWindow):
         self.__p = 0       
         self.__y = 0
         self.__a = 0
+
+        self.__pr = 255
+        self.__pg = 255
+        self.__pb = 255
+
+        self.__pdr = -2
+        self.__pdg = -2
+        self.__pdb = -1
+
+        self.__clip_height = 65
+
 
         self.__frames = 1
 
@@ -116,8 +128,41 @@ class SnowWindow(GenericWindow):
         scene_big_balls.transform(t_bigger)
         self.scene.add_child(scene_big_balls)
 
-        #if self.__frames > 10:
-           # pol = Polygon([
+        if self.__frames > self.POLYGON_START_AT:
+            pol_colour = (self.__pr, self.__pg, self.__pb)
+
+            self.__polv = [(-2, -1), (-0.75, -1), (0, -2), (0.75, -1),
+                (2, -1), (1.25, 0), (2, 1), (0.75, 1), (0, 2), (-0.75, 1),
+                (-2, 1), (-1.25, 0)]
+            pol = Polygon(self.__polv, pol_colour)
+
+            t_bigger = [[20, 0, 0], [0, 20, 0], [0, 0, 1]]
+            pol.transform(t_bigger)
+
+            size = self.GetSize().Get()
+            t_move = [[1, 0, size[0]/2], [0, 1, size[1]/2], [0, 0, 1]]
+            pol.transform(t_move)
+
+            self.scene.add_child(pol)
+
+            if self.__pb > 200:
+                self.__pr = self.__pr + self.__pdr
+                self.__pg = self.__pg + self.__pdg
+                self.__pb = self.__pb + self.__pdb
+
+            elif self.__clip_height > 0:
+                pol.vertices = clipping.clip(clipping.ViewPort((210, 110), 200,
+                    self.__clip_height), self.__polv)
+                self.__clip_height = self.__clip_height - 1
+
+                if self.__clip_height == 1:
+                    self.__pr = 255
+                    self.__pg = 255
+                    self.__pb = 255
+                    self.__clip_height = 65
+
+# [[210, 130], [235, 130], [250, 110], [265, 130], [290, 130], [275, 150], [290, 170], [265, 170], [250, 190], [235, 170], [210, 170], [225, 150]]
+                
 
 
         self.scene.draw(putpixel)
