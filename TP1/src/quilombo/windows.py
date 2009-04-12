@@ -26,8 +26,6 @@ class GenericWindow(wx.Frame):
 
         self.Bind(wx.EVT_CLOSE, self.on_close, id=1)
 
-
-
         self.Centre()
         self.Show(True)
 
@@ -35,7 +33,6 @@ class GenericWindow(wx.Frame):
         if self.type == self.AUTO_REFRESHING:
             self.timer.Stop()
         self.Destroy()
-
 
 
     def on_paint(self, event):

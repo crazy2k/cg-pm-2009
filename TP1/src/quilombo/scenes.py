@@ -72,3 +72,13 @@ class Triangle(Scene):
         self.vertex1 = transformed_point(self.vertex1, transformation)
         self.vertex2 = transformed_point(self.vertex2, transformation)
         self.vertex3 = transformed_point(self.vertex3, transformation)
+
+class Polygon(Scene):
+    def __init__(self, vertices, colour = (0, 0, 0)):
+        self.vertices = vertices
+        self.colour = colour
+
+    def draw(self, putpixel):
+        algorithm = PolygonScanAlgorithm()
+        algorithm.scan(vertices, draw_segment, putpixel, self.colour)
+

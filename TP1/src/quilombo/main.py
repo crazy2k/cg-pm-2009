@@ -21,9 +21,10 @@ class PolygonWindow(GenericWindow):
     
     def draw(self, putpixel):
         algorithm = scan.PolygonScanAlgorithm()
-        algorithm.scan([(10,10), (100,50), (120,70), (120,100)], bresenham.draw_segment, putpixel, (0, 0, 0))
-        
-        clipping.clip(clipping.ViewPort((10,10), 20, 20), [(10,10), (100,50), (120,70), (120,100)])
+        #algorithm.scan([(10,10), (100,50), (120,70), (120,100)], bresenham.draw_segment, putpixel, (0, 0, 0))
+        vertices = [(10,10), (100,50), (120,70), (120,100)]
+        vertices = clipping.clip(clipping.ViewPort((40,30), 40, 20), vertices)
+        algorithm.scan(vertices, bresenham.draw_segment, putpixel, (0, 0, 0))
         
 
 
@@ -65,12 +66,12 @@ class SnowWindow(GenericWindow):
         self.__t_down = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
         
         self.__history = [transformations.IDENTITY]*self.BALLS
-        #print transformations.IDENTITY
-        #print self.__history
         
         self.__p = 0       
         self.__y = 0
         self.__a = 0
+
+        self.__frames = 1
 
     def draw(self, putpixel):
         t_rotate = [[0.866025403784439, 0.5, 0], [-0.5, 0.866025403784439, 0], [0, 0, 1]]
@@ -114,8 +115,15 @@ class SnowWindow(GenericWindow):
         t_bigger = [[2, 0, 0], [0, 2, 0], [0, 0, 1]]
         scene_big_balls.transform(t_bigger)
         self.scene.add_child(scene_big_balls)
+
+        #if self.__frames > 10:
+           # pol = Polygon([
+
+
         self.scene.draw(putpixel)
+
         self.__y = self.__y + 1
+        self.__frames = self.__frames + 1
         
 class OurWindow(GenericWindow):
     def __init__(self, size):
@@ -189,6 +197,6 @@ class OurWindow(GenericWindow):
 if __name__ == "__main__":
     app = wx.App()
     #OurWindow((500, 600))
-    #SnowWindow((500, 300))
-    PolygonWindow((800, 600))
+    SnowWindow((500, 300))
+    #PolygonWindow((800, 600))
     app.MainLoop()
