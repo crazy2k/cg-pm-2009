@@ -1,67 +1,64 @@
 import wx
-from windows import GenericWindow
-
 import random
-from scenes import CompositeScene, Triangle, Polygon
-
-from utils import transformations
-
 import time
 import copy
-from algorithms import scan
-from algorithms import bresenham
 
-import clipping
+from core.windows import GenericWindow
+from core.scenes import CompositeScene, Polygon
 
-class PolygonWindow(GenericWindow):
-    
-    def __init__(self, size):
-        GenericWindow.__init__(self, 0, "Poligono", size,
-            GenericWindow.AUTO_REFRESHING)
-    
-    def draw(self, putpixel):
-        algorithm = scan.PolygonScanAlgorithm()
-        #algorithm.scan([(10,10), (100,50), (120,70), (120,100)], bresenham.draw_segment, putpixel, (0, 0, 0))
-        vertices = [(10,10), (100,50), (120,70), (120,100)]
-        vertices = clipping.clip(clipping.ViewPort((40,30), 40, 20), vertices)
-        algorithm.scan(vertices, bresenham.draw_segment, putpixel, (0, 0, 0))
-        
-
+from utils import transformations
+from algorithms import scan, bresenham, clipping
 
 class SnowWindow(GenericWindow):
 
+    # numero de bolas que tendran movimiento independiente de las demas
     BALLS = 30
+    # frame a partir del cual se comienza a mostrar el poligono que se
+    # recorta
     POLYGON_START_AT = 10
-    
-    def __init__(self, size):
-        GenericWindow.__init__(self, 0, "Nieve", size,
-            GenericWindow.AUTO_REFRESHING)
-            
-        # creacion de la bola
-        self.__ball = CompositeScene()
-        
+
+    def __create_small_ball(self):
         small_ball = CompositeScene()
 
-        tr1 = Triangle((-2, 1), (0, -2), (2, 1))
+        tr1 = Polygon([(-2, 1), (0, -2), (2, 1)])
         small_ball.add_child(tr1)
 
-        tr2 = Triangle((-2, 1), (0, -2), (2, 1))
+        tr2 = Polygon([(-2, 1), (0, -2), (2, 1)])
         t_rotate = [[-1, 0, 0], [0, -1, 0], [0, 0, 1]]
         tr2.transform(t_rotate)
         small_ball.add_child(tr2)
 
         small_ball.set_colour((226, 225, 255))
-        
+
+        return small_ball
+ 
+    def __create_big_ball(self, small_ball):
         big_ball = copy.deepcopy(small_ball)  
         big_ball.set_colour((133, 131, 203))
+
         t_bigger = [[2, 0, 0], [0, 2, 0], [0, 0, 1]]
         big_ball.transform(t_bigger)
+        return big_ball
+
+    
+    def __init__(self, size):
+        GenericWindow.__init__(self, 0, "Nieve", size,
+            GenericWindow.AUTO_REFRESHING)
+            
+        # creacion de la bola/estrella compuesta (la que se ve cayendo por
+        # toda la pantalla); consta de dos bolas/estrellas: una chica, y una
+        # grande
+        self.__ball = CompositeScene()
         
+        small_ball = self.__create_small_ball()
+        big_ball = self.__create_big_ball(small_ball)
+
+        # ambas bolas forman la bola compuesta
         self.__ball.add_child(big_ball)
         self.__ball.add_child(small_ball)
         
-        # fin
 
+        # valores de y en los que se ubicaran las bolas
         self.__yes = [random.randint(0, 500) for x in range(self.BALLS)]
         
         self.__t_down = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
@@ -161,87 +158,13 @@ class SnowWindow(GenericWindow):
                     self.__pb = 255
                     self.__clip_height = 65
 
-# [[210, 130], [235, 130], [250, 110], [265, 130], [290, 130], [275, 150], [290, 170], [265, 170], [250, 190], [235, 170], [210, 170], [225, 150]]
-                
-
-
         self.scene.draw(putpixel)
 
         self.__y = self.__y + 1
         self.__frames = self.__frames + 1
         
-class OurWindow(GenericWindow):
-    def __init__(self, size):
-        GenericWindow.__init__(self, 0, "Nuestra escena", size,
-            GenericWindow.AUTO_REFRESHING)
-
-        self.__r = 0
-        self.__g = 0
-        self.__b = 0
-
-        self.__dr = 1
-        self.__dg = -1
-        self.__db = 1
-
-        self.__tr = Triangle((200, 300), (250, 200), (300, 300))
-        self.__t = [[1, 0, 1], [0, 1, -1], [0, 0, 1]]
-
-    def draw(self, putpixel):
-
-        tr = self.__tr
-
-        t = self.__t
-
-        
-        scene = CompositeScene()
-
-        scene.add_child(tr)
-
-        if self.__r == 255:
-            self.__dr = -1
-        if self.__g == 255:
-            self.__dg = -1
-        if self.__b == 255:
-            self.__db = -1
-
-        if self.__r == 0:
-            self.__dr = 1
-        if self.__g == 0:
-            self.__dg = 1
-        if self.__b == 0:
-            self.__db = 1
-
-        v = random.randint(0, 2)
-        if v == 0:
-            self.__r = self.__r + self.__dr
-        elif v == 1:
-            self.__g = self.__g + self.__dg
-        elif v == 2:
-            self.__b = self.__b + self.__db
-
-        
-        tr.colour = (self.__r, self.__g, self.__b)
-        tr.transform(self.__t)
-
-        if tr.vertex2[1] == 0:
-            self.__t[1] = [0, 1, 1]
-            print time.time()
-        if tr.vertex3[0] == self.GetSize().Get()[0] - 1:
-            self.__t[0] = [1, 0, -1]
-            print time.time()
-        if tr.vertex1[0] == 0:
-            self.__t[0] = [1, 0, 1]
-            print time.time()
-        if tr.vertex3[1] == self.GetSize().Get()[1] - 1:
-            self.__t[1] = [0, 1, -1]
-            print time.time()
-
-        scene.draw(putpixel)
-
 
 if __name__ == "__main__":
     app = wx.App()
-    #OurWindow((500, 600))
     SnowWindow((500, 300))
-    #PolygonWindow((800, 600))
     app.MainLoop()

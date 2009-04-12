@@ -55,24 +55,6 @@ class LineSegment(Scene):
         self.endpoint1 = transformed_point(self.endpoint1, transformation)
         self.endpoint2 = transformed_point(self.endpoint2, transformation)
 
-class Triangle(Scene):
-    def __init__(self, vertex1, vertex2, vertex3, colour = (0, 0, 0)):
-        self.vertex1 = vertex1
-        self.vertex2 = vertex2
-        self.vertex3 = vertex3
-        self.colour = colour
-
-    def draw(self, putpixel):
-        algorithm = PolygonScanAlgorithm()
-
-        algorithm.scan([self.vertex1, self.vertex2, self.vertex3],
-            draw_segment, putpixel, self.colour)
-
-    def transform(self, transformation):
-        self.vertex1 = transformed_point(self.vertex1, transformation)
-        self.vertex2 = transformed_point(self.vertex2, transformation)
-        self.vertex3 = transformed_point(self.vertex3, transformation)
-
 class Polygon(Scene):
     def __init__(self, vertices, colour = (0, 0, 0)):
         self.vertices = vertices
