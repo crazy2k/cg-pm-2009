@@ -57,13 +57,6 @@ class ComparationWindow(GenericWindow):
         seg12.draw(putpixel)
 
 
-
-
-
-
-
-
-
 class SnowWindow(GenericWindow):
 
     # numero de bolas que tendran movimiento independiente de las demas
