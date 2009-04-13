@@ -1,0 +1,60 @@
+Comparación de los algoritmos de DDA y Bresenham para la graficación de rectas
+==============================================================================
+
+Se llevaron a cabo algunas pruebas para comparar los algoritmos. Estas
+se dividen en dos grupos:
+
+* aquellas que buscan comparar la performance, y
+* aquellas que intentan vislumbrar las diferencias estéticas de los segmentos
+  dibujados por los distintos métodos.
+
+Pruebas de performance
+----------------------
+
+Se dibujaron 20 segmentos entre puntos tomados al azar dentro de la
+pantalla utilizando los dos algoritmos. Cada segmento se dibujó 10000
+veces. Se obtuvo el tiempo promedio que le tomó a cada algoritmo
+realizar la tarea.
+
+La prueba antes mencionada se realizó 5 veces y se promediaron los
+resultados. Si bien en dos de las cinco pruebas DDA fue más eficiente,
+el promedio benefició al algoritmo de Bresenham en cuanto a performance.
+
+Los números se detallan a continuación:
+
++-----------+-------------------+---------------+
+| Pruebas   | Bresenham         | DDA           |
++===========+===================+===============+
+| Prueba 1  | 2.17303782701     | 2.17754302025 |
++-----------+-------------------+---------------+
+| Prueba 2  | 2.21748520136     | 2.21691846848 |
++-----------+-------------------+---------------+
+| Prueba 3  | 2.18031002283     | 2.17969208956 |
++-----------+-------------------+---------------+
+| Prueba 4  | 1.6120257616      | 1.61621671915 |
++-----------+-------------------+---------------+
+| Prueba 5  | 2.61618829966     | 2.61921401024 |
++-----------+-------------------+---------------+
+
+
+*Promedio de Bressenham*: 2.15980942249200 s
+
+*Promedio de DDA*:  2.16191686153600 s
+
+Pruebas gráficas
+----------------
+
+Se dibujaron 6 segmentos que se consideraron representativos para mostrar
+las diferencias estéticas entre los segmentos dibujados por los algoritmos
+de Bresenham y DDA.
+
+Se esperaba observar una diferencia a favor de Bresenham en al menos una de
+las rectas dibujadas, pero sin embargo los resultados fueron análogos para
+ambos algoritmos.
+
+Ante esta situación nos preguntamos cuál era la causa de que no se
+encontraran diferencias. Las posibilidades son varias. Puede ser a causa
+de la falta de representatividad de los segmentos elegidos, o quizás la
+implementación de DDA realizada es suficientemente precisa en cuanto a los
+cálculos no permitiendo así que los errores de redondeo afecten el dibujado
+de los segmentos.

@@ -39,10 +39,13 @@ class CompositeScene(Scene):
 
 
 class LineSegment(Scene):
-    def __init__(self, endpoint1, endpoint2):
+    def __init__(self, endpoint1, endpoint2,
+        draw_segment_function = draw_segment, colour = (0, 0, 0)):
+
         self.endpoint1 = endpoint1
         self.endpoint2 = endpoint2
-        self.colour = (0, 0, 0)
+        self.colour = colour
+        self.draw_segment = draw_segment_function
         
 
     def draw(self, putpixel):
