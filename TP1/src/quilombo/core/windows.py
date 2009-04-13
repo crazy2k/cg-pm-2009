@@ -24,7 +24,7 @@ class GenericWindow(wx.Frame):
             self.timer.Start(1)
             self.Bind(wx.EVT_TIMER, self.on_paint, id=1)
 
-        self.Bind(wx.EVT_CLOSE, self.on_close, id=1)
+        self.Bind(wx.EVT_CLOSE, self.on_close)
 
         self.Centre()
         self.Show(True)
