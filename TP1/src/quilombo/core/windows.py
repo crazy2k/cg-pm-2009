@@ -5,6 +5,7 @@ from PIL import Image
 class GenericWindow(wx.Frame):
     
     AUTO_REFRESHING = 0
+    STATIC = 1
 
     def __init__(self, id, title, size, type):
         wx.Frame.__init__(self, None, id, title, size = size)

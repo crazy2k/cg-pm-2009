@@ -1,0 +1,92 @@
+Computación Gráfica: Trabajo Práctico Número 1
+==============================================
+
+La presente aplicación es el resultado del desarrollo del Trabajo Práctico
+Número 1 de la materia Computación Gráfica de la Facultad de Ciencias
+Exactas y Naturales de la Universidad de Buenos Aires (UBA).
+
+La aplicación fue desarrollada el primer cuatrimestre del año 2009 por:
+
+* Pablo Antonio (pabloa@gmail.com)
+* Marta Ponzoni (martaponzoni@gmail.com)
+
+
+Instalación
+-----------
+
+La aplicación fue desarrollada íntegramente en Python, por lo que es
+necesario contar con el compilador/máquina virtual de Python para
+poder ejecutarla. La mayoría de las distribuciones de GNU/Linux vienen
+con Python instalado.
+
+Para descargar Python, o para hallar más información con respecto a su
+instalación, dirigirse al sitio oficial de Python: http://www.python.org/
+
+Además, la aplicación requiere los siguientes componentes:
+
+1. wxPython
+2. PIL (Python Imaging Library)
+
+wxPython es la biblioteca de Python "wrapper" para la API/toolkit wxWidgets
+(escrita en C++). En las pruebas se utilizó la versión 2.8.8.0 provista por
+los repositorios de Ubuntu (2.8.8.0-0ubuntu2). Para instalarla en
+Debian/Ubuntu, sólo hace falta usar el comando
+``sudo apt-get install python-wxgtk2.8``. En Windows (u otras plataformas)
+hace falta descargar wxPython de su sitio oficial: http://www.wxpython.org/
+
+PIL (Python Imaging Library) es la biblioteca que utilizamos para crear
+fácil y eficientemente los bitmaps que mostramos por pantalla. En las
+pruebas se utilizó la versión 1.1.6 provista por los repositorios de
+Ubuntu (1.1.6-3). Para instalar la biblioteca en Debian/Ubuntu sólo hace
+falta usar el comando ``sudo apt-get install python-imaging``. Información
+sobre la instalación en otras plataformas puede obtenerse en el sitio
+oficial de la biblioteca: http://www.pythonware.com/products/pil/
+
+
+Sobre la aplicación
+-------------------
+
+Ejecución
+~~~~~~~~~
+
+Para ejecutar la aplicación, debe ejecutarse el archivo main.py (que debería
+hallarse en el directorio raíz de la aplicación) con el compilador/máquina
+virtual de Python. En GNU/Linux, probablemente baste usar el comando
+``python main.py``, encontrándonos en la ubicación del archivo en el árbol
+de directorios.
+
+
+Organización del código
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Ubicándonos en el directorio raíz de la aplicación (en la ubicación de
+main.py) podemos observar los siguientes archivos/directorios:
+
+* *./main.py*: En este archivo se encuentra el programa principal. Aquí
+  se crea la aplicación de wxPython. En el mismo archivo se halla la
+  clase que define a la ventana que se observará en pantalla.
+* *./algorithms/*: En este directorio se hallan los algoritmos de Bresenham
+  y DDA para la graficación de segmentos de rectas. También se encuentran
+  los algoritmos de scan y clipping de polígonos.
+* *./core/*: Aquí están las partes principales de la aplicación. En
+  scenes.py se halla la estructura creada para albergar las escenas,
+  incluyendo la representación de las primitivas de segmento de recta y
+  polígonos. En windows.py se halla la definición de una ventana genérica,
+  la que sirve como base a cualquier ventana presente en la aplicación.
+  Aquí se encuentra encapsulado el procedimiento de *double buffering*
+  utilizado, y lo básico concerniente a la animación en la ventana.
+* *./README*: Este archivo es el archivo de ayuda que estás leyendo
+  (directamente, o indirectamente a través de su versión en HTML).
+* *./docs/*: En este directorio se hallan archivos de documentación de
+  la aplicación. Entre ellos, una versión en HTML del archivo README.
+* *./utils/*: En este directorio se hallan, por un lado, los algoritmos
+  necesarios para la aplicación de transformaciones a puntos de la
+  pantalla y, por el otro, funciones de conversión entre distintas
+  representaciones utilizadas para las imágenes. (Estas funciones de
+  conversión fueron tomadas del wiki de wxPython:
+  http://wiki.wxpython.org/).
+* *./segments_test.py*: Este programa realiza tests de performance
+  para los algoritmos de graficación de rectas de Bresenham y DDA. Los
+  resultados de dichos tests se detallan en el archivo INFORME en ./docs/.
+
+

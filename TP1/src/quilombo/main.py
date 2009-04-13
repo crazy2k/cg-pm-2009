@@ -9,6 +9,61 @@ from core.scenes import CompositeScene, Polygon
 from utils import transformations
 from algorithms import scan, bresenham, clipping
 
+from core.scenes import LineSegment
+from algorithms import dda
+
+
+class ComparationWindow(GenericWindow):
+    
+    def __init__(self, size):
+        GenericWindow.__init__(self, 0, "Comparacion - Bresenham vs DDA",
+            size, GenericWindow.STATIC)
+
+    def draw(self, putpixel):
+        seg1 = LineSegment((10, 10), (10, 50), bresenham.draw_segment)
+        seg2 = LineSegment((50, 10), (50, 50), dda.draw_segment)
+
+        seg1.draw(putpixel)
+        seg2.draw(putpixel)
+
+        seg3 = LineSegment((10, 110), (50, 110), bresenham.draw_segment)
+        seg4 = LineSegment((10, 150), (50, 150), dda.draw_segment)
+
+        seg3.draw(putpixel)
+        seg4.draw(putpixel)
+
+        seg5 = LineSegment((10, 250), (50, 210), bresenham.draw_segment)
+        seg6 = LineSegment((60, 250), (100, 210), dda.draw_segment)
+
+        seg5.draw(putpixel)
+        seg6.draw(putpixel)
+
+        seg7 = LineSegment((10, 350), (50, 349), bresenham.draw_segment)
+        seg8 = LineSegment((60, 350), (100, 349), dda.draw_segment)
+
+        seg7.draw(putpixel)
+        seg8.draw(putpixel)
+
+        seg9 = LineSegment((10, 450), (30, 390), bresenham.draw_segment)
+        seg10 = LineSegment((60, 450), (80, 390), dda.draw_segment)
+
+        seg9.draw(putpixel)
+        seg10.draw(putpixel)
+
+        seg11 = LineSegment((210, 500), (300, 502), bresenham.draw_segment)
+        seg12 = LineSegment((360, 500), (450, 502), dda.draw_segment)
+
+        seg11.draw(putpixel)
+        seg12.draw(putpixel)
+
+
+
+
+
+
+
+
+
 class SnowWindow(GenericWindow):
 
     # numero de bolas que tendran movimiento independiente de las demas
@@ -190,4 +245,5 @@ class SnowWindow(GenericWindow):
 if __name__ == "__main__":
     app = wx.App()
     SnowWindow((500, 300))
+    #ComparationWindow((800, 600))
     app.MainLoop()
