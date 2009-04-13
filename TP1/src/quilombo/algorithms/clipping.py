@@ -39,16 +39,6 @@ def clipping(vertices, boundary):
 
 
 def intersection(boundary, p1, p2):
-    """
-    a = p1x - p2x - b1x + b2x
-    c = b1x - p1x
-    
-    x = c/a
-    
-    y = (b1x - b2x)*x + b1x
-    return (x, y)
-    """
-
 
     x1, y1 = boundary[0][0], boundary[0][1]
     x2, y2 = boundary[1][0], boundary[1][1]
@@ -72,7 +62,8 @@ def intersection(boundary, p1, p2):
     return (int(round(x)), int(round(y)))
 
 
-#boundary es la frontera de cliping, representada por los vertices de ese lado de derecha a izquierda
+# boundary es la frontera de cliping, representada por los vertices de ese
+# lado de derecha a izquierda
 def is_inside(point, boundary):
     px = point[0]
     py = point[1]

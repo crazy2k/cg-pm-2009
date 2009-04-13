@@ -15,7 +15,6 @@ class GenericWindow(wx.Frame):
         # realizaremos double buffering
         width = size[0]
         height = size[1]
-        #self.__buff = [[(255,255,255)]*height]*width
 
         # el metodo on_paint se encargara de repintar
         self.Bind(wx.EVT_PAINT, self.on_paint)
@@ -58,7 +57,7 @@ class GenericWindow(wx.Frame):
 
     def add_to_buffer(self, x, y, colour = (0, 0, 0)):
         size = self.GetSize().Get()
-        #print size
+
         x = x % size[0]
         y = y % size[1]
         self.__buff[x, y] = colour
