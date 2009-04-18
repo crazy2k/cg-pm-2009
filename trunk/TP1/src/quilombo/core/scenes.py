@@ -1,6 +1,7 @@
-from algorithms.bresenham import draw_segment
 from algorithms.scan import PolygonScanAlgorithm
 from utils.transformations import transformed_point
+
+from algorithms import bresenham
 
 class Scene:
 
@@ -40,7 +41,7 @@ class CompositeScene(Scene):
 
 class LineSegment(Scene):
     def __init__(self, endpoint1, endpoint2,
-        draw_segment_function = draw_segment, colour = (0, 0, 0)):
+        draw_segment_function = bresenham.draw_segment, colour = (0, 0, 0)):
 
         self.endpoint1 = endpoint1
         self.endpoint2 = endpoint2
@@ -52,7 +53,8 @@ class LineSegment(Scene):
         endpoint1 = self.endpoint1
         endpoint2 = self.endpoint2
 
-        draw_segment(endpoint1, endpoint2, putpixel, self.colour)
+        self.draw_segment(endpoint1, endpoint2, putpixel,
+            self.colour)
 
     def transform(self, transformation):
         self.endpoint1 = transformed_point(self.endpoint1, transformation)
@@ -65,7 +67,7 @@ class Polygon(Scene):
 
     def draw(self, putpixel):
         algorithm = PolygonScanAlgorithm()
-        algorithm.scan(self.vertices, draw_segment, putpixel, self.colour)
+        algorithm.scan(self.vertices, bresenham.draw_segment, putpixel, self.colour)
 
     def transform(self, transformation):
         for i in range(len(self.vertices)):
