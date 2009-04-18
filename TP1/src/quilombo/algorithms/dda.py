@@ -4,10 +4,10 @@ def draw_segment(endpoint1, endpoint2, putpixel, colour):
     como extremos del segmento. Utiliza la funcion putpixel(x, y) para
     dibujar los puntos."""
 
-    x1 = endpoint1(0)
-    y1 = endpoint1(1)
-    x2 = endpoint2(0)
-    y2 = endpoint2(1)
+    x1 = endpoint1[0]
+    y1 = endpoint1[1]
+    x2 = endpoint2[0]
+    y2 = endpoint2[1]
 
     # tratamos el caso de las lineas verticales aparte
     if x1 == x2:
