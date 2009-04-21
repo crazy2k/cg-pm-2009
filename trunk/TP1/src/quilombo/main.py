@@ -50,11 +50,11 @@ class ComparationWindow(GenericWindow):
         seg9.draw(putpixel)
         seg10.draw(putpixel)
 
-        seg11 = LineSegment((210, 500), (300, 502), bresenham.draw_segment)
-        seg12 = LineSegment((360, 500), (450, 502), dda.draw_segment)
+        seg13 = LineSegment((30, 550), (10, 490), bresenham.draw_segment)
+        seg14 = LineSegment((80, 550), (60, 490), dda.draw_segment)
 
-        seg11.draw(putpixel)
-        seg12.draw(putpixel)
+        seg13.draw(putpixel)
+        seg14.draw(putpixel)
 
 
 class SnowWindow(GenericWindow):
@@ -237,6 +237,6 @@ class SnowWindow(GenericWindow):
             
 if __name__ == "__main__":
     app = wx.App()
-    SnowWindow((500, 300))
-    #ComparationWindow((800, 600))
+    #SnowWindow((500, 300))
+    ComparationWindow((800, 600))
     app.MainLoop()

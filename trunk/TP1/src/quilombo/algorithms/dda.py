@@ -21,20 +21,35 @@ def draw_segment(endpoint1, endpoint2, putpixel, colour):
 
         return
 
-
-    if x1 > x2:
-        x1, x2 = x2, x1
-        y1, y2 = y2, y1
-
     dx = x2 - x1
     dy = y2 - y1
 
     m = float((y2 - y1))/(x2 - x1)
+        
+    if -1 <= m <= 1:
+        
+        if x1 > x2:
+            x1, x2 = x2, x1
+            y1, y2 = y2, y1
+        
+        y = y1
 
-    y = y1
+        for x in range(x1, x2 -1):
+            putpixel(x, round(y), colour)
+            y = y + m
 
-    for x in range(x1, x2 -1):
-        putpixel(x, round(y), colour)
-
-        y = y + m
-
+    else:
+        
+        if y1 < y2:
+            x1, x2 = x2, x1
+            y1, y2 = y2, y1
+        
+        x = x1
+        y = y1
+        
+        while y >= y2 -1:
+            print round(x)
+            print y
+            putpixel(round(x), y, colour)
+            x = x - 1/m
+            y = y - 1
