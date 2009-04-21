@@ -3,7 +3,7 @@ from utils import convert
 from PIL import Image
 
 #import array
-import numpy
+#import numpy
 
 class GenericWindow(wx.Frame):
     
