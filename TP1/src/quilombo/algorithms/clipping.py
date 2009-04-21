@@ -1,9 +1,4 @@
-
-class ViewPort:
-    def __init__(self, refpoint, width, height):
-        self.refpoint = refpoint
-        self.width = width
-        self.height = height
+from core.windows import ViewPort
 
 def clip(viewport, vertices):
     rp = viewport.refpoint

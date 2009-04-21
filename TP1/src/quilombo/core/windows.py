@@ -5,6 +5,22 @@ from PIL import Image
 #import array
 #import numpy
 
+
+class ViewPort:
+    def __init__(self, refpoint, width, height):
+        self.refpoint = refpoint
+        self.width = width
+        self.height = height
+        
+    def getRefPoint(self):
+        return self.refpoint
+        
+    def getWidth(self):
+        return self.width
+        
+    def getHeight(self):
+        return self.height
+
 class GenericWindow(wx.Frame):
     
     AUTO_REFRESHING = 0

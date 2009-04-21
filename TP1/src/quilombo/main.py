@@ -3,11 +3,11 @@ import random
 import time
 import copy
 
-from core.windows import GenericWindow
+from core.windows import GenericWindow, ViewPort
 from core.scenes import CompositeScene, Polygon
 
 from utils import transformations
-from algorithms import scan, bresenham, clipping
+from algorithms import scan, bresenham, clipping, windowing
 
 from core.scenes import LineSegment
 from algorithms import dda
@@ -128,7 +128,8 @@ class SnowWindow(GenericWindow):
 
     def draw(self, putpixel):
         self.__prepare_winter_scene()
-        self.__prepare_clipping_scene()        
+        self.__prepare_clipping_scene()
+        self.__scene.transform(windowing.WindowingMatrix(ViewPort((0,0),1000,1000), ViewPort((0,0),4000,4000)))       
         self.__scene.draw(putpixel)
 
     def __prepare_winter_scene(self):
@@ -237,6 +238,6 @@ class SnowWindow(GenericWindow):
             
 if __name__ == "__main__":
     app = wx.App()
-    #SnowWindow((500, 300))
-    ComparationWindow((800, 600))
+    SnowWindow((500, 300))
+    #ComparationWindow((800, 600))
     app.MainLoop()
