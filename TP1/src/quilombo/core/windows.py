@@ -10,6 +10,8 @@ class GenericWindow(wx.Frame):
     AUTO_REFRESHING = 0
     STATIC = 1
 
+    USE_NUMPY = False
+
     def __init__(self, id, title, size, type):
         wx.Frame.__init__(self, None, id, title, size = size)
 
@@ -45,41 +47,26 @@ class GenericWindow(wx.Frame):
         width = size[0]
         height = size[1]
 
-        # creo una imagen de PIL, en blanco
-        #im = Image.new('RGB', size, (255, 255, 255))
+        if not self.USE_NUMPY:
+            # creo una imagen de PIL, en blanco
+            im = Image.new('RGB', size, (255, 255, 255))
 
-        # voy a acceder a sus pixels a traves de esta variable
-        #self.__buff = im.load()
+            # voy a acceder a sus pixels a traves de esta variable
+            self.__buff = im.load()
 
-        #bmp = wx.EmptyBitmap(size[0], size[1], 32)
-
-        #self.__px_data = wx.NativePixelData(bmp)
-        #print wx.NativePixelData(bmp)
-        #if not self.__px_data:
-        #    raise RuntimeError("No se puede acceder a los datos del bmp.")
-
-        #self.__pixels = self.__px_data.GetPixels()
-        #for y in xrange(size[1]):
-        #    for x in xrange(size[0]):
-        #        pixels.Set
-        # Make a bitmap using an array of RGB bytes
-
-        self.__bpp = 3  # bytes per pixel
-        #self.__bytes = array.array('B', [255] * width*height*self.__bpp)
-        self.__bytes = numpy.zeros((width, height, 3), 'uint8')
-
+        elif self.USE_NUMPY:
+            self.__bytes = numpy.empty((height, width, 3), numpy.uint8)
+            self.__bytes[:][:][:] = 255
 
         # escribo en sus pixels, segun la funcion de dibujado
         self.draw(self.add_to_buffer)
 
-        # me genero un bitmap a partir de la imagen creada
-        #bmp = convert.pilToBitmap(im)
+        if not self.USE_NUMPY:
+            # me genero un bitmap a partir de la imagen creada
+            bmp = convert.pilToBitmap(im)
 
-        #bmp = wx.BitmapFromBuffer(width, height, self.__bytes)
-        
-        image = wx.EmptyImage(width, height)
-        image.SetData(self.__bytes.tostring())
-        bmp = image.ConvertToBitmap()
+        if self.USE_NUMPY:
+            bmp = wx.BitmapFromBuffer(width, height, self.__bytes)
 
         # pinto el bitmap en la ventana
         pdc = wx.PaintDC(self)
@@ -95,18 +82,13 @@ class GenericWindow(wx.Frame):
         x = x % size[0]
         y = y % size[1]
 
-        #self.__buff[x, y] = colour
+        if not self.USE_NUMPY:
+            self.__buff[x, y] = colour
 
-        #self.__pixels.MoveTo(self.__px_data, x, y)
-        #self.__pixels.Set(colour[0], colour[1], colour[2])
-
-        #offset = y*width*self.__bpp + x*self.__bpp
-        #r, g, b = colour[0], colour[1], colour[2]
-        #self.__bytes[offset + 0] = r
-        #self.__bytes[offset + 1] = g
-        #self.__bytes[offset + 2] = b
-        self.__bytes[x][y] = [colour[0], colour[1], colour[2]]
-
+        if self.USE_NUMPY:
+            self.__bytes[y][x][0] = colour[0]
+            self.__bytes[y][x][1] = colour[1]
+            self.__bytes[y][x][2] = colour[2]
 
     def draw(self, x, y):
         raise NotImplementedError
