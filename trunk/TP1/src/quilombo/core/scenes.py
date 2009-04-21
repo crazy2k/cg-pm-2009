@@ -1,5 +1,6 @@
 from algorithms.scan import PolygonScanAlgorithm
 from utils.transformations import transformed_point
+from algorithms.windowing import WindowingMatrix
 
 from algorithms import bresenham
 
@@ -13,6 +14,9 @@ class Scene:
 
     def set_colour(self, colour):
         self.colour = colour
+        
+    def window(self, old_viewport, new_viewport):
+        self.transform(WindowingMatrix(old_viewport, new_viewport))
 
 class CompositeScene(Scene):
     
@@ -37,7 +41,10 @@ class CompositeScene(Scene):
     def transform(self, transformation):
         for s in self.__children:
             s.transform(transformation)
-
+            
+    def window(self, old_viewport, new_viewport):
+        for s in self.__children:
+            s = s.window(old_viewport, new_viewport)
 
 class LineSegment(Scene):
     def __init__(self, endpoint1, endpoint2,
