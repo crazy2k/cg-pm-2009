@@ -40,20 +40,32 @@ class GenericWindow(wx.Frame):
         # el metodo on_paint se encargara de repintar
         self.Bind(wx.EVT_PAINT, self.on_paint)
 
+        self.Bind(wx.EVT_SIZE, self.on_size)
+
         if self.type == self.AUTO_REFRESHING:
             self.timer = wx.Timer(self, id=1)
-            self.timer.Start(1)
+            self.timer.Start(300)
             self.Bind(wx.EVT_TIMER, self.on_timer, id=1)
+
 
         self.Bind(wx.EVT_CLOSE, self.on_close)
 
         self.Centre()
         self.Show(True)
 
-    def on_close(self, event):
-        if self.type == self.AUTO_REFRESHING:
-            self.timer.Stop()
-        self.Destroy()
+    def on_timer(self, event):
+        bmp = self.__create_bmp()
+
+        # pinto el bitmap en la ventana
+        dc = wx.ClientDC(self)
+        dc.DrawBitmap(bmp, 0, 0)
+
+    def on_paint(self, event):
+        bmp = self.__create_bmp()
+
+        # pinto el bitmap en la ventana
+        dc = wx.PaintDC(self)
+        dc.DrawBitmap(bmp, 0, 0)
 
     def __create_bmp(self):
         size = self.GetSize().Get()
@@ -84,21 +96,14 @@ class GenericWindow(wx.Frame):
         
         return bmp
 
-    def on_timer(self, event):
-        bmp = self.__create_bmp()
 
-        # pinto el bitmap en la ventana
-        dc = wx.ClientDC(self)
-        dc.DrawBitmap(bmp, 0, 0)
+    def on_size(self, event):
+       pass
 
-
-    def on_paint(self, event):
-        bmp = self.__create_bmp()
-
-        # pinto el bitmap en la ventana
-        dc = wx.PaintDC(self)
-        dc.DrawBitmap(bmp, 0, 0)
-
+    def on_close(self, event):
+        if self.type == self.AUTO_REFRESHING:
+            self.timer.Stop()
+        self.Destroy()
 
     def add_to_buffer(self, x, y, colour = (0, 0, 0)):
         size = self.GetSize().Get()

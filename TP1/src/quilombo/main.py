@@ -79,6 +79,7 @@ class SnowWindow(GenericWindow):
         
         self.__initialize_variables()
 
+
     def __create_small_ball(self):
         small_ball = CompositeScene()
 
@@ -126,11 +127,21 @@ class SnowWindow(GenericWindow):
 
         self.__frames = 1
 
+        size = self.GetSize().Get()
+        self.__initial_vp = ViewPort((0,0), size[0], size[1])
+
     def draw(self, putpixel):
         self.__prepare_winter_scene()
         self.__prepare_clipping_scene()
-        self.__scene.transform(windowing.WindowingMatrix(ViewPort((0,0),600,600), ViewPort((0,0),600,800)))    
+
+        self.__scene.window(self.__initial_vp, self.__new_vp)
+
         self.__scene.draw(putpixel)
+
+    def on_size(self, event):
+        new_size = event.GetSize()
+
+        self.__new_vp = ViewPort((0,0), new_size[0], new_size[1])
 
     def __prepare_winter_scene(self):
         ball = self.__rotate_original_ball()
@@ -209,8 +220,8 @@ class SnowWindow(GenericWindow):
         t_bigger = [[20, 0, 0], [0, 20, 0], [0, 0, 1]]
         pol.transform(t_bigger)
 
-        size = self.GetSize().Get()
-        t_move = [[1, 0, size[0]/2], [0, 1, size[1]/2], [0, 0, 1]]
+        w, h = self.__initial_vp.width, self.__initial_vp.height
+        t_move = [[1, 0, w/2], [0, 1, h/2], [0, 0, 1]]
         pol.transform(t_move)
 
         self.__scene.add_child(pol)
@@ -222,7 +233,10 @@ class SnowWindow(GenericWindow):
         self.__pb = self.__pb + self.__pdb
     
     def __clip_star(self, pol):
-        vp = clipping.ViewPort((210 + self.__h, 110 + self.__h), self.__clip,
+
+        w, h = self.__initial_vp.width, self.__initial_vp.height
+
+        vp = clipping.ViewPort((w/2 - 40 + self.__h, h/2 - 40 + self.__h), self.__clip,
             self.__clip)
         pol.vertices = clipping.clip(vp, self.__polv)
         
@@ -238,6 +252,6 @@ class SnowWindow(GenericWindow):
             
 if __name__ == "__main__":
     app = wx.App()
-    SnowWindow((600, 600))
+    SnowWindow((500, 300))
     #ComparationWindow((800, 600))
     app.MainLoop()
