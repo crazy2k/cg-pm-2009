@@ -48,8 +48,7 @@ def draw_segment(endpoint1, endpoint2, putpixel, colour):
         y = y1
         
         while y >= y2 -1:
-            print round(x)
-            print y
+
             putpixel(round(x), y, colour)
             x = x - 1/m
             y = y - 1
