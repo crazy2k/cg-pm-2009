@@ -129,7 +129,7 @@ class SnowWindow(GenericWindow):
     def draw(self, putpixel):
         self.__prepare_winter_scene()
         self.__prepare_clipping_scene()
-        self.__scene.transform(windowing.WindowingMatrix(ViewPort((0,0),1000,1000), ViewPort((0,0),4000,4000)))       
+        self.__scene.transform(windowing.WindowingMatrix(ViewPort((0,0),600,600), ViewPort((0,0),600,1300)))    
         self.__scene.draw(putpixel)
 
     def __prepare_winter_scene(self):
@@ -238,6 +238,6 @@ class SnowWindow(GenericWindow):
             
 if __name__ == "__main__":
     app = wx.App()
-    SnowWindow((500, 300))
+    SnowWindow((600, 600))
     #ComparationWindow((800, 600))
     app.MainLoop()
