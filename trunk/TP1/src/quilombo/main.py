@@ -129,7 +129,7 @@ class SnowWindow(GenericWindow):
     def draw(self, putpixel):
         self.__prepare_winter_scene()
         self.__prepare_clipping_scene()
-        self.__scene.transform(windowing.WindowingMatrix(ViewPort((0,0),600,600), ViewPort((0,0),600,1300)))    
+        self.__scene.transform(windowing.WindowingMatrix(ViewPort((0,0),600,600), ViewPort((0,0),600,800)))    
         self.__scene.draw(putpixel)
 
     def __prepare_winter_scene(self):
