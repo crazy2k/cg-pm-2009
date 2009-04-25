@@ -252,6 +252,6 @@ class SnowWindow(GenericWindow):
             
 if __name__ == "__main__":
     app = wx.App()
-    SnowWindow((500, 300))
+    SnowWindow((1280, 725))
     #ComparationWindow((800, 600))
     app.MainLoop()
