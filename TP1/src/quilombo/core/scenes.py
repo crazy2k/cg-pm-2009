@@ -2,7 +2,7 @@ from algorithms.scan import PolygonScanAlgorithm
 from utils.transformations import transformed_point
 from algorithms.windowing import WindowingMatrix
 
-from algorithms import bresenham
+from algorithms import bresenham, clipping
 
 class Scene:
 
@@ -46,6 +46,14 @@ class CompositeScene(Scene):
         for s in self.__children:
             s = s.window(old_viewport, new_viewport)
 
+    def clip(self, viewport):
+        for s in self.__children:
+            s = s.clip(viewport)
+
+    def imprimite(self):
+        for s in self.__children:
+            s.imprimite()
+
 class LineSegment(Scene):
     def __init__(self, endpoint1, endpoint2,
         draw_segment_function = bresenham.draw_segment, colour = (0, 0, 0)):
@@ -73,6 +81,8 @@ class Polygon(Scene):
         self.colour = colour
 
     def draw(self, putpixel):
+        if len(self.vertices) == 0:
+            return
         algorithm = PolygonScanAlgorithm()
         algorithm.scan(self.vertices, bresenham.draw_segment, putpixel, self.colour)
 
@@ -80,3 +90,9 @@ class Polygon(Scene):
         for i in range(len(self.vertices)):
             self.vertices[i] = transformed_point(self.vertices[i],
                 transformation)
+
+    def clip(self, viewport):
+        self.vertices = clipping.clip(viewport, self.vertices)
+
+    def imprimite(self):
+        print self.vertices
