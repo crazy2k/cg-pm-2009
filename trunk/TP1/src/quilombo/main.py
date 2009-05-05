@@ -10,7 +10,8 @@ from utils import transformations
 from algorithms import scan, bresenham, clipping, windowing
 
 from core.scenes import LineSegment
-from algorithms import dda
+from algorithms import dda, curvas
+
 
 
 class ComparationWindow(GenericWindow):
@@ -55,15 +56,18 @@ class ComparationWindow(GenericWindow):
 
         seg13.draw(putpixel)
         seg14.draw(putpixel)
+        
+        #curvas.Bezier([[0,0],[20,40],[70,10],[100,100],[140,10]], 20, bresenham.draw_segment, putpixel)
+        curvas.bsplines([[0,0],[20,40],[70,10],[100,100],[140,10]], 10, bresenham.draw_segment, putpixel)
 
 
 class SnowWindow(GenericWindow):
 
     # numero de bolas que tendran movimiento independiente de las demas
-    BALLS = 30
+    BALLS = 20
     # frame a partir del cual se comienza a mostrar el poligono que se
     # recorta
-    POLYGON_START_AT = 10
+    POLYGON_START_AT = 20
     
     def __init__(self, size):
         GenericWindow.__init__(self, 0, "Nieve", size,
@@ -134,14 +138,22 @@ class SnowWindow(GenericWindow):
         self.__prepare_winter_scene()
         self.__prepare_clipping_scene()
 
+        #vp = ViewPort((1000, 1000), 1100, 1100)
+        vp = ViewPort((-100, -100), 800, 300)
+        self.__scene.clip(vp)
+        #self.__scene.imprimite()
+
+
+        self.__scene.window(vp, self.__initial_vp)
         self.__scene.window(self.__initial_vp, self.__new_vp)
+
 
         self.__scene.draw(putpixel)
 
     def on_size(self, event):
         new_size = event.GetSize()
 
-        self.__new_vp = ViewPort((0,0), new_size[0], new_size[1])
+        self.__new_vp = ViewPort((0, 0), new_size[0], new_size[1])
 
     def __prepare_winter_scene(self):
         ball = self.__rotate_original_ball()
@@ -170,7 +182,7 @@ class SnowWindow(GenericWindow):
         for b in balls:
             b.transform(t_pos)
 
-            t_pos[0][2] = t_pos[0][2] + 35
+            t_pos[0][2] = t_pos[0][2] + 25
             t_pos[1][2] = self.__yes[i]
             
             if self.__a == 0:
@@ -192,10 +204,11 @@ class SnowWindow(GenericWindow):
         self.__y = self.__y + 1
         
     def __add_bigger_balls(self):
-        scene_big_balls = copy.deepcopy(self.__scene)
-        t_bigger = [[2, 0, 0], [0, 2, 0], [0, 0, 1]]
-        scene_big_balls.transform(t_bigger)
-        self.__scene.add_child(scene_big_balls)
+        #scene_big_balls = copy.deepcopy(self.__scene)
+        #t_bigger = [[2, 0, 0], [0, 2, 0], [0, 0, 1]]
+        #scene_big_balls.transform(t_bigger)
+        #self.__scene.add_child(scene_big_balls)
+        pass
 
     def __prepare_clipping_scene(self):
         if self.__frames > self.POLYGON_START_AT:
@@ -252,6 +265,6 @@ class SnowWindow(GenericWindow):
             
 if __name__ == "__main__":
     app = wx.App()
-    SnowWindow((1280, 725))
-    #ComparationWindow((800, 600))
+    #SnowWindow((800, 300))
+    ComparationWindow((800, 600))
     app.MainLoop()
