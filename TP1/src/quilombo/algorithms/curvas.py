@@ -8,20 +8,22 @@ def Bezier(grafo_control, paso, drawsegment, putpixel):
         n = len(grafo_control)
         for k in range (1, n):
             for l in range (0, n-k):
-                grafo_control[l][0] = (1-u)*grafo_control[l][0]+u*grafo_control[l+1][0]
-                grafo_control[l][1] = (1-u)*grafo_control[l][1]+u*grafo_control[l+1][1]
+                grafo_control[l][0] = (1-u)*grafo_control[l][0] + u*grafo_control[l+1][0]
+                grafo_control[l][1] = (1-u)*grafo_control[l][1] + u*grafo_control[l+1][1]
 
-        punto[0] = int(punto[0])
-        punto[1] = int(punto[1])
+        return (int(grafo_control[0][0]), int(grafo_control[0][1]))
 
 
-    punto = grafo_control[0]
+    p = grafo_control[0]
 
     for k in range (1, paso + 1):
-        u = float(k)/float(paso)
-        punto_anterior = copy.deepcopy(punto)
-        de_casteljau(u, grafo_control, punto)
-        drawsegment(punto_anterior, punto, putpixel, (0,0,0))
+        u = float(k)/paso
+
+        p_anterior = copy.deepcopy(p)
+
+        p = de_casteljau(u, grafo_control, p)
+
+        drawsegment(p_anterior, p, putpixel, (0,0,0))
 
 
 
@@ -56,12 +58,11 @@ def bsplines(g, pasos, draw_segment, putpixel):
                 elif index >= len(g):
                     index = len(g)-1
 
-                p[0] = int(p[0] + g[index][0]*v)
-                p[1] = int(p[1] + g[index][1]*v) 
-                  
+                p[0] = p[0] + g[index][0]*v
+                p[1] = p[1] + g[index][1]*v
+            
+            p = [int(p[0]), int(p[1])]
             draw_segment(p_anterior, p, putpixel, (0,0,0))
-            print p_anterior
-            print p
 
 
 
