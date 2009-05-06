@@ -57,8 +57,13 @@ class ComparationWindow(GenericWindow):
         seg13.draw(putpixel)
         seg14.draw(putpixel)
         
-        #curvas.Bezier([[0,0],[20,40],[70,10],[100,100],[140,10]], 20, bresenham.draw_segment, putpixel)
-        curvas.bsplines([[0,0],[20,40],[70,10],[100,100],[140,10]], 10, bresenham.draw_segment, putpixel)
+        curvas.Bezier([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, bresenham.draw_segment, putpixel)
+        LineSegment((400,0),(550,550), dda.draw_segment).draw(putpixel)
+        LineSegment((550,550),(660,0), dda.draw_segment).draw(putpixel)
+        LineSegment((660,0),(700,510), dda.draw_segment).draw(putpixel)
+        LineSegment((700,510),(750,10), dda.draw_segment).draw(putpixel)
+
+        curvas.bsplines([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, bresenham.draw_segment, putpixel)
 
 
 class SnowWindow(GenericWindow):
