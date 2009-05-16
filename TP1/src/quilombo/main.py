@@ -19,51 +19,85 @@ class ComparationWindow(GenericWindow):
     def __init__(self, size):
         GenericWindow.__init__(self, 0, "Comparacion - Bresenham vs DDA",
             size, GenericWindow.STATIC)
-
-    def draw(self, putpixel):
-        seg1 = LineSegment((10, 10), (10, 50), bresenham.draw_segment)
-        seg2 = LineSegment((50, 10), (50, 50), dda.draw_segment)
-
-        seg1.draw(putpixel)
-        seg2.draw(putpixel)
-
-        seg3 = LineSegment((10, 110), (50, 110), bresenham.draw_segment)
-        seg4 = LineSegment((10, 150), (50, 150), dda.draw_segment)
-
-        seg3.draw(putpixel)
-        seg4.draw(putpixel)
-
-        seg5 = LineSegment((10, 250), (50, 210), bresenham.draw_segment)
-        seg6 = LineSegment((60, 250), (100, 210), dda.draw_segment)
-
-        seg5.draw(putpixel)
-        seg6.draw(putpixel)
-
-        seg7 = LineSegment((10, 350), (50, 349), bresenham.draw_segment)
-        seg8 = LineSegment((60, 350), (100, 349), dda.draw_segment)
-
-        seg7.draw(putpixel)
-        seg8.draw(putpixel)
-
-        seg9 = LineSegment((10, 450), (30, 390), bresenham.draw_segment)
-        seg10 = LineSegment((60, 450), (80, 390), dda.draw_segment)
-
-        seg9.draw(putpixel)
-        seg10.draw(putpixel)
-
-        seg13 = LineSegment((30, 550), (10, 490), bresenham.draw_segment)
-        seg14 = LineSegment((80, 550), (60, 490), dda.draw_segment)
-
-        seg13.draw(putpixel)
-        seg14.draw(putpixel)
+        self.CreateMenu()
+    
+    def CreateMenu(self):
+        self.__algorithm = ""
+        menu = wx.Menu()
+        menu.Append(1, "Bezier")
+        menu.AppendSeparator()
+        menu.Append(2, "B-Spline Uniforme")
+        menu.AppendSeparator()
+        menu.Append(3, "B-Spline No Uniforme")
+        menuBar = wx.MenuBar()
+        menuBar.Append(menu, "Algoritmo")
+        self.SetMenuBar(menuBar)
+        self.Bind(wx.EVT_MENU, self.menuBezier, id=1)
+        self.Bind(wx.EVT_MENU, self.menuBSplineUniforme, id=2)
+        self.Bind(wx.EVT_MENU, self.menuBSplineNoUniforme, id=3)
         
-        curvas.Bezier([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, bresenham.draw_segment, putpixel)
-        LineSegment((400,0),(550,550), dda.draw_segment).draw(putpixel)
-        LineSegment((550,550),(660,0), dda.draw_segment).draw(putpixel)
-        LineSegment((660,0),(700,510), dda.draw_segment).draw(putpixel)
-        LineSegment((700,510),(750,10), dda.draw_segment).draw(putpixel)
+    def menuBezier(self, event):
+        self.__algorithm = "Bezier"
+        self.Refresh()
+    
+    def menuBSplineUniforme(self, event):
+        self.__algorithm = "BSplineUniforme"
+        self.Refresh()
+    
+    def menuBSplineNoUniforme(self, event):
+        self.__algorithm = "BSplineNoUniforme"
+        self.Refresh()
+    
+    def draw(self, putpixel):
 
-        curvas.bsplines([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, bresenham.draw_segment, putpixel)
+        if False:
+            seg1 = LineSegment((10, 10), (10, 50), bresenham.draw_segment)
+            seg2 = LineSegment((50, 10), (50, 50), dda.draw_segment)
+
+            seg1.draw(putpixel)
+            seg2.draw(putpixel)
+
+            seg3 = LineSegment((10, 110), (50, 110), bresenham.draw_segment)
+            seg4 = LineSegment((10, 150), (50, 150), dda.draw_segment)
+
+            seg3.draw(putpixel)
+            seg4.draw(putpixel)
+
+            seg5 = LineSegment((10, 250), (50, 210), bresenham.draw_segment)
+            seg6 = LineSegment((60, 250), (100, 210), dda.draw_segment)
+
+            seg5.draw(putpixel)
+            seg6.draw(putpixel)
+
+            seg7 = LineSegment((10, 350), (50, 349), bresenham.draw_segment)
+            seg8 = LineSegment((60, 350), (100, 349), dda.draw_segment)
+
+            seg7.draw(putpixel)
+            seg8.draw(putpixel)
+
+            seg9 = LineSegment((10, 450), (30, 390), bresenham.draw_segment)
+            seg10 = LineSegment((60, 450), (80, 390), dda.draw_segment)
+
+            seg9.draw(putpixel)
+            seg10.draw(putpixel)
+
+            seg13 = LineSegment((30, 550), (10, 490), bresenham.draw_segment)
+            seg14 = LineSegment((80, 550), (60, 490), dda.draw_segment)
+
+            seg13.draw(putpixel)
+            seg14.draw(putpixel)
+               
+        LineSegment((400,0),(550,550), dda.draw_segment, (255,0, 0)).draw(putpixel)
+        LineSegment((550,550),(660,0), dda.draw_segment, (255,0, 0)).draw(putpixel)
+        LineSegment((660,0),(700,510), dda.draw_segment, (255,0, 0)).draw(putpixel)
+        LineSegment((700,510),(750,10), dda.draw_segment, (255,0, 0)).draw(putpixel)
+        
+        if (self.__algorithm == "Bezier"):
+            curvas.Bezier([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, bresenham.draw_segment, putpixel)
+        elif(self.__algorithm == "BSplineUniforme"):
+            curvas.bsplines([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, bresenham.draw_segment, putpixel)
+        elif (self.__algorithm == "BSplineNoUniforme"):
+            curvas.bsplines_no_uniforme([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, 3, bresenham.draw_segment, putpixel)
 
 
 class SnowWindow(GenericWindow):
