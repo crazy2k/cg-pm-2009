@@ -2,6 +2,8 @@ import wx
 import random
 import time
 import copy
+import cPickle
+import weakref
 
 from core.windows import GenericWindow, ViewPort
 from core.scenes import CompositeScene, Polygon
@@ -91,6 +93,17 @@ class ComparationWindow(GenericWindow):
         LineSegment((550,550),(660,0), dda.draw_segment, (255,0, 0)).draw(putpixel)
         LineSegment((660,0),(700,510), dda.draw_segment, (255,0, 0)).draw(putpixel)
         LineSegment((700,510),(750,10), dda.draw_segment, (255,0, 0)).draw(putpixel)
+
+        self.button1 = wx.Button(self, id=-1, label='Button1', pos=(396, 0), size=(8, 8))
+        self.button1.Bind(wx.EVT_BUTTON, self.buttonClick(self.button1))
+        self.button2 = wx.Button(self, id=-1, label='Button2', pos=(546, 550), size=(8, 8))
+        self.button2.Bind(wx.EVT_BUTTON, self.buttonClick(self.button2))
+        self.button3 = wx.Button(self, id=-1, label='Button3', pos=(656, 0), size=(8, 8))
+        self.button3.Bind(wx.EVT_BUTTON, self.buttonClick(self.button3))
+        self.button4 = wx.Button(self, id=-1, label='Button4', pos=(696, 510), size=(8, 8))
+        self.button4.Bind(wx.EVT_BUTTON, self.buttonClick(self.button4))
+        self.button5 = wx.Button(self, id=-1, label='Button5', pos=(746, 10), size=(8, 8))
+        self.button5.Bind(wx.EVT_BUTTON, self.buttonClick(self.button5))
         
         if (self.__algorithm == "Bezier"):
             curvas.Bezier([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, bresenham.draw_segment, putpixel)
@@ -98,7 +111,13 @@ class ComparationWindow(GenericWindow):
             curvas.bsplines([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, bresenham.draw_segment, putpixel)
         elif (self.__algorithm == "BSplineNoUniforme"):
             curvas.bsplines_no_uniforme([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, 3, bresenham.draw_segment, putpixel)
-
+    
+    def buttonClick(self, button):
+        dataobject = wx.CustomDataObject(wx.CustomDataFormat("MySpecialData"))
+        dataobject.SetData("")
+        dragSource = wx.DropSource(button)
+        dragSource.SetData(dataobject)
+        dragSource.DoDragDrop(wx.Drag_DefaultMove)
 
 class SnowWindow(GenericWindow):
 
