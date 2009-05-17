@@ -2,8 +2,8 @@ import wx
 import random
 import time
 import copy
-import cPickle
-import weakref
+
+import traceback
 
 from core.windows import GenericWindow, ViewPort
 from core.scenes import CompositeScene, Polygon
@@ -20,49 +20,42 @@ class MyButton(wx.Button):
     def __init__(self, window, id, label, pos, size, point):
         wx.Button.__init__(self, window, id, label, pos, size)
 
-        self.size = size
-        self.point = point
+        self.id = id
         self.window = window
 
         wx.EVT_LEFT_DOWN(self, self.OnMouseDown)
-        wx.EVT_LEFT_UP(self, self.OnMouseUp)
 
 
     def OnMouseDown(self, event):
-        print "Matanga!"
-
-        self.initial_x = event.GetX()
-        self.initial_y = event.GetY()
-
-        print event.GetX()
-        print event.GetY()
-
-    def distance_to_center(x, y):
-        self.size[0]
-
-    def OnMouseUp(self, event):
-        print "Matanga, changa!"
-
-        new_x = event.GetX()
-        new_y = event.GetY()
-
-        self.point[0] = self.point[0] - self.initial_x + new_x
-        self.point[1] = self.point[1] - self.initial_y + new_y
-
-        self.window.Refresh()
+        if self.window.being_dragged == None:
+            self.window.being_dragged = self.id
+        else:
+            self.window.being_dragged = None
 
 
-
-
-class ComparationWindow(GenericWindow):
+class CurvesWindow(GenericWindow):
     
     def __init__(self, size):
         GenericWindow.__init__(self, 0, "Comparacion - Bresenham vs DDA",
             size, GenericWindow.STATIC)
-        #self.CreateMenu()
-        self.__algorithm = "Bezier"
+
+        wx.EVT_MOTION(self, self.OnMouseMove)
+
+        self.CreateMenu()
 
         self.c_points = [[400, 0], [550, 550], [660, 0], [700, 510], [750, 10]]
+
+        self.count = 0
+        self.being_dragged = None
+        self.buttons = []
+
+            
+    def OnMouseMove(self, event):
+        if self.being_dragged != None:
+            self.c_points[self.being_dragged][0] = event.GetX()
+            self.c_points[self.being_dragged][1] = event.GetY()
+            self.Refresh()
+
 
     def CreateMenu(self):
         self.__algorithm = ""
@@ -92,14 +85,18 @@ class ComparationWindow(GenericWindow):
         self.Refresh()
     
     def draw(self, putpixel):
-        print "Marta bonita"
+
+        self.count += 1
 
         c_points = self.c_points
+
+        for b in self.buttons:
+            b.Destroy()
 
         self.buttons = []
         s = len(c_points)
     
-        b_size = (5, 5)
+        b_size = (15, 15)
 
         alter_size = lambda p: [p[0] - b_size[0]/2, p[1] - b_size[1]/2]
 
@@ -322,5 +319,5 @@ class SnowWindow(GenericWindow):
 if __name__ == "__main__":
     app = wx.App()
     #SnowWindow((800, 300))
-    ComparationWindow((800, 600))
+    CurvesWindow((800, 600))
     app.MainLoop()
