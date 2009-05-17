@@ -43,7 +43,7 @@ class CurvesWindow(GenericWindow):
 
         self.CreateMenu()
 
-        self.c_points = [[400, 0], [550, 550], [660, 0], [700, 510], [750, 10]]
+        self.c_points = [[200,200],[300,30],[400, 40], [500, 50], [600, 60], [700, 510], [750, 10]]
 
         self.count = 0
         self.being_dragged = None
@@ -107,7 +107,7 @@ class CurvesWindow(GenericWindow):
             self.buttons.append(MyButton(self, i, 'Button', alter_size(c_points[i]), b_size, c_points[i]))
 
         if self.__algorithm == "Bezier":
-            curvas.Bezier(c_points, 1000, bresenham.draw_segment, putpixel)
+            curvas.BezierMenorGrado(c_points, 1000, bresenham.draw_segment, putpixel)
         elif self.__algorithm == "BSplineUniforme":
             curvas.bsplines(c_points, 1000, bresenham.draw_segment, putpixel)
         elif self.__algorithm == "BSplineNoUniforme":
