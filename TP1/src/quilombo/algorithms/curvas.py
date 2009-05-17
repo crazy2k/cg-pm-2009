@@ -14,7 +14,7 @@ def Bezier(grafo_control, paso, drawsegment, putpixel):
         return (int(grafo_control[0][0]), int(grafo_control[0][1]))
 
 
-    p = grafo_control[0]
+    p = int(grafo_control[0][0]), int(grafo_control[0][1])
 
     for k in range (1, paso + 1):
         u = float(k)/paso
