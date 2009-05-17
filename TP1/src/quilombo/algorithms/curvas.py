@@ -27,6 +27,15 @@ def Bezier(grafo_control, paso, drawsegment, putpixel):
         drawsegment(p_anterior, p, putpixel, (0,0,0))
 
 
+def BezierMenorGrado(grafo_control, paso, drawsegment, putpixel):
+    for i in range ((len(grafo_control)+1)/4):
+        for j in range (3):
+            if i==0:
+                Bezier(grafo_control[i*4:i*4+4], paso, drawsegment, putpixel)
+            else:
+                Bezier(grafo_control[i*4-1:i*4+3], paso, drawsegment, putpixel)
+            
+
 
 def bsplines(g, pasos, draw_segment, putpixel):
     def base(u, i):
