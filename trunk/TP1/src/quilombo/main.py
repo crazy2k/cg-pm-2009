@@ -102,7 +102,7 @@ class CurvesWindow(GenericWindow):
 
         for i in range(s):
             if i + 1 != s:
-                LineSegment(c_points[i], c_points[i + 1], dda.draw_segment, (255, 0, 0)).draw(putpixel)
+                LineSegment([int(c_points[i][0]),int(c_points[i][1])], [int(c_points[i+1][0]),int(c_points[i+1][1])] , bresenham.draw_segment, (255, 0, 0)).draw(putpixel)
 
             self.buttons.append(MyButton(self, i, 'Button', alter_size(c_points[i]), b_size, c_points[i]))
 
