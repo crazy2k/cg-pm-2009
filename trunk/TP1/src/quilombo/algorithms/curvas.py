@@ -10,10 +10,11 @@ def Bezier(grafo_control, paso, drawsegment, putpixel):
             for l in range (0, n-k):
                 grafo_control[l][0] = (1-u)*grafo_control[l][0] + u*grafo_control[l+1][0]
                 grafo_control[l][1] = (1-u)*grafo_control[l][1] + u*grafo_control[l+1][1]
+                
+        punto = int(grafo_control[0][0]), int(grafo_control[0][1])
+        return punto
 
-        return (int(grafo_control[0][0]), int(grafo_control[0][1]))
-
-
+    copia_grafo_control = copy.deepcopy(grafo_control)
     p = int(grafo_control[0][0]), int(grafo_control[0][1])
 
     for k in range (1, paso + 1):
@@ -21,7 +22,7 @@ def Bezier(grafo_control, paso, drawsegment, putpixel):
 
         p_anterior = copy.deepcopy(p)
 
-        p = de_casteljau(u, grafo_control, p)
+        p = de_casteljau(u, copia_grafo_control, p)
 
         drawsegment(p_anterior, p, putpixel, (0,0,0))
 
