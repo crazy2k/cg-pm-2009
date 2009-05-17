@@ -56,12 +56,17 @@ class GenericWindow(wx.Frame):
     def on_timer(self, event):
         bmp = self.__create_bmp()
 
+        print "Timer!"
+
         # pinto el bitmap en la ventana
         dc = wx.ClientDC(self)
         dc.DrawBitmap(bmp, 0, 0)
 
     def on_paint(self, event):
         bmp = self.__create_bmp()
+
+
+        print "Paint!"
 
         # pinto el bitmap en la ventana
         dc = wx.PaintDC(self)

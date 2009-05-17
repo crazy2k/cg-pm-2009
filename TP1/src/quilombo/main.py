@@ -16,13 +16,54 @@ from algorithms import dda, curvas
 
 
 
+class MyButton(wx.Button):
+    def __init__(self, window, id, label, pos, size, point):
+        wx.Button.__init__(self, window, id, label, pos, size)
+
+        self.size = size
+        self.point = point
+        self.window = window
+
+        wx.EVT_LEFT_DOWN(self, self.OnMouseDown)
+        wx.EVT_LEFT_UP(self, self.OnMouseUp)
+
+
+    def OnMouseDown(self, event):
+        print "Matanga!"
+
+        self.initial_x = event.GetX()
+        self.initial_y = event.GetY()
+
+        print event.GetX()
+        print event.GetY()
+
+    def distance_to_center(x, y):
+        self.size[0]
+
+    def OnMouseUp(self, event):
+        print "Matanga, changa!"
+
+        new_x = event.GetX()
+        new_y = event.GetY()
+
+        self.point[0] = self.point[0] - self.initial_x + new_x
+        self.point[1] = self.point[1] - self.initial_y + new_y
+
+        self.window.Refresh()
+
+
+
+
 class ComparationWindow(GenericWindow):
     
     def __init__(self, size):
         GenericWindow.__init__(self, 0, "Comparacion - Bresenham vs DDA",
             size, GenericWindow.STATIC)
-        self.CreateMenu()
-    
+        #self.CreateMenu()
+        self.__algorithm = "Bezier"
+
+        self.c_points = [[400, 0], [550, 550], [660, 0], [700, 510], [750, 10]]
+
     def CreateMenu(self):
         self.__algorithm = ""
         menu = wx.Menu()
@@ -51,73 +92,30 @@ class ComparationWindow(GenericWindow):
         self.Refresh()
     
     def draw(self, putpixel):
+        print "Marta bonita"
 
-        if False:
-            seg1 = LineSegment((10, 10), (10, 50), bresenham.draw_segment)
-            seg2 = LineSegment((50, 10), (50, 50), dda.draw_segment)
+        c_points = self.c_points
 
-            seg1.draw(putpixel)
-            seg2.draw(putpixel)
-
-            seg3 = LineSegment((10, 110), (50, 110), bresenham.draw_segment)
-            seg4 = LineSegment((10, 150), (50, 150), dda.draw_segment)
-
-            seg3.draw(putpixel)
-            seg4.draw(putpixel)
-
-            seg5 = LineSegment((10, 250), (50, 210), bresenham.draw_segment)
-            seg6 = LineSegment((60, 250), (100, 210), dda.draw_segment)
-
-            seg5.draw(putpixel)
-            seg6.draw(putpixel)
-
-            seg7 = LineSegment((10, 350), (50, 349), bresenham.draw_segment)
-            seg8 = LineSegment((60, 350), (100, 349), dda.draw_segment)
-
-            seg7.draw(putpixel)
-            seg8.draw(putpixel)
-
-            seg9 = LineSegment((10, 450), (30, 390), bresenham.draw_segment)
-            seg10 = LineSegment((60, 450), (80, 390), dda.draw_segment)
-
-            seg9.draw(putpixel)
-            seg10.draw(putpixel)
-
-            seg13 = LineSegment((30, 550), (10, 490), bresenham.draw_segment)
-            seg14 = LineSegment((80, 550), (60, 490), dda.draw_segment)
-
-            seg13.draw(putpixel)
-            seg14.draw(putpixel)
-               
-        LineSegment((400,0),(550,550), dda.draw_segment, (255,0, 0)).draw(putpixel)
-        LineSegment((550,550),(660,0), dda.draw_segment, (255,0, 0)).draw(putpixel)
-        LineSegment((660,0),(700,510), dda.draw_segment, (255,0, 0)).draw(putpixel)
-        LineSegment((700,510),(750,10), dda.draw_segment, (255,0, 0)).draw(putpixel)
-
-        self.button1 = wx.Button(self, id=-1, label='Button1', pos=(396, 0), size=(8, 8))
-        self.button1.Bind(wx.EVT_BUTTON, self.buttonClick(self.button1))
-        self.button2 = wx.Button(self, id=-1, label='Button2', pos=(546, 550), size=(8, 8))
-        self.button2.Bind(wx.EVT_BUTTON, self.buttonClick(self.button2))
-        self.button3 = wx.Button(self, id=-1, label='Button3', pos=(656, 0), size=(8, 8))
-        self.button3.Bind(wx.EVT_BUTTON, self.buttonClick(self.button3))
-        self.button4 = wx.Button(self, id=-1, label='Button4', pos=(696, 510), size=(8, 8))
-        self.button4.Bind(wx.EVT_BUTTON, self.buttonClick(self.button4))
-        self.button5 = wx.Button(self, id=-1, label='Button5', pos=(746, 10), size=(8, 8))
-        self.button5.Bind(wx.EVT_BUTTON, self.buttonClick(self.button5))
-        
-        if (self.__algorithm == "Bezier"):
-            curvas.Bezier([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, bresenham.draw_segment, putpixel)
-        elif(self.__algorithm == "BSplineUniforme"):
-            curvas.bsplines([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, bresenham.draw_segment, putpixel)
-        elif (self.__algorithm == "BSplineNoUniforme"):
-            curvas.bsplines_no_uniforme([[400,0],[550,550],[660,0],[700,510],[750,10]], 1000, 3, bresenham.draw_segment, putpixel)
+        self.buttons = []
+        s = len(c_points)
     
-    def buttonClick(self, button):
-        dataobject = wx.CustomDataObject(wx.CustomDataFormat("MySpecialData"))
-        dataobject.SetData("")
-        dragSource = wx.DropSource(button)
-        dragSource.SetData(dataobject)
-        dragSource.DoDragDrop(wx.Drag_DefaultMove)
+        b_size = (5, 5)
+
+        alter_size = lambda p: [p[0] - b_size[0]/2, p[1] - b_size[1]/2]
+
+        for i in range(s):
+            if i + 1 != s:
+                LineSegment(c_points[i], c_points[i + 1], dda.draw_segment, (255, 0, 0)).draw(putpixel)
+
+            self.buttons.append(MyButton(self, i, 'Button', alter_size(c_points[i]), b_size, c_points[i]))
+
+        if self.__algorithm == "Bezier":
+            curvas.Bezier(c_points, 1000, bresenham.draw_segment, putpixel)
+        elif self.__algorithm == "BSplineUniforme":
+            curvas.bsplines(c_points, 1000, bresenham.draw_segment, putpixel)
+        elif self.__algorithm == "BSplineNoUniforme":
+            curvas.bsplines_no_uniforme(c_points, 1000, 3, bresenham.draw_segment, putpixel)
+    
 
 class SnowWindow(GenericWindow):
 
