@@ -23,16 +23,16 @@ class MyButton(wx.Button):
         self.id = id
         self.window = window
 
-        wx.EVT_LEFT_DOWN(self, self.OnMouseDown)
-        wx.EVT_RIGHT_DOWN(self, self.OnMouseRightDown)
+        wx.EVT_LEFT_DOWN(self, self.on_mouse_down)
+        wx.EVT_RIGHT_DOWN(self, self.on_mouse_right_down)
 
 
-    def OnMouseRightDown(self, event):
+    def on_mouse_right_down(self, event):
         if self.window.being_dragged == None:
             del(self.window.c_points[self.id])
             self.window.Refresh()
 
-    def OnMouseDown(self, event):
+    def on_mouse_down(self, event):
         if self.window.being_dragged == None:
             self.window.being_dragged = self.id
         else:
@@ -45,10 +45,10 @@ class CurvesWindow(GenericWindow):
         GenericWindow.__init__(self, 0, "Trabajo Practico de Curvas",
             size, GenericWindow.STATIC)
 
-        wx.EVT_MOTION(self, self.OnMouseMove)
-        wx.EVT_LEFT_DOWN(self, self.OnMouseDown)
+        wx.EVT_MOTION(self, self.on_mouse_move)
+        wx.EVT_LEFT_DOWN(self, self.on_mouse_down)
 
-        self.CreateMenu()
+        self.create_menu()
 
         #self.c_points = [[100,100],[150,80],[200,100], [200,150], [150,180],[100,150],[100,100],[150,80],[200,100], [200,150], [150,180],[100,150],[100,100],[150,80],[200,100], [200,150], [150,180],[100,150]]
         self.c_points = []
@@ -58,18 +58,18 @@ class CurvesWindow(GenericWindow):
         self.show_drawings = False
 
 
-    def OnMouseDown(self, event):
+    def on_mouse_down(self, event):
         self.c_points.append([event.GetX(), event.GetY()])
         self.Refresh()
             
-    def OnMouseMove(self, event):
+    def on_mouse_move(self, event):
         if self.being_dragged != None:
             self.c_points[self.being_dragged][0] = event.GetX()
             self.c_points[self.being_dragged][1] = event.GetY()
             self.Refresh()
 
 
-    def CreateMenu(self):
+    def create_menu(self):
         self.__algorithm = ""
         menu_algo = wx.Menu()
         menu_algo.Append(1, "Bezier")
@@ -135,15 +135,19 @@ class CurvesWindow(GenericWindow):
     def draw(self, putpixel):
 
         if self.show_drawings:
-            nube = [[313, 410], [305, 486], [205, 486], [185, 412], [95, 434],
-                [48, 389], [100, 336], [45, 295], [46, 231], [117, 213],
-                [132, 149], [196, 142], [236, 203], [291, 135], [371, 138],
-                [370, 205], [445, 146], [510, 139], [540, 210], [616, 204],
-                [660, 257], [577, 312], [663, 353], [647, 397], [582, 418],
-                [577, 488], [502, 487], [490, 428], [423, 513], [365, 509],
-                [322, 410]]
+            nube = [[80, 67], [92, 46], [111, 44], [124, 74], [141, 49], [160, 46], [175, 69], [190, 47], [209, 46], [220, 66], [238, 78], [238, 103], [223, 115], [211, 132], [195, 130], [179, 113], [163, 129], [144, 129], [128, 112], [117, 126], [96, 128], [84, 112], [65, 101], [63, 77], [80,67]]
             curvas.BezierMenorGrado(nube, 1000, bresenham.draw_segment, putpixel)
 
+            campo = [[7, 398], [110, 337], [226, 321], [355, 316], [483, 312], [591, 318], [697, 345], [791, 368]]
+            curvas.Bezier(campo, 1000, bresenham.draw_segment, putpixel)
+
+            arbol = [[271, 484], [301, 440], [316, 380], [314, 296], [243, 269], [252, 218], [218, 180], [250, 124], [302, 82], [388, 80], [419, 125], [458, 157], [446, 217], [437, 264], [386, 288], [384, 382], [397, 443], [421, 486]]
+            curvas.bsplines_no_uniforme(arbol, 1000, 3, bresenham.draw_segment, putpixel)
+
+
+            sol = [[100,100],[150,80],[200,100], [200,150], [150,180],[100,150],[100,100],[150,80],[200,100], [200,150], [150,180],[100,150],[100,100],[150,80],[200,100], [200,150], [150,180],[100,150]]
+            curvas.bsplines(sol, 1000, bresenham.draw_segment, putpixel)
+            
         else:
 
             c_points = self.c_points

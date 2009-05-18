@@ -96,3 +96,4 @@ class Polygon(Scene):
 
     def imprimite(self):
         print self.vertices
+
