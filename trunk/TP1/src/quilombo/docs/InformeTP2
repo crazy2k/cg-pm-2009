@@ -19,9 +19,10 @@ Ejercicio 2
 
 
 La cantidad de puntos de control depende básicamente de dos factores:
-- La complejidad de la figura (el árbol necesita más puntos que el horizonte)
-- El método elegido para graficarla (para el sol se repitieron 6 puntos 3 veces cada
-uno para lograr el efecto mostrado en el apunte)
+
+* La complejidad de la figura (el árbol necesita más puntos que el horizonte)
+* El método elegido para graficarla (para el sol se repitieron 6 puntos 3 veces cada
+  uno para lograr el efecto mostrado en el apunte)
 
 Utilizamos el editor para realizar los dibujos, lo cual simplificó mucho la tarea de
 determinar los puntos de control. Además el editor nos facilitó la elección del
