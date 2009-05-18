@@ -36,7 +36,7 @@ class MyButton(wx.Button):
 class CurvesWindow(GenericWindow):
     
     def __init__(self, size):
-        GenericWindow.__init__(self, 0, "Comparacion - Bresenham vs DDA",
+        GenericWindow.__init__(self, 0, "Trabajo Practico de Curvas",
             size, GenericWindow.STATIC)
 
         wx.EVT_MOTION(self, self.OnMouseMove)
@@ -77,6 +77,7 @@ class CurvesWindow(GenericWindow):
 
         menu_opt = wx.Menu()
         menu_opt.Append(5, "Limpiar")
+        menu_opt.Append(6, "Imprimir puntos del grafo de control")
         
         menuBar = wx.MenuBar()
         menuBar.Append(menu_algo, "Algoritmos")
@@ -87,7 +88,11 @@ class CurvesWindow(GenericWindow):
         self.Bind(wx.EVT_MENU, self.menuBSplineNoUniforme, id=3)
         self.Bind(wx.EVT_MENU, self.menuBezierMenorGrado, id=4)
         self.Bind(wx.EVT_MENU, self.menuLimpiar, id=5)
+        self.Bind(wx.EVT_MENU, self.menuImprimir, id=6)
         
+    def menuImprimir(self, event):
+        print self.c_points
+
     def menuLimpiar(self, event):
         self.c_points = []
         self.Refresh()
@@ -128,7 +133,7 @@ class CurvesWindow(GenericWindow):
             if i + 1 != s:
                 LineSegment([int(c_points[i][0]),int(c_points[i][1])], [int(c_points[i+1][0]),int(c_points[i+1][1])] , bresenham.draw_segment, (255, 0, 0)).draw(putpixel)
 
-            self.buttons.append(MyButton(self, i, 'Button', alter_size(c_points[i]), b_size, c_points[i]))
+            self.buttons.append(MyButton(self, i, '', alter_size(c_points[i]), b_size, c_points[i]))
 
         if self.__algorithm == "Bezier":
             curvas.Bezier(c_points, 1000, bresenham.draw_segment, putpixel)
