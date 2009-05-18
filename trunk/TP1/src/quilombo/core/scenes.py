@@ -2,7 +2,7 @@ from algorithms.scan import PolygonScanAlgorithm
 from utils.transformations import transformed_point
 from algorithms.windowing import WindowingMatrix
 
-from algorithms import bresenham, clipping
+from algorithms import bresenham, clipping, curvas
 
 class Scene:
 
@@ -97,3 +97,49 @@ class Polygon(Scene):
     def imprimite(self):
         print self.vertices
 
+
+class Curve(Scene):
+    def __init__(self, control_points, algorithm = bresenham):
+        self.c_points = control_points
+        self.algorithm = algorithm
+
+    def draw(self, putpixel):
+        raise NotImplementedError
+        
+
+class BezierCurve(Curve):
+    def __init__(self, control_points, algorithm = bresenham):
+        Curve.__init__(self, control_points, algorithm)
+
+    def draw(self, putpixel):
+        curvas.Bezier(self.c_points, 1000, self.algorithm.draw_segment,
+            putpixel)
+
+
+class NotUniformBSplineCurve(Curve):
+    def __init__(self, control_points, algorithm = bresenham):
+        Curve.__init__(self, control_points, algorithm)
+
+    def draw(self, putpixel):
+        curvas.bsplines_no_uniforme(self.c_points, 1000, 3,
+            self.algorithm.draw_segment, putpixel)
+
+
+class BSplineCurve(Curve):
+    def __init__(self, control_points, algorithm = bresenham):
+        Curve.__init__(self, control_points, algorithm)
+
+    def draw(self, putpixel):
+        curvas.bsplines(self.c_points, 1000, self.algorithm.draw_segment,
+            putpixel)
+
+
+class PolyBezierCurve(Curve):
+    def __init__(self, control_points, algorithm = bresenham):
+        Curve.__init__(self, control_points, algorithm)
+
+    def draw(self, putpixel):
+        curvas.BezierMenorGrado(self.c_points, 1000,
+        self.algorithm.draw_segment, putpixel)
+
+    
