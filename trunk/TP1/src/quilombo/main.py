@@ -241,11 +241,11 @@ class CurvesWindow(GenericWindow):
                     alter_size(c_points[i]), b_size, c_points[i]))
 
             curve = None
-            if self.__algorithm == "Bezier":
+            if self.__algorithm == "Bezier" and len(c_points) != 0:
                 curve = BezierCurve(c_points, bresenham)
-            elif self.__algorithm == "BSplineUniforme":
+            elif self.__algorithm == "BSplineUniforme" and len(c_points) != 0:
                 curve = BSplineCurve(c_points, bresenham)
-            elif self.__algorithm == "BSplineNoUniforme":
+            elif self.__algorithm == "BSplineNoUniforme" and len(c_points) != 0:
                 curve = NotUniformBSplineCurve(c_points, bresenham)
             elif self.__algorithm == "BezierMenorGrado": 
                 curve = PolyBezierCurve(c_points, bresenham)
