@@ -65,12 +65,17 @@ class CurvesWindow(GenericWindow):
         menu.Append(2, "B-Spline Uniforme")
         menu.AppendSeparator()
         menu.Append(3, "B-Spline No Uniforme")
+        menu.AppendSeparator()
+        menu.Append(4, "Poly Bezier")
+        
         menuBar = wx.MenuBar()
         menuBar.Append(menu, "Algoritmo")
         self.SetMenuBar(menuBar)
         self.Bind(wx.EVT_MENU, self.menuBezier, id=1)
         self.Bind(wx.EVT_MENU, self.menuBSplineUniforme, id=2)
         self.Bind(wx.EVT_MENU, self.menuBSplineNoUniforme, id=3)
+        self.Bind(wx.EVT_MENU, self.menuBezierMenorGrado, id=4)
+        
         
     def menuBezier(self, event):
         self.__algorithm = "Bezier"
@@ -82,6 +87,10 @@ class CurvesWindow(GenericWindow):
     
     def menuBSplineNoUniforme(self, event):
         self.__algorithm = "BSplineNoUniforme"
+        self.Refresh()
+
+    def menuBezierMenorGrado(self, event):
+        self.__algorithm = "BezierMenorGrado"
         self.Refresh()
     
     def draw(self, putpixel):
@@ -107,12 +116,14 @@ class CurvesWindow(GenericWindow):
             self.buttons.append(MyButton(self, i, 'Button', alter_size(c_points[i]), b_size, c_points[i]))
 
         if self.__algorithm == "Bezier":
-            curvas.BezierMenorGrado(c_points, 1000, bresenham.draw_segment, putpixel)
+            curvas.Bezier(c_points, 1000, bresenham.draw_segment, putpixel)
         elif self.__algorithm == "BSplineUniforme":
             curvas.bsplines(c_points, 1000, bresenham.draw_segment, putpixel)
         elif self.__algorithm == "BSplineNoUniforme":
             curvas.bsplines_no_uniforme(c_points, 1000, 3, bresenham.draw_segment, putpixel)
-    
+        elif self.__algorithm == "BezierMenorGrado": 
+            curvas.BezierMenorGrado(c_points, 1000, bresenham.draw_segment, putpixel)
+  
 
 class SnowWindow(GenericWindow):
 
