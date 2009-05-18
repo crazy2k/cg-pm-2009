@@ -29,7 +29,7 @@ def Bezier(grafo_control, paso, drawsegment, putpixel):
 
 def BezierMenorGrado(grafo_control, paso, drawsegment, putpixel):
     for i in range ((len(grafo_control)+1)/4):
-        for j in range (3):
+        for j in range (4):
             if i==0:
                 Bezier(grafo_control[i*4:i*4+4], paso, drawsegment, putpixel)
             else:
