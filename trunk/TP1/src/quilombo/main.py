@@ -82,9 +82,14 @@ class CurvesWindow(GenericWindow):
         menu_opt = wx.Menu()
         menu_opt.Append(5, "Limpiar editor")
         menu_opt.AppendSeparator()
+        menu_opt.Append(8, "Mostrar espiral")
+        menu_opt.Append(9, "Mostrar onda")
+        menu_opt.Append(10, "Mostrar U")
+        menu_opt.AppendSeparator()
+
         menu_opt.Append(6, "Imprimir puntos del grafo de control")
         menu_opt.AppendSeparator()
-        menu_opt.Append(7, "Mostrar/Ocultar dibujos")
+        menu_opt.Append(7, "Modo dibujos/editor")
 
         menuBar = wx.MenuBar()
         menuBar.Append(menu_algo, "Algoritmos")
@@ -99,10 +104,31 @@ class CurvesWindow(GenericWindow):
         self.Bind(wx.EVT_MENU, self.menu_clear, id=5)
         self.Bind(wx.EVT_MENU, self.menu_print_points, id=6)
         self.Bind(wx.EVT_MENU, self.menu_show_drawings, id=7)
+        self.Bind(wx.EVT_MENU, self.menu_show_spiral, id=8)
+        self.Bind(wx.EVT_MENU, self.menu_show_wave, id=9)
+        self.Bind(wx.EVT_MENU, self.menu_show_U, id=10)
 
         self.__menu_algo = menu_algo
         self.__menu_opt = menu_opt
         
+    def menu_show_spiral(self, event):
+        self.c_points = [[95, 102], [127, 45], [180, 48], [205, 76],
+            [223, 101], [217, 162], [183, 171], [139, 181], [115, 146],
+            [130, 117], [149, 90], [181, 110], [175, 139]]
+        self.Refresh()
+        
+    def menu_show_wave(self, event):
+        self.c_points = [[52, 198], [70, 173], [112, 136], [161, 110],
+            [203, 89], [253, 114], [289, 138], [324, 160], [382, 175],
+            [446, 129], [499, 91]]
+        self.Refresh()
+ 
+    def menu_show_U(self, event):
+        self.c_points = [[133, 61], [104, 116], [128, 227], [203, 227],
+            [278, 227], [311, 119], [283, 62]]
+        self.Refresh()
+ 
+
     def menu_show_drawings(self, event):
         if self.show_drawings:
             self.show_drawings = False
