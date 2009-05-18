@@ -99,12 +99,22 @@ class Polygon(Scene):
 
 
 class Curve(Scene):
-    def __init__(self, control_points, algorithm = bresenham):
+    def __init__(self, control_points, algorithm = bresenham, draw_cp = True):
         self.c_points = control_points
         self.algorithm = algorithm
 
     def draw(self, putpixel):
-        raise NotImplementedError
+        b_size = (3, 3)
+        alter_size = lambda p: [p[0] - b_size[0]/2, p[1] - b_size[1]/2]
+        cs = CompositeScene()
+        for p in self.c_points:
+            p = alter_size(p)
+            pol = Polygon([(p[0], p[1]), (p[0] + b_size[0], p[1]),
+                (p[0] + b_size[0], p[1] + b_size[1]),
+                (p[0], p[1] + b_size[1])], (255, 0, 0))
+            cs.add_child(pol)
+        cs.draw(putpixel)
+
         
 
 class BezierCurve(Curve):
@@ -112,6 +122,7 @@ class BezierCurve(Curve):
         Curve.__init__(self, control_points, algorithm)
 
     def draw(self, putpixel):
+        Curve.draw(self, putpixel)
         curvas.Bezier(self.c_points, 1000, self.algorithm.draw_segment,
             putpixel)
 
@@ -121,6 +132,7 @@ class NotUniformBSplineCurve(Curve):
         Curve.__init__(self, control_points, algorithm)
 
     def draw(self, putpixel):
+        Curve.draw(self, putpixel)
         curvas.bsplines_no_uniforme(self.c_points, 1000, 3,
             self.algorithm.draw_segment, putpixel)
 
@@ -130,6 +142,7 @@ class BSplineCurve(Curve):
         Curve.__init__(self, control_points, algorithm)
 
     def draw(self, putpixel):
+        Curve.draw(self, putpixel)
         curvas.bsplines(self.c_points, 1000, self.algorithm.draw_segment,
             putpixel)
 
@@ -139,6 +152,7 @@ class PolyBezierCurve(Curve):
         Curve.__init__(self, control_points, algorithm)
 
     def draw(self, putpixel):
+        Curve.draw(self, putpixel)
         curvas.BezierMenorGrado(self.c_points, 1000,
         self.algorithm.draw_segment, putpixel)
 
