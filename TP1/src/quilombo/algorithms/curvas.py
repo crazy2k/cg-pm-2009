@@ -50,7 +50,7 @@ def bsplines(g, pasos, draw_segment, putpixel):
 
     p = g[0]
     
-    for j in range(0, len(g)):
+    for j in range(1, len(g)-1):
         for k in range(2, pasos + 1):
             u = float(k)/pasos
         
@@ -72,7 +72,8 @@ def bsplines(g, pasos, draw_segment, putpixel):
                 p[1] = p[1] + g[index][1]*v
             
             p = [int(p[0]), int(p[1])]
-            draw_segment(p_anterior, p, putpixel, (0,0,0))
+            if j>1:
+                draw_segment(p_anterior, p, putpixel, (0,0,0))
 
 
 
