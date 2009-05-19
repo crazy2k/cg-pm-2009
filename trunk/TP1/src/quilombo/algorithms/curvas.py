@@ -77,31 +77,31 @@ def bsplines(g, pasos, draw_segment, putpixel):
 #def bspline2(grafo_control):
  #   for x in range(pasos):
         
-def bsplines_no_uniforme(g, pasos, grado, draw_segment, putpixel):
+def bsplines_no_uniforme(g, n, pasos, grado, draw_segment, putpixel):
 
     pts_ctrol=len(g)-1
 
-    def Nudo(i):
+    #def Nudo(i):
 
-        if i < grado:
-            return 0
-        elif i > pts_ctrol:
-            return pts_ctrol-grado+2
-        else:
-            return i-grado+1
+     #   if i < grado:
+      #      return 0
+       # elif i > pts_ctrol:
+        #    return pts_ctrol-grado+2
+        #else:
+         #   return i-grado+1
     
-    def Base(u, i, k):
+    def Base(n, u, i, k):
     
         if k==1:
-            if (u < Nudo(i+1)) and (Nudo(i) <= u):
+            if (u < n[i+1]) and (n[i] <= u):
                 return 1
             else:
                 return 0
         else:
-            n1 = (u-Nudo(i))*Base(u,i,k-1)
-            n2 = (Nudo(i+k)-u)*Base(u,i+1,k-1)
-            d1 = Nudo(i+k-1)-Nudo(i)
-            d2 = Nudo(i+k)-Nudo(i+1)
+            n1 = (u-n[i])*Base(n,u,i,k-1)
+            n2 = (n[i+k]-u)*Base(n,u,i+1,k-1)
+            d1 = n[i+k-1]-n[i]
+            d2 = n[i+k]-n[i+1]
             if d1==0:
                 c1 = 0
             else:
@@ -119,7 +119,7 @@ def bsplines_no_uniforme(g, pasos, grado, draw_segment, putpixel):
         u = float(i)/pasos
         
         for j in range(0,pts_ctrol+1):
-            v = Base(u,j,grado)
+            v = Base(n,u,j,grado)
             p[0] = p[0] + g[j][0]*v
             p[1] = p[1] + g[j][1]*v
 

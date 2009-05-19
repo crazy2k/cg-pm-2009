@@ -123,17 +123,18 @@ class BezierCurve(Curve):
 
     def draw(self, putpixel):
         Curve.draw(self, putpixel)
-        curvas.Bezier(self.c_points, 1000, self.algorithm.draw_segment,
+        curvas.Bezier(self.c_points, 100, self.algorithm.draw_segment,
             putpixel)
 
 
 class NotUniformBSplineCurve(Curve):
-    def __init__(self, control_points, algorithm = bresenham):
+    def __init__(self, control_points, knots, algorithm = bresenham):
         Curve.__init__(self, control_points, algorithm)
+        self.knots = knots
 
     def draw(self, putpixel):
         Curve.draw(self, putpixel)
-        curvas.bsplines_no_uniforme(self.c_points, 1000, 3,
+        curvas.bsplines_no_uniforme(self.c_points, self.knots, 50, len(self.knots) - len(self.c_points),
             self.algorithm.draw_segment, putpixel)
 
 
@@ -143,7 +144,7 @@ class BSplineCurve(Curve):
 
     def draw(self, putpixel):
         Curve.draw(self, putpixel)
-        curvas.bsplines(self.c_points, 1000, self.algorithm.draw_segment,
+        curvas.bsplines(self.c_points, 50, self.algorithm.draw_segment,
             putpixel)
 
 
@@ -153,7 +154,7 @@ class PolyBezierCurve(Curve):
 
     def draw(self, putpixel):
         Curve.draw(self, putpixel)
-        curvas.BezierMenorGrado(self.c_points, 1000,
+        curvas.BezierMenorGrado(self.c_points, 100,
         self.algorithm.draw_segment, putpixel)
 
     

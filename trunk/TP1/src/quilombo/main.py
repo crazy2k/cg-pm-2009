@@ -174,6 +174,23 @@ class CurvesWindow(GenericWindow):
     
     def menuBSplineNoUniforme(self, event):
         self.__algorithm = "BSplineNoUniforme"
+        self.__knots = [0,0,0,0,1,2,3,4,4,4,4]
+        self.__grade = 3
+        dlg = wx.TextEntryDialog(self, 'Grado:', 'Eleccion del grado')
+        while True:
+            if dlg.ShowModal() == wx.ID_OK:
+                try: 
+                    grado = int(dlg.GetValue())
+                    if grado > 0:
+                        self.__grade = grado
+                        break
+                    else:
+                        wx.MessageBox('El grado debe ser mayor que cero.',
+                                   'Grado invalido') 
+                except ValueError: 
+                     wx.MessageBox('El grado ingresado es invalido.',
+                                   'Grado invalido')                                           
+        dlg.Destroy()
         self.Refresh()
 
     def menuBezierMenorGrado(self, event):
@@ -199,7 +216,8 @@ class CurvesWindow(GenericWindow):
                 [243, 269], [252, 218], [218, 180], [250, 124], [302, 82],
                 [388, 80], [419, 125], [458, 157], [446, 217], [437, 264],
                 [386, 288], [384, 382], [397, 443], [421, 486]]
-            arbol = NotUniformBSplineCurve(arbol_points, bresenham)
+            knots = [0,0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,16,16]
+            arbol = NotUniformBSplineCurve(arbol_points, knots, bresenham)
 
             sol_points = [[580, 70], [630, 50], [680, 70], [680, 120],
                 [630, 150], [580, 120], [580, 70], [630, 50], [680, 70],
@@ -246,7 +264,7 @@ class CurvesWindow(GenericWindow):
             elif self.__algorithm == "BSplineUniforme" and len(c_points) != 0:
                 curve = BSplineCurve(c_points, bresenham)
             elif self.__algorithm == "BSplineNoUniforme" and len(c_points) != 0:
-                curve = NotUniformBSplineCurve(c_points, bresenham)
+                curve = NotUniformBSplineCurve(c_points, self.__knots, bresenham)
             elif self.__algorithm == "BezierMenorGrado": 
                 curve = PolyBezierCurve(c_points, bresenham)
 
