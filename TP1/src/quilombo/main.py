@@ -217,10 +217,22 @@ class CurvesWindow(GenericWindow):
         self.Refresh()
         wx.StaticText(self, 11, 'Nudo')
         self.__knotNumber = wx.SpinCtrl(self, 12, pos = (0, 20) , min = 1, max = (len(self.c_points) - self.__grade) , initial = 1)
+        self.Bind(wx.EVT_SPIN_UP, self.refreshSpinUp, id=12)
+        self.Bind(wx.EVT_SPIN_DOWN, self.refreshSpinDown, id=12)
         wx.StaticText(self, 13, 'Valor', pos = (0, 50))
         self.__knotValue = wx.Slider(self, 14, pos = (0, 70), minValue = self.__knots[self.__knotNumber.GetValue() + self.__grade - 2]*100, maxValue = self.__knots[self.__knotNumber.GetValue() + self.__grade]*100)
         self.Bind(wx.EVT_SLIDER, self.valorNudo, id=14)
 
+    def refreshSpinUp(self, event):
+        self.__knotValue.Destroy()
+        self.__knotValue = wx.Slider(self, 14, pos = (0, 70), minValue = self.__knots[self.__knotNumber.GetValue() + self.__grade - 1]*100, maxValue = self.__knots[self.__knotNumber.GetValue() + self.__grade + 1]*100)
+        self.Refresh()
+
+    def refreshSpinDown(self, event):
+        self.__knotValue.Destroy()
+        self.__knotValue = wx.Slider(self, 14, pos = (0, 70), minValue = self.__knots[self.__knotNumber.GetValue() + self.__grade - 3]*100, maxValue = self.__knots[self.__knotNumber.GetValue() + self.__grade - 1]*100)
+        self.Refresh()
+        
     def valorNudo(self, event):
         self.__knots[self.__knotNumber.GetValue() + self.__grade -1] = float(self.__knotValue.GetValue())/100
         self.Refresh()
