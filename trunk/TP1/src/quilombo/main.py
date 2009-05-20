@@ -174,8 +174,7 @@ class CurvesWindow(GenericWindow):
     
     def menuBSplineNoUniforme(self, event):
         self.__algorithm = "BSplineNoUniforme"
-        self.__knots = [0,0,0,0,1,2,3,4,4,4,4]
-        self.__grade = 3
+        self.__knots = []
         dlg = wx.TextEntryDialog(self, 'Grado:', 'Eleccion del grado')
         while True:
             if dlg.ShowModal() == wx.ID_OK:
@@ -191,6 +190,30 @@ class CurvesWindow(GenericWindow):
                      wx.MessageBox('El grado ingresado es invalido.',
                                    'Grado invalido')                                           
         dlg.Destroy()
+        for i in range (0,self.__grade):
+            self.__knots.append(0)
+            
+        dlg2 = wx.TextEntryDialog(self, 'Nudos:', 'Eleccion de los nudos')
+        while (len(self.__knots) < len(self.c_points)):
+            while True:
+                if dlg2.ShowModal() == wx.ID_OK:
+                    try: 
+                        knot = int(dlg2.GetValue())
+                        if knot > 0 and knot <= (len(self.c_points) - self.__grade):
+                            self.__knots.append(knot)
+                            dlg2.SetValue("")
+                            break                                                
+                        else:
+                            wx.MessageBox('El nudo ingresado no se encuentra en el rango adecuado.',
+                                   'Grado invalido')
+                    except ValueError: 
+                        wx.MessageBox('El nudo ingresado es invalido.',
+                                   'Grado invalido')
+                    dlg2.SetValue("")                    
+        dlg2.Destroy()
+        for i in range (0,self.__grade):
+            self.__knots.append((len(self.c_points) - self.__grade) + 1)
+            
         self.Refresh()
 
     def menuBezierMenorGrado(self, event):
