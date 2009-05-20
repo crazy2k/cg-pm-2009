@@ -198,7 +198,7 @@ class CurvesWindow(GenericWindow):
             while True:
                 if dlg2.ShowModal() == wx.ID_OK:
                     try: 
-                        knot = int(dlg2.GetValue())
+                        knot = float(dlg2.GetValue())
                         if knot > 0 and knot <= (len(self.c_points) - self.__grade):
                             self.__knots.append(knot)
                             dlg2.SetValue("")
