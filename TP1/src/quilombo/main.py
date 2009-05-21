@@ -28,7 +28,7 @@ class MyButton(wx.Button):
 
 
     def on_mouse_right_down(self, event):
-        if self.window.being_dragged == None:
+        if self.window.being_dragged == None and self.window.dirty() == False:
             del(self.window.c_points[self.id])
             self.window.Refresh()
 
@@ -48,6 +48,7 @@ class CurvesWindow(GenericWindow):
         wx.EVT_MOTION(self, self.on_mouse_move)
         wx.EVT_LEFT_DOWN(self, self.on_mouse_down)
 
+        self.__dirty = False
         self.create_menu()
 
         self.c_points = []
@@ -55,9 +56,11 @@ class CurvesWindow(GenericWindow):
         self.buttons = []
         self.show_drawings = False
 
-
+    def dirty(self):
+        return self.__dirty
+        
     def on_mouse_down(self, event):
-        if not self.show_drawings:
+        if not self.show_drawings and self.__dirty == False:
             self.c_points.append([event.GetX(), event.GetY()])
             self.Refresh()
             
@@ -110,8 +113,6 @@ class CurvesWindow(GenericWindow):
 
         self.__menu_algo = menu_algo
         self.__menu_opt = menu_opt
-
-        self.__dirty = False
         
     def menu_show_spiral(self, event):
         self.c_points = [[95, 102], [127, 45], [180, 48], [205, 76],
@@ -254,7 +255,7 @@ class CurvesWindow(GenericWindow):
             self.__knotNumber.Destroy()
             self.__knotValueTitle.Destroy()
             self.__knotValue.Destroy()
-            self.__dirty = False
+            self.__dirty = False        
     
     def draw(self, putpixel):
         # Dibujos
