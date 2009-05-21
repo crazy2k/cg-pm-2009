@@ -181,7 +181,12 @@ class CurvesWindow(GenericWindow):
         self.__algorithm = "BSplineNoUniforme"
         self.LimpiarNoUnif()
         self.__dirty = True
-        self.__knots = []
+        self.ingresarGrado()                                            
+        self.crearNudosIniciales()                  
+        self.Refresh()
+        self.crearCombosNoUnif()
+
+    def ingresarGrado(self):
         dlg = wx.TextEntryDialog(self, 'Grado:', 'Eleccion del grado')
         while True:
             if dlg.ShowModal() == wx.ID_OK:
@@ -194,10 +199,11 @@ class CurvesWindow(GenericWindow):
                         wx.MessageBox('El grado debe ser mayor que cero.',
                                    'Grado invalido') 
                 except ValueError: 
-                     wx.MessageBox('El grado ingresado es invalido.',
-                                   'Grado invalido')                                           
+                     wx.MessageBox('El grado ingresado es invalido.', 'Grado invalido')
         dlg.Destroy()
-        
+
+    def crearNudosIniciales(self):
+        self.__knots = []
         for i in range (0,self.__grade + len(self.c_points)):
             if i < self.__grade:
                 self.__knots.append(0)    
@@ -205,8 +211,8 @@ class CurvesWindow(GenericWindow):
                 self.__knots.append((len(self.c_points) - self.__grade) + 1)
             else:
                 self.__knots.append(i + 1 - self.__grade)
-                  
-        self.Refresh()
+
+    def crearCombosNoUnif(self):
         self.__knotTitle = wx.StaticText(self, 11, 'Nudo')
         self.__knotNumber = wx.SpinCtrl(self, 12, pos = (0, 20) , min = 1, max = (len(self.c_points) - self.__grade) , initial = 1)
         self.Bind(wx.EVT_SPIN_UP, self.refreshSpinUp, id=12)
@@ -214,7 +220,7 @@ class CurvesWindow(GenericWindow):
         self.__knotValueTitle = wx.StaticText(self, 13, 'Valor', pos = (0, 50))
         self.__knotValue = wx.Slider(self, 14, pos = (0, 70), minValue = self.__knots[self.__knotNumber.GetValue() + self.__grade - 2]*100, maxValue = self.__knots[self.__knotNumber.GetValue() + self.__grade]*100)
         self.Bind(wx.EVT_SLIDER, self.valorNudo, id=14)
-
+        
     def refreshSpinUp(self, event):
         self.__knotValue.Destroy()
         self.__knotValue = wx.Slider(self, 14, pos = (0, 70), minValue = self.__knots[self.__knotNumber.GetValue() + self.__grade - 1]*100, maxValue = self.__knots[self.__knotNumber.GetValue() + self.__grade + 1]*100)
