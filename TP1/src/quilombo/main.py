@@ -197,30 +197,15 @@ class CurvesWindow(GenericWindow):
                      wx.MessageBox('El grado ingresado es invalido.',
                                    'Grado invalido')                                           
         dlg.Destroy()
-        for i in range (0,self.__grade):
-            self.__knots.append(0)
-            
-        dlg2 = wx.TextEntryDialog(self, 'Nudos:', 'Eleccion de los nudos')
-        while (len(self.__knots) < len(self.c_points)):
-            while True:
-                if dlg2.ShowModal() == wx.ID_OK:
-                    try: 
-                        knot = float(dlg2.GetValue())
-                        if knot > 0 and knot <= (len(self.c_points) - self.__grade):
-                            self.__knots.append(knot)
-                            dlg2.SetValue("")
-                            break                                                
-                        else:
-                            wx.MessageBox('El nudo ingresado no se encuentra en el rango adecuado.',
-                                   'Grado invalido')
-                    except ValueError: 
-                        wx.MessageBox('El nudo ingresado es invalido.',
-                                   'Grado invalido')
-                    dlg2.SetValue("")                    
-        dlg2.Destroy()
-        for i in range (0,self.__grade):
-            self.__knots.append((len(self.c_points) - self.__grade) + 1)
-            
+        
+        for i in range (0,self.__grade + len(self.c_points)):
+            if i < self.__grade:
+                self.__knots.append(0)    
+            elif i >= len(self.c_points):
+                self.__knots.append((len(self.c_points) - self.__grade) + 1)
+            else:
+                self.__knots.append(i + 1 - self.__grade)
+                  
         self.Refresh()
         self.__knotTitle = wx.StaticText(self, 11, 'Nudo')
         self.__knotNumber = wx.SpinCtrl(self, 12, pos = (0, 20) , min = 1, max = (len(self.c_points) - self.__grade) , initial = 1)
