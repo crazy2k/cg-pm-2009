@@ -110,6 +110,8 @@ class CurvesWindow(GenericWindow):
 
         self.__menu_algo = menu_algo
         self.__menu_opt = menu_opt
+
+        self.__dirty = False
         
     def menu_show_spiral(self, event):
         self.c_points = [[95, 102], [127, 45], [180, 48], [205, 76],
@@ -166,14 +168,18 @@ class CurvesWindow(GenericWindow):
         
     def menuBezier(self, event):
         self.__algorithm = "Bezier"
+        self.LimpiarNoUnif()
         self.Refresh()
     
     def menuBSplineUniforme(self, event):
         self.__algorithm = "BSplineUniforme"
+        self.LimpiarNoUnif()
         self.Refresh()
     
     def menuBSplineNoUniforme(self, event):
         self.__algorithm = "BSplineNoUniforme"
+        self.LimpiarNoUnif()
+        self.__dirty = True
         self.__knots = []
         dlg = wx.TextEntryDialog(self, 'Grado:', 'Eleccion del grado')
         while True:
@@ -215,11 +221,11 @@ class CurvesWindow(GenericWindow):
             self.__knots.append((len(self.c_points) - self.__grade) + 1)
             
         self.Refresh()
-        wx.StaticText(self, 11, 'Nudo')
+        self.__knotTitle = wx.StaticText(self, 11, 'Nudo')
         self.__knotNumber = wx.SpinCtrl(self, 12, pos = (0, 20) , min = 1, max = (len(self.c_points) - self.__grade) , initial = 1)
         self.Bind(wx.EVT_SPIN_UP, self.refreshSpinUp, id=12)
         self.Bind(wx.EVT_SPIN_DOWN, self.refreshSpinDown, id=12)
-        wx.StaticText(self, 13, 'Valor', pos = (0, 50))
+        self.__knotValueTitle = wx.StaticText(self, 13, 'Valor', pos = (0, 50))
         self.__knotValue = wx.Slider(self, 14, pos = (0, 70), minValue = self.__knots[self.__knotNumber.GetValue() + self.__grade - 2]*100, maxValue = self.__knots[self.__knotNumber.GetValue() + self.__grade]*100)
         self.Bind(wx.EVT_SLIDER, self.valorNudo, id=14)
 
@@ -239,7 +245,16 @@ class CurvesWindow(GenericWindow):
             
     def menuBezierMenorGrado(self, event):
         self.__algorithm = "BezierMenorGrado"
+        self.LimpiarNoUnif()
         self.Refresh()
+
+    def LimpiarNoUnif(self):
+        if self.__dirty:
+            self.__knotTitle.Destroy()
+            self.__knotNumber.Destroy()
+            self.__knotValueTitle.Destroy()
+            self.__knotValue.Destroy()
+            self.__dirty = False
     
     def draw(self, putpixel):
         # Dibujos
