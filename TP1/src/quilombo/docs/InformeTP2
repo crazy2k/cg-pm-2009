@@ -4,19 +4,24 @@ Curvas Planares
 Ejercicio 2
 -----------
 
-+-----------+-------------------+---------------------------------+----------+
-| Formas    | Método            | Qué buscabamos?                 | Puntos   |
-+===========+===================+=================================+==========+
-| Arbol     | B-Spline no unif  | Una línea con cierto movimiento |    18    | 
-+-----------+-------------------+---------------------------------+----------+
-| Sol       | B-Spline uniforme | Un círculo (que no pasara por   | 18(mod 6)|
-|           |                   | los puntos de control)          |          |
-+-----------+-------------------+---------------------------------+----------+
-| Nube      | Poly Bezier       | Muchas curvas "concatenadas"    |    24    |
-+-----------+-------------------+---------------------------------+----------+
-| Horizonte | Bezier            | Una línea con poco movimiento   |    8     |
-+-----------+-------------------+---------------------------------+----------+
 
++-----------+-----------------------+---------------------------------+----------+
+|  Formas   |        Método         |        ¿Qué buscabamos?         |  Puntos  |
++===========+=======================+=================================+==========+
+| Arbol     | B-Spline no uniforme  | Una línea que se acerque        |    18    |
+|           |                       | bastante al grafo de control    |          | 
++-----------+-----------------------+---------------------------------+----------+
+| Sol       | B-Spline uniforme     | Un círculo (que no pasara por   | 18(mod 6)|
+|           |                       | los puntos de control)          |          |
++-----------+-----------------------+---------------------------------+----------+
+| Nube      | Poly Bezier           | Muchas curvas "concatenadas" con|    24    |
+|           |                       | varios picos                    |          |
++-----------+-----------------------+---------------------------------+----------+
+| Horizonte | Bezier                | Una línea con poco movimiento   |    8     |
++-----------+-----------------------+---------------------------------+----------+
+
+¿De qué depende la cantidad de puntos de control?
+-------------------------------------------------
 
 La cantidad de puntos de control depende básicamente de dos factores:
 
@@ -24,6 +29,9 @@ La cantidad de puntos de control depende básicamente de dos factores:
 * El método elegido para graficarla (para el sol se repitieron 6 puntos 3 veces cada
   uno para lograr el efecto mostrado en el apunte)
 
+¿Cuánto tiempo de trabajo requirió encontrarlos o determinarlos?  
+---------------------------------------------------------------- 
+ 
 Utilizamos el editor para realizar los dibujos, lo cual simplificó mucho la tarea de
 determinar los puntos de control. Además el editor nos facilitó la elección del
 método a utilizar en el trazado de las curvas.
