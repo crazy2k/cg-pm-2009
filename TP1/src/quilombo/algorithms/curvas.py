@@ -74,57 +74,59 @@ def bsplines(g, pasos, draw_segment, putpixel):
 
 
 
-#def bspline2(grafo_control):
- #   for x in range(pasos):
-        
+# g: grafo de control
+# n: nudos (knots)
 def bsplines_no_uniforme(g, n, pasos, grado, draw_segment, putpixel):
 
-    pts_ctrol=len(g)-1
+    pts_ctrol = len(g) - 1
 
-    #def Nudo(i):
+    def base(n, u, i, k):
 
-     #   if i < grado:
-      #      return 0
-       # elif i > pts_ctrol:
-        #    return pts_ctrol-grado+2
-        #else:
-         #   return i-grado+1
-    
-    def Base(n, u, i, k):
-    
-        if k==1:
+        # caso base de la recursion
+        if k == 1:
             if (u < n[i+1]) and (n[i] <= u):
                 return 1
-            else:
-                return 0
+            return 0
+
+        # recursion
         else:
-            n1 = (u-n[i])*Base(n,u,i,k-1)
-            n2 = (n[i+k]-u)*Base(n,u,i+1,k-1)
-            d1 = n[i+k-1]-n[i]
-            d2 = n[i+k]-n[i+1]
-            if d1==0:
+            # N_{i,k} = n1/d1 + n2/d2
+            n1 = (u - n[i])*base(n, u, i, k - 1)
+            n2 = (n[i + k] - u)*base(n, u, i+1, k-1)
+            d1 = n[i + k -1] - n[i]
+            d2 = n[i + k] - n[i + 1]
+
+            # evitamos la division por cero para el primer cociente
+            if d1 == 0:
                 c1 = 0
             else:
                 c1 = float(n1)/d1
-            if d2==0:
+                
+            # evitamos la division por cero para el segundo cociente
+            if d2 == 0:
                 c2 = 0
             else:
                 c2 = float(n2)/d2
-            return c1+c2
 
-    p = g[0]            
-    for i in range(0,pasos*(pts_ctrol-grado+2)):
+            return c1 + c2
+
+    p = g[0]
+    # u va de 0 a pts_control - grado + 2
+    for i in range(0, pasos*(pts_ctrol - grado + 2)):
         p_anterior = copy.deepcopy(p)
-        p = [0,0]
+        p = [0, 0]
         u = float(i)/pasos
         
-        for j in range(0,pts_ctrol+1):
-            v = Base(n,u,j,grado)
-            p[0] = p[0] + g[j][0]*v
-            p[1] = p[1] + g[j][1]*v
+        # calculo P(u) = sumatoria de j = 0,..., pts_control de g_j*N
+        # (N es la funcion de blending)
+        # (recordar: j va hasta pts_control; el '+ 1' es por el range)
+        for j in range(0, pts_ctrol + 1):
+            v = base(n, u, j, grado)
+            p[0] += g[j][0]*v
+            p[1] += g[j][1]*v
 
         p_ant_int = [int(p_anterior[0]), int(p_anterior[1])]
         p_int = [int(p[0]), int(p[1])]
-        #print p_ant_int, p_int
+
         draw_segment(p_ant_int, p_int, putpixel, (0,0,0))
 
