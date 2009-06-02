@@ -40,6 +40,8 @@ class GenericWindow(wx.Frame):
         # el metodo on_paint se encargara de repintar
         self.Bind(wx.EVT_PAINT, self.on_paint)
 
+        self.Bind(wx.EVT_ERASE_BACKGROUND, self.on_erase)
+
         self.Bind(wx.EVT_SIZE, self.on_size)
 
         if self.type == self.AUTO_REFRESHING:
@@ -55,6 +57,10 @@ class GenericWindow(wx.Frame):
         self.Centre()
         self.Show(True)
 
+    def on_erase(self, event):
+        pass
+
+    
     def on_timer(self, event):
         self.bmp = self.__create_bmp()
 
