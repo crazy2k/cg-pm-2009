@@ -62,10 +62,12 @@ class BasicGLCanvas(wx.glcanvas.GLCanvas):
         # projection matrix will be the identity
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
+        gluPerspective(30, 1.3, 0.01, 1000)
 
         # modelview matrix will be the identity
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
+        gluLookAt(5, 10, 10, 0, 0, 0, 0, 1, 0)
 
         # enable depth test (otherwise, the depth buffer is not updated)
         glEnable(GL_DEPTH_TEST)
@@ -76,9 +78,9 @@ class BasicGLCanvas(wx.glcanvas.GLCanvas):
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
         # create a new quadrics object
-        quad = gluNewQuadric()
+        #quad = gluNewQuadric()
         # quadrics rendered with quad will not have texturing
-        gluQuadricTexture(quad, False)
+        #gluQuadricTexture(quad, False)
 
         # make polygons be filled with color or just see the lines/points
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE) 
@@ -90,19 +92,91 @@ class BasicGLCanvas(wx.glcanvas.GLCanvas):
         glColor3f(0, 10, 0)
 
         # we save the matrix in the modelview mode for further use
-        glPushMatrix()
+        #glPushMatrix()
 
         # we rotate 10 degrees around the X-axis
-        angle = -70
-        glRotated(angle, 1, 0, 0)
+        #angle = -70
+        #glRotated(angle, 1, 0, 0)
 
         # draw a cylinder
-        gluCylinder(quad, 0.50, 0.01, 1.0, 26, 4)
+        #gluCylinder(quad, 0.50, 0.01, 1.0, 26, 4)
+
+        glBegin(GL_LINES)
+        glColor3f(1, 0, 0)
+        glVertex3f(0, 0, 0)
+        glVertex3f(1, 0, 0)
+        glColor3f(0, 1, 0)
+        glVertex3f(0, 0, 0)
+        glVertex3f(0, 1, 0)
+        glColor3f(0, 0, 1)
+        glVertex3f(0, 0, 0)
+        glVertex3f(0, 0, 1)
+        glEnd()
+
+
+        glBegin(GL_POINTS)
+        glColor3f(1, 1, 1)
+        glVertex3f(0, 0, 0)
+        glColor3f(1, 0, 0)
+        glVertex3f(1, 0, 0)
+        glColor3f(0, 1, 0)
+        glVertex3f(0, 1, 0)
+        glColor3f(0, 0, 1)
+        glVertex3f(0, 0, 1)
+        glEnd()
+
+
+        self.draw_tree()
 
         # get rid of the new matrix
-        glPopMatrix()
+        #glPopMatrix()
 
         self.SwapBuffers()
+
+    def draw_cylinder(self, rad, height):
+        glPushMatrix()
+
+        # create a new quadrics object
+        quad = gluNewQuadric()
+        # quadrics rendered with quad will not have texturing
+        gluQuadricTexture(quad, False)
+        
+        glRotatef(-90, 1, 0, 0)
+        gluCylinder(quad, rad, rad, height, 26, 4)
+        
+        gluDeleteQuadric(quad)
+
+        glPopMatrix()
+
+    def draw_tree(self):
+        self.tree(6)
+
+
+    def tree(self, level):
+        h = 0.5
+        self.draw_cylinder(rad = 0.01, height = h)
+        
+        if level > 0:
+
+            glPushMatrix()
+
+            glTranslatef(0, h, 0)
+            glRotatef(15, 0, 0, 1)
+
+            self.tree(level - 1)
+
+            glPopMatrix()
+
+            glPushMatrix()
+
+            glTranslatef(0, h, 0)
+            glRotatef(-15, 0, 0, 1)
+            glRotatef(-20, 1, 0, 0)
+
+            self.tree(level - 1)
+
+            glPopMatrix()
+
 
 
     def on_erase_background(self, event):
