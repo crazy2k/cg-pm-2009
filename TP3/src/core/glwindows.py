@@ -4,6 +4,8 @@ import wx.glcanvas
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+from core.glfigures import *
+
 from math import sin, cos, pi
 
 class GLFrame(wx.Frame):
@@ -11,21 +13,28 @@ class GLFrame(wx.Frame):
     def __init__(self, id, title, size):
         wx.Frame.__init__(self, None, id, title, size = size)
 
-        # BasicGLCanvas' creation
+        # DrawingGLCanvas' creation
         attrib_list = (wx.glcanvas.WX_GL_RGBA, # RGBA
                        wx.glcanvas.WX_GL_DOUBLEBUFFER) # double-buffering
 
-        self.glcanvas = BasicGLCanvas(self, attrib_list)
+        self.glcanvas = DrawingGLCanvas(self, attrib_list)
+
+        self.glcanvas.add_figure(GLAxis())
+
+        cylinder_generator = GLCylinder.generator()
+        self.glcanvas.add_figure(GLTree(5, cylinder_generator))
 
         self.Centre()
         self.Show(True)
 
 
-class BasicGLCanvas(wx.glcanvas.GLCanvas):
+class DrawingGLCanvas(wx.glcanvas.GLCanvas):
 
     def __init__(self, parent, attrib_list):
         wx.glcanvas.GLCanvas.__init__(self, parent = parent,
             attribList = attrib_list)
+
+        self.figures = []
 
         self.context_initialized = False
 
@@ -39,6 +48,8 @@ class BasicGLCanvas(wx.glcanvas.GLCanvas):
         self.Bind(wx.EVT_ERASE_BACKGROUND, self.on_erase_background)
         self.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
 
+    def add_figure(self, figure):
+        self.figures.append(figure)
 
     def on_size(self, event):
         if self.GetContext():
@@ -74,9 +85,8 @@ class BasicGLCanvas(wx.glcanvas.GLCanvas):
         # clear color and depth buffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        self.draw_axis()
-
-        self.draw_tree(5)
+        for f in self.figures:
+            f.draw()
 
         self.SwapBuffers()
 
@@ -128,68 +138,6 @@ class BasicGLCanvas(wx.glcanvas.GLCanvas):
         # center (point at which the camera is aiming): always (0, 0, 0)
         # up vector: (0, 1, 0) (positive Y-axis)
         gluLookAt(eye_x, eye_y, eye_z, 0, 0, 0, 0, 1, 0)
-
-    def draw_axis(self):
-        glBegin(GL_LINES)
-
-        # X-axis
-        glColor3f(1, 0, 0)
-
-        glVertex3f(0, 0, 0)
-        glVertex3f(1, 0, 0)
-
-        # Y-axis
-        glColor3f(0, 1, 0)
-
-        glVertex3f(0, 0, 0)
-        glVertex3f(0, 1, 0)
-
-        # Z-axis
-        glColor3f(0, 0, 1)
-        glVertex3f(0, 0, 0)
-        glVertex3f(0, 0, 1)
-
-        glEnd()
-
-    def draw_tree(self, level):
-        h = 0.5
-        self.draw_cylinder(rad = 0.01, height = h)
-        
-        if level > 0:
-
-            glPushMatrix()
-
-            glTranslatef(0, h, 0)
-            glRotatef(15, 0, 0, 1)
-
-            self.draw_tree(level - 1)
-
-            glPopMatrix()
-
-            glPushMatrix()
-
-            glTranslatef(0, h, 0)
-            glRotatef(-15, 0, 0, 1)
-            glRotatef(-20, 1, 0, 0)
-
-            self.draw_tree(level - 1)
-
-            glPopMatrix()
-
-    def draw_cylinder(self, rad, height):
-        glPushMatrix()
-
-        # create a new quadrics object
-        quad = gluNewQuadric()
-        # quadrics rendered with quad will not have texturing
-        gluQuadricTexture(quad, False)
-        
-        glRotatef(-90, 1, 0, 0)
-        gluCylinder(quad, rad, rad, height, 26, 4)
-        
-        gluDeleteQuadric(quad)
-
-        glPopMatrix()
 
     def on_erase_background(self, event):
         # this is to avoid flickering on Win
