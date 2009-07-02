@@ -29,6 +29,19 @@ class GLFrame(wx.Frame):
 
 
 class DrawingGLCanvas(wx.glcanvas.GLCanvas):
+    """A DrawingGLCanvas is basically a GLCanvas with some additional
+    behaviour.
+
+    The DrawingGLCanvas takes care of the following events that occur on it:
+    * Resize event  -- when this event happens, the viewport of the canvas'
+                       OpenGL context is updated accordingly
+    * Repaint event -- OpenGL context initialization takes place if needed,
+                       some settings are updated (like the camera position)
+                       and all figures added with .add_figure() are drawn
+                       (their .draw() method is called)
+    * UI events     -- user-interface related events are handled
+
+    """
 
     def __init__(self, parent, attrib_list):
         wx.glcanvas.GLCanvas.__init__(self, parent = parent,
@@ -63,7 +76,6 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
             glViewport(0, 0, width, height)
 
     def on_paint(self, event):
-        """Attend the EVT_PAINT event."""
 
         # a PaintDC has to be created when attending an EVT_PAINT event
         wx.PaintDC(self)

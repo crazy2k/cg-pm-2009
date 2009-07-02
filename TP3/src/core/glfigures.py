@@ -1,7 +1,14 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-class GLAxis:
+class GLFigure:
+    """GLFigure defines a common interface for all figures that are going
+    to be drawn on a GLCanvas."""
+
+    def draw(self):
+        raise NotImplementedError
+
+class GLAxis(GLFigure):
 
     def draw(self):
         glBegin(GL_LINES)
@@ -25,9 +32,18 @@ class GLAxis:
 
         glEnd()
 
-class GLTree:
+class GLTree(GLFigure):
 
     def __init__(self, level, trunk_generator):
+        """GLTree's constructor takes two arguments:
+        * level             -- nonnegative integer indicating the tree's level
+        * trunk_generator   -- a Python generator, which will be called every
+                               time a trunk is needed to be drawn; it should
+                               give figures with the .draw() method
+                               implemented
+
+        """
+
         self.level = level
         self.trunk_generator = trunk_generator
 
@@ -59,7 +75,7 @@ class GLTree:
             glPopMatrix()
 
 
-class GLCylinder:
+class GLCylinder(GLFigure):
 
     def __init__(self, radius, height):
         self.radius = radius
@@ -82,7 +98,7 @@ class GLCylinder:
         glPopMatrix()
 
     @classmethod
-    def generator(self):
+    def generator(cls):
         while True:
             c = GLCylinder(0.01, 0.5)
 
