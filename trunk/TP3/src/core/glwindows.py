@@ -122,6 +122,15 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
         # nicest opt. as quality of color and texture coordinate interpolation
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
+        # Lighting settings
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, 50)
+        glLightfv(GL_LIGHT0, GL_POSITION, (0, 0, 10, 0))
+        glLightfv(GL_LIGHT0, GL_AMBIENT, (0.5, 0.5, 0.5, 1))
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, (1, 1, 1, 1))
+
+        glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
+
         self.context_initialized = True
 
     def position_camera(self, radius, elevation, azimuth):
