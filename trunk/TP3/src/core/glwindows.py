@@ -89,7 +89,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
         # modelview matrix
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        self.position_camera(10, self.cam_elevation, self.cam_azimuth)
+        self.position_camera(6, self.cam_elevation, self.cam_azimuth)
 
         # just see polygons' lines
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) 
