@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
+import random
 
 class GLFigure:
     """GLFigure defines a common interface for all figures that are going
@@ -52,15 +53,18 @@ class GLTree(GLFigure):
 
     def draw_tree(self, level):
         h = 0.5
+        r = ((random.random()*100)%44)-22
+        s = ((random.random()*100)%44)-22
+        t = random.random()
 
         f = self.trunk_generator.next()
         f.draw()
 
-        if level > 0:
+        if level > 0 and (t > 0.4 or level > 1):
             glPushMatrix()
 
             glTranslatef(0, h, 0)
-            glRotatef(15, 0, 0, 1)
+            glRotatef(r-s, 0, 0, 1)
             self.draw_tree(level - 1)
 
             glPopMatrix()
@@ -68,8 +72,8 @@ class GLTree(GLFigure):
             glPushMatrix()
 
             glTranslatef(0, h, 0)
-            glRotatef(-15, 0, 0, 1)
-            glRotatef(-20, 1, 0, 0)
+            glRotatef(r, 0, 0, 1)
+            glRotatef(s, 1, 0, 0)
             self.draw_tree(level - 1)
 
             glPopMatrix()
@@ -80,7 +84,6 @@ class GLCylinder(GLFigure):
     def __init__(self, radius, height):
         self.radius = radius
         self.height = height
-
         
     def draw(self):
         glPushMatrix()
@@ -91,7 +94,7 @@ class GLCylinder(GLFigure):
         gluQuadricTexture(quad, False)
         
         glRotatef(-90, 1, 0, 0)
-        gluCylinder(quad, self.radius, self.radius, self.height, 26, 4)
+        gluCylinder(quad, self.radius, self.radius-0.01, self.height, 26, 4)
         
         gluDeleteQuadric(quad)
 
@@ -100,8 +103,7 @@ class GLCylinder(GLFigure):
     @classmethod
     def generator(cls):
         while True:
-            c = GLCylinder(0.01, 0.5)
-
+            c = GLCylinder(0.05, 0.5)
             yield c
 
 
