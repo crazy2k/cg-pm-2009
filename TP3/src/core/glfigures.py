@@ -53,8 +53,8 @@ class GLTree(GLFigure):
 
     def draw_tree(self, level):
         h = 0.5
-        r = ((random.random()*100)%44)-22
-        s = ((random.random()*100)%44)-22
+        r = ((random.random()*100)%66)-33
+        s = ((random.random()*100)%50)-25
         t = random.random()
 
         f = self.trunk_generator(self.level - level)
