@@ -57,7 +57,7 @@ class GLTree(GLFigure):
         s = ((random.random()*100)%44)-22
         t = random.random()
 
-        f = self.trunk_generator.next()
+        f = self.trunk_generator(self.level - level)
         f.draw()
 
         if level > 0 and (t > 0.4 or level > 1):
@@ -101,10 +101,9 @@ class GLCylinder(GLFigure):
         glPopMatrix()
 
     @classmethod
-    def generator(cls):
-        while True:
-            c = GLCylinder(0.05, 0.5)
-            yield c
+    def generate(cls, level):
+        c = GLCylinder(0.05 - level*0.01, 0.5)
+        return c
 
 
 
