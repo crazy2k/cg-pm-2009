@@ -35,7 +35,7 @@ class GLAxis(GLFigure):
 
 class GLTree(GLFigure):
 
-    def __init__(self, level, trunk_generator):
+    def __init__(self, level, root, trunk_generator):
         """GLTree's constructor takes two arguments:
         * level             -- nonnegative integer indicating the tree's level
         * trunk_generator   -- a Python generator, which will be called every
@@ -46,13 +46,20 @@ class GLTree(GLFigure):
         """
 
         self.level = level
+        self.root = root
         self.trunk_generator = trunk_generator
 
     def draw(self):
+
+        glPushMatrix()
+        glTranslatef(self.root[0], self.root[1], self.root[2])
+
         self.draw_tree(self.level)
+        glPopMatrix()
 
     def draw_tree(self, level):
         h = 0.5
+
         r = ((random.random()*100)%66)-33
         s = ((random.random()*100)%50)-25
         t = random.random()
