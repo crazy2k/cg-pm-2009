@@ -151,12 +151,10 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
         """
         
         inclination = pi/2 - elevation
-        eye_x = round(radius*cos(azimuth)*sin(inclination))
-        eye_y = round(radius*sin(azimuth)*sin(inclination))
-        eye_z = round(radius*cos(inclination))
+        eye_x = radius*cos(azimuth)*sin(inclination)
+        eye_y = radius*sin(azimuth)*sin(inclination)
+        eye_z = radius*cos(inclination)
 
-        print "camera position: ", eye_x, eye_y, eye_z
-        
         # center (point at which the camera is aiming): always (0, 0, 0)
         # up vector: (0, 1, 0) (positive Y-axis)
         gluLookAt(eye_x, eye_y, eye_z, 0, 1, 0, 0, 1, 0)
