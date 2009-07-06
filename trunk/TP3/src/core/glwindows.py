@@ -8,6 +8,8 @@ from core.glfigures import *
 
 from math import sin, cos, pi
 
+from utils.transformations import IDENTITY_4
+
 class GLFrame(wx.Frame):
 
     def __init__(self, id, title, size):
@@ -20,10 +22,9 @@ class GLFrame(wx.Frame):
         self.glcanvas = DrawingGLCanvas(self, attrib_list)
 
         #self.glcanvas.add_figure(GLAxis())
-        cylinder_generator = GLCylinder.generate
+        generate_cylinder = GLCylinder.generate
         
-        self.glcanvas.add_figure(GLTree(5, (0, 0, 0), cylinder_generator))
-        #self.glcanvas.add_figure(GLTree(12, (1.5, 0, 0), cylinder_generator))
+        self.glcanvas.add_figure(generate_tree(1, IDENTITY_4, generate_cylinder))
 
         self.Centre()
         self.Show(True)
@@ -90,7 +91,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
         # modelview matrix
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        self.position_camera(6, self.cam_elevation, self.cam_azimuth)
+        self.position_camera(5, self.cam_elevation, self.cam_azimuth)
 
         # just see polygons' lines
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) 
@@ -99,7 +100,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         for f in self.figures:
-            f.draw()
+            f.paint()
 
         self.SwapBuffers()
 
@@ -113,7 +114,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
         # projection matrix
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        gluPerspective(45, 1, 1, 1000)
+        gluPerspective(45, 1, 0.1, 1000)
 
         # enable depth test (otherwise, the depth buffer is not updated)
         glEnable(GL_DEPTH_TEST)
@@ -124,13 +125,13 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
 
         # Lighting settings
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, 50)
-        glLightfv(GL_LIGHT0, GL_POSITION, (0, 0, 10, 0))
-        glLightfv(GL_LIGHT0, GL_AMBIENT, (0.5, 0.5, 0.5, 1))
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, (1, 1, 1, 1))
+ #       glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, 50)
+ #       glLightfv(GL_LIGHT0, GL_POSITION, (0, 0, 10, 0))
+ #       glLightfv(GL_LIGHT0, GL_AMBIENT, (0.5, 0.5, 0.5, 1))
+ #       glLightfv(GL_LIGHT0, GL_DIFFUSE, (1, 1, 1, 1))
 
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
+ #       glEnable(GL_LIGHTING)
+ #       glEnable(GL_LIGHT0)
 
         self.context_initialized = True
 
