@@ -1,9 +1,8 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from numpy import pi
-
-from utils.transformations import translation, rotation, IDENTITY_4
+from utils.transformations import *
+import random
 
 class SceneNode:
     
@@ -46,12 +45,21 @@ def generate_tree(level, initial_transformation, generate_trunk):
     # generate a node with a new trunk into it, and make
     # initial_transformation its associated transformation
     trunk = generate_trunk()
-    node = GLSceneNode(initial_transformation, trunk)   
+    node = GLSceneNode(initial_transformation, trunk)
+
+    r = ((random.random()*100)%66)-33
+    s = ((random.random()*100)%50)-25
+    t = ((random.random()*100)%66)-33
+    u = ((random.random()*100)%50)-25
+    w = ((random.random()*100)%66)-33
+    x = ((random.random()*100)%50)-25
+    y = ((random.random()*100)%66)-33
+    z = ((random.random()*100)%50)-25
 
     if level > 0:
         translation_m = translation(trunk.endpoint())
 
-        next_t = translation_m*rotation(pi/6, "X")
+        next_t = translation_m*rotation(degree2radians(r), "Z")*rotation(degree2radians(s), "X")
 
         node.add_child(generate_tree(level - 1, next_t, generate_trunk))
 
