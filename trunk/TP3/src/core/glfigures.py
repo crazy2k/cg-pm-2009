@@ -1,6 +1,8 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+from numpy import pi
+
 from utils.transformations import translation, rotation, IDENTITY_4
 
 class SceneNode:
@@ -15,12 +17,17 @@ class SceneNode:
         self.children.append(child)
 
     def paint(self):
+
+        glPushMatrix()
+
         self.apply_transformation()
 
         self.obj.draw()
 
         for s in self.children:
             s.paint()
+
+        glPopMatrix()
 
     def apply_transformation(self):
         raise NotImplementedError
@@ -32,7 +39,7 @@ class GLSceneNode(SceneNode):
         SceneNode.__init__(self, transformation, obj)
 
     def apply_transformation(self):
-        glMultMatrixd(self.transformation)
+        glMultMatrixd(self.transformation.transpose())
 
 
 def generate_tree(level, initial_transformation, generate_trunk):
@@ -44,8 +51,7 @@ def generate_tree(level, initial_transformation, generate_trunk):
     if level > 0:
         translation_m = translation(trunk.endpoint())
 
-        next_t = translation_m*rotation(30, "X")
-        next_t = initial_transformation*next_t
+        next_t = translation_m*rotation(pi/6, "X")
 
         node.add_child(generate_tree(level - 1, next_t, generate_trunk))
 
