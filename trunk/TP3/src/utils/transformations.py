@@ -5,7 +5,6 @@ from numpy import identity, matrix
 IDENTITY_3 = identity(3, float)
 IDENTITY_4 = identity(4, float)
 
-
 def translation(xyz):
     x, y, z = xyz
     return matrix([[1, 0, 0, x],
@@ -31,5 +30,7 @@ def rotation(a, axis):
                        [0, 0, 1, 0],
                        [0, 0, 0, 1]], float)
 
+def degree2radians(degree):
+    return degree*pi/180
         
 
