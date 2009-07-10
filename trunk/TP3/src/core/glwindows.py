@@ -24,7 +24,7 @@ class GLFrame(wx.Frame):
         #self.glcanvas.add_figure(GLAxis())
         generate_cylinder = GLCylinder.generate
         
-        self.glcanvas.add_figure(generate_tree(2, IDENTITY_4, generate_cylinder))
+        self.glcanvas.add_figure(generate_tree(0, zz, 0.05, 0.01, IDENTITY_4, generate_cylinder))
 
         self.Centre()
         self.Show(True)
