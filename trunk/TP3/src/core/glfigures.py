@@ -1,3 +1,95 @@
+<<<<<<< .mine
+from OpenGL.GL import *
+from OpenGL.GLU import *
+
+from utils.transformations import *
+import random
+
+class SceneNode:
+    
+    def __init__(self, transformation, obj):
+        self.transformation = transformation
+        self.obj = obj
+
+        self.children = []
+
+    def add_child(self, child):
+        self.children.append(child)
+
+    def paint(self):
+
+        glPushMatrix()
+
+        self.apply_transformation()
+
+        self.obj.draw()
+
+        for s in self.children:
+            s.paint()
+
+        glPopMatrix()
+
+    def apply_transformation(self):
+        raise NotImplementedError
+
+
+class GLSceneNode(SceneNode):
+    
+    def __init__(self, transformation, obj):
+        SceneNode.__init__(self, transformation, obj)
+
+    def apply_transformation(self):
+        glMultMatrixd(self.transformation.transpose())
+
+
+def generate_tree(actual_level, height, branch_height, min_cant, max_cant, bottom_radius, top_radius, angle, transformation, generate_trunk):
+    # generate a node with a new trunk into it, and make
+    # initial_transformation its associated transformation
+    
+    trunk = generate_trunk(bottom_radius, top_radius, branch_height)
+    node = GLSceneNode(transformation, trunk)
+    
+    if actual_level < height:
+        cant = int(random.random()*float(max_cant - min_cant)) + min_cant
+        for i in range (cant):
+                angle_x = int(random.random()*float(2*angle) - float(angle))
+                angle_z = int(random.random()*float(2*angle) - float(angle))
+                next_transformation = translation(trunk.endpoint()) * rotation(degree2radians(angle_z), "Z") * rotation(degree2radians(angle_x), "X")
+                node.add_child(generate_tree(actual_level + 1, height, branch_height, min_cant, max_cant, 2*bottom_radius - top_radius, bottom_radius, angle, next_transformation, generate_trunk))
+    return node
+
+class GLCylinder:
+
+    def __init__(self, bottom_radius, top_radius, height):
+        self.bottom_radius = bottom_radius
+        self.top_radius = top_radius
+        self.height = height
+                
+    def draw(self):
+        glPushMatrix()
+
+        # create a new quadrics object
+        quad = gluNewQuadric()
+        # quadrics rendered with quad will not have texturing
+        gluQuadricTexture(quad, False)
+        
+        glRotatef(-90, 1, 0, 0)
+        gluCylinder(quad, self.top_radius, self.bottom_radius, self.height, 26, 4)
+        
+        gluDeleteQuadric(quad)
+
+        glPopMatrix()
+
+    def endpoint(self):
+        return (0, self.height, 0)
+
+    @classmethod
+    def generate(cls, bottom_radius, top_radius, height):
+        c = GLCylinder(bottom_radius, top_radius, height)
+        return c
+
+
+=======
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
@@ -208,3 +300,4 @@ class GLSurfaceOfRevolution:
 
 
 
+>>>>>>> .r104
