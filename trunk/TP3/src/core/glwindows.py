@@ -22,9 +22,12 @@ class GLFrame(wx.Frame):
         self.glcanvas = DrawingGLCanvas(self, attrib_list)
 
         #self.glcanvas.add_figure(GLAxis())
-        generate_cylinder = GLCylinder.generate
+        #generate_cylinder = GLCylinder.generate
+
+        generate_surface = GLSurfaceOfRevolution.generate
         
-        self.glcanvas.add_figure(generate_tree(0, zz, 0.05, 0.01, IDENTITY_4, generate_cylinder))
+        #self.glcanvas.add_figure(generate_tree(0, 5, 0.05, 0.01, IDENTITY_4, generate_cylinder))
+        self.glcanvas.add_figure(generate_tree(0, 3, 0.05, 0.01, IDENTITY_4, generate_surface))
 
         self.Centre()
         self.Show(True)
@@ -155,6 +158,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
         eye_x = radius*cos(azimuth)*sin(inclination)
         eye_y = radius*sin(azimuth)*sin(inclination)
         eye_z = radius*cos(inclination)
+
 
         # center (point at which the camera is aiming): always (0, 0, 0)
         # up vector: (0, 1, 0) (positive Y-axis)
