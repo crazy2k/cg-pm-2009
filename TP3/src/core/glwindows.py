@@ -26,8 +26,7 @@ class GLFrame(wx.Frame):
 
         generate_surface = GLSurfaceOfRevolution.generate
         
-        #self.glcanvas.add_figure(generate_tree(0, 5, 0.05, 0.01, IDENTITY_4, generate_cylinder))
-        self.glcanvas.add_figure(generate_tree(0, 3, 0.05, 0.01, IDENTITY_4, generate_surface))
+        self.glcanvas.add_figure(generate_tree(0, 3, 0.5, 3, 8, 0.04, 0.05, 40, IDENTITY_4, generate_surface))
 
         self.Centre()
         self.Show(True)
