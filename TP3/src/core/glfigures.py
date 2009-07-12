@@ -163,11 +163,16 @@ class GLSurfaceOfRevolution:
                 self.precision_correction(next_point_sec)
 
                 # draw the 4-sided polygon                
-                glBegin(GL_QUADS)
-                glVertex3d(curr_point_fst[0], curr_point_fst[1], curr_point_fst[2])
+                glBegin(GL_QUAD_STRIP)
+
+                if y == 0:
+                    glVertex3d(curr_point_fst[0], curr_point_fst[1], curr_point_fst[2])
+                    glVertex3d(curr_point_sec[0], curr_point_sec[1], curr_point_sec[2])
+
                 glVertex3d(next_point_fst[0], next_point_fst[1], next_point_fst[2])
                 glVertex3d(next_point_sec[0], next_point_sec[1], next_point_sec[2])
-                glVertex3d(curr_point_sec[0], curr_point_sec[1], curr_point_sec[2])
+
+
                 glEnd()
 
             # angles are increased in self.rotation_step
