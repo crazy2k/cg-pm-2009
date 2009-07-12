@@ -133,6 +133,7 @@ class GLSurfaceOfRevolution:
         for x in range(self.rotation_steps):
 
             curr_eval_number = 0
+            glBegin(GL_QUAD_STRIP)
             for y in range(self.eval_steps):
                 # curr_point and next_point are two contiguous points on the
                 # curve that lies on the XY-plane
@@ -163,8 +164,6 @@ class GLSurfaceOfRevolution:
                 self.precision_correction(next_point_sec)
 
                 # draw the 4-sided polygon                
-                glBegin(GL_QUAD_STRIP)
-
                 if y == 0:
                     glVertex3d(curr_point_fst[0], curr_point_fst[1], curr_point_fst[2])
                     glVertex3d(curr_point_sec[0], curr_point_sec[1], curr_point_sec[2])
@@ -172,8 +171,7 @@ class GLSurfaceOfRevolution:
                 glVertex3d(next_point_fst[0], next_point_fst[1], next_point_fst[2])
                 glVertex3d(next_point_sec[0], next_point_sec[1], next_point_sec[2])
 
-
-                glEnd()
+            glEnd()
 
             # angles are increased in self.rotation_step
             fst_rotation_angle = sec_rotation_angle
@@ -197,5 +195,5 @@ class GLSurfaceOfRevolution:
     @classmethod
     def generate(cls, bottom_radius, top_radius, height):
         function = lambda x: (bottom_radius, x*height)
-        c = GLSurfaceOfRevolution(function, 1, 25)
+        c = GLSurfaceOfRevolution(function, 1, 10)
         return c
