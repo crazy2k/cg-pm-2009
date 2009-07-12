@@ -68,7 +68,7 @@ def generate_tree(actual_level, height, branch_height, min_cant, max_cant, botto
     return node
 
     
-class GLCylinder:
+class GLCylinder(Drawable):
 
     def __init__(self, bottom_radius, top_radius, height):
         self.bottom_radius = bottom_radius
@@ -99,11 +99,13 @@ class GLCylinder:
         return c
 
 
-class GLSweptSurface:
-    pass
+class GLSweptSurface(Drawable):
+    
+    def __init__(self, curve_function, direction_function, rotation_function):
+        pass
 
 
-class GLSurfaceOfRevolution:
+class GLSurfaceOfRevolution(Drawable):
     
     def __init__(self, function, eval_steps, rotation_steps):
         """Construct a closed surface of revolution which will be drawn
