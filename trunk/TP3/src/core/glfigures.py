@@ -3,7 +3,7 @@ from OpenGL.GLU import *
 
 from utils.transformations import *
 
-from numpy import pi, matrix
+from numpy import pi, matrix, cross, size
 
 import random
 
@@ -101,8 +101,105 @@ class GLCylinder(Drawable):
 
 class GLSweptSurface(Drawable):
     
-    def __init__(self, curve_function, direction_function, rotation_function):
-        pass
+    def __init__(self, curve_function, direction_function, rotation_function,
+        curve_eval_steps, surface_eval_steps):
+        """Construct a closed swept surface which will be drawn
+        around the Y-axis using OpenGL.
+        
+        curve_function      -- function that defines the curve to be swept
+        direction_function  -- function that defines the surface's direction
+                               when drawing it
+        rotation_function   -- function that defines how the curve will rotate
+                               while the surface is crated
+        curve_eval_steps    -- integer number that defines de number of times
+                               the curve will be evaluated
+        surface_eval_steps  -- integer number that defines de number of times
+                               the curve will be drawn
+
+        Functions receive a number from 0 to 1, and give, for each invocation:
+        * an (x, y) pair (point on the XY-plane) corresponding to a point
+          in the curve, in the case of the curve_function (thus, the
+          curve_function is a parametric function that defines a curve on
+          the XY-plane)
+        * a translation matrix (might be a numpy.matrix) that will be used to
+          translate the origin when drawing the curve, in the case of the
+          direction_function
+        * a rotation matrix (might be a numpy.matrix) that will be applied
+          in order to rotate the curve before translating it according to
+          the direction_function, in the case of the rotation_function
+
+        It should be noted that the parameter in the curve_function has a
+        different meaning than in both the direction_function and the
+        rotation_function. In the first, it is used to describe the curve
+        to be swept, whereas in the other two it is used as a surface's
+        parameter.
+
+        """
+
+        self.curve_function = curve_function
+        self.direction_function = direction_function
+        self.rotation_function = rotation_function
+        self.curve_eval_steps = curve_eval_steps
+        self.surface_eval_steps = surface_eval_steps
+
+        self.curve_eval_step = 1.0/(self.curve_eval_steps - 1)
+        self.surface_eval_step = 1/(self.surface_eval_steps - 1)
+    
+    def draw(self):
+
+        curr_curve_eval_number = 0
+        for i in range(self.curve_eval_steps):
+            # p1 and p2 are two (general) contiguous points on the curve
+            p = self.curve_function(curr_curve_eval_number)
+            p1 = (p[0], p[1], 0, 1)
+
+            curr_curve_eval_number += self.curve_eval_step
+
+            p = self.curve_function(curr_curve_eval_number)
+            p2 = (p[0], p[1], 0, 1)
+            
+            # transform points into 1x4 matrixes
+            p1 = matrix(p1).transpose()
+            p2 = matrix(p2).transpose()
+
+            curr_surface_eval_number = 0
+
+            glBegin(GL_QUAD_STRIP)
+            for j in range(self.surface_eval_steps):
+
+                # q1 and q2 are two contiguous points on a specific curve
+                # on the surface
+
+                q1 = copy.copy(p1)
+                q2 = copy.copy(p2)
+
+                q1 = self.rotation_function(curr_surface_eval_number)*q1
+                q1 = self.direction_function(curr_surface_eval_number)*q1
+
+                q2 = self.rotation_function(curr_surface_eval_number)*q2
+                q2 = self.direction_function(curr_surface_eval_number)*q2
+
+                # r1 and r2 are two contiguous points on the next curve
+                # on the surface
+
+                r1 = copy.copy(p1)
+                r2 = copy.copy(p2)
+
+                curr_surface_eval_number += self.surface_eval_step
+
+                r1 = self.rotation_function(curr_surface_eval_number)*r1
+                r1 = self.direction_function(curr_surface_eval_number)*r1
+
+                r2 = self.rotation_function(curr_surface_eval_number)*r2
+                r2 = self.direction_function(curr_surface_eval_number)*r2
+
+                if j == 0:
+                    glVertex3d()
+
+                
+                
+
+
 
 
 class GLSurfaceOfRevolution(Drawable):
@@ -120,6 +217,7 @@ class GLSurfaceOfRevolution(Drawable):
 
         The function receives a number from 0 to 1, and gives (x, y) pairs
         (points on the XY-plane).
+
         """
 
         self.function = function
@@ -132,11 +230,11 @@ class GLSurfaceOfRevolution(Drawable):
     def draw(self):
         fst_rotation_angle = 0
         sec_rotation_angle = self.rotation_step 
-        for x in range(self.rotation_steps):
+        for i in range(self.rotation_steps):
 
             curr_eval_number = 0
             glBegin(GL_QUAD_STRIP)
-            for y in range(self.eval_steps):
+            for j in range(self.eval_steps):
                 # curr_point and next_point are two contiguous points on the
                 # curve that lies on the XY-plane
                 p = self.function(curr_eval_number)
@@ -165,8 +263,14 @@ class GLSurfaceOfRevolution(Drawable):
                 self.precision_correction(curr_point_sec)
                 self.precision_correction(next_point_sec)
 
-                # draw the 4-sided polygon                
-                if y == 0:
+                # draw the 4-sided polygon
+                d1 = next_point_sec[:-1] - curr_point_fst[:-1]
+                d2 = next_point_fst[:-1] - curr_point_sec[:-1]
+
+                n = cross(d1.transpose(), d2.transpose())
+                glNormal3d(n.item(0), n.item(1), n.item(2))
+
+                if j == 0:
                     glVertex3d(curr_point_fst[0], curr_point_fst[1], curr_point_fst[2])
                     glVertex3d(curr_point_sec[0], curr_point_sec[1], curr_point_sec[2])
 
@@ -196,6 +300,12 @@ class GLSurfaceOfRevolution(Drawable):
 
     @classmethod
     def generate(cls, bottom_radius, top_radius, height):
-        function = lambda x: (bottom_radius, x*height)
-        c = GLSurfaceOfRevolution(function, 1, 10)
+        #function = lambda x: (bottom_radius, x*height)
+
+        def function(x):
+            if x > 1:
+                print "MAYOR!"
+            return (bottom_radius, x*height)
+
+        c = GLSurfaceOfRevolution(function, 1, 20)
         return c
