@@ -107,6 +107,8 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
         self.SwapBuffers()
 
     def initialize_context(self):
+        # all normal vectors will be normalised
+        glEnable(GL_NORMALIZE)
         # smooth shading: colors of vertices are interpolated
         glShadeModel(GL_SMOOTH)
 

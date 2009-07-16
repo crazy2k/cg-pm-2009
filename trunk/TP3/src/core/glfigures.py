@@ -3,7 +3,7 @@ from OpenGL.GLU import *
 
 from utils.transformations import *
 
-from numpy import pi, matrix, cross, size
+from numpy import pi, matrix, sin, size, sqrt, dot
 
 import random
 
@@ -142,8 +142,8 @@ class GLSweptSurface(Drawable):
         self.curve_eval_steps = curve_eval_steps
         self.surface_eval_steps = surface_eval_steps
 
-        self.curve_eval_step = 1.0/(self.curve_eval_steps - 1)
-        self.surface_eval_step = 1/(self.surface_eval_steps - 1)
+        self.curve_eval_step = 1.0/self.curve_eval_steps
+        self.surface_eval_step = 1/self.surface_eval_steps
     
     def draw(self):
 
@@ -196,16 +196,11 @@ class GLSweptSurface(Drawable):
                 if j == 0:
                     glVertex3d()
 
-                
-                
-
-
-
 
 class GLSurfaceOfRevolution(Drawable):
     
     def __init__(self, function, eval_steps, rotation_steps):
-        """Construct a closed surface of revolution which will be drawn
+        """Construct a surface of revolution which will be drawn
         around the Y-axis using OpenGL.
         
         function        -- function that defines the curve to be rotated
@@ -216,7 +211,7 @@ class GLSurfaceOfRevolution(Drawable):
                            the curve will be rotated
 
         The function receives a number from 0 to 1, and gives (x, y) pairs
-        (points on the XY-plane).
+        (points on the XY-plane) with x > 0.
 
         """
 
@@ -237,17 +232,13 @@ class GLSurfaceOfRevolution(Drawable):
             for j in range(self.eval_steps):
                 # curr_point and next_point are two contiguous points on the
                 # curve that lies on the XY-plane
-                p = self.function(curr_eval_number)
-                curr_point = (p[0], p[1], 0, 1)
+                p_curr = self.function(curr_eval_number)
+                curr_point = self.twodseq_to_vector(p_curr)
 
                 curr_eval_number += self.eval_step
 
-                p = self.function(curr_eval_number)
-                next_point = (p[0], p[1], 0, 1)
-
-                # transform points into 1x4 matrixes
-                curr_point = matrix(curr_point).transpose()
-                next_point = matrix(next_point).transpose()
+                p_next = self.function(curr_eval_number)
+                next_point = self.twodseq_to_vector(p_next)
 
                 # get points on the first curve
                 curr_point_fst = rotation(fst_rotation_angle, "Y")*curr_point
@@ -264,18 +255,51 @@ class GLSurfaceOfRevolution(Drawable):
                 self.precision_correction(next_point_sec)
 
                 # draw the 4-sided polygon
-                d1 = next_point_sec[:-1] - curr_point_fst[:-1]
-                d2 = next_point_fst[:-1] - curr_point_sec[:-1]
-
-                n = cross(d1.transpose(), d2.transpose())
-                glNormal3d(n.item(0), n.item(1), n.item(2))
-
                 if j == 0:
-                    glVertex3d(curr_point_fst[0], curr_point_fst[1], curr_point_fst[2])
-                    glVertex3d(curr_point_sec[0], curr_point_sec[1], curr_point_sec[2])
+                    # normals for the first two vertices will be the X-axis
+                    # rotated accordingly and then normalized
+                    x_axis = matrix((1, 0, 0, 1)).transpose()
+                    n_fst = rotation(fst_rotation_angle, "Y")*x_axis
+                    n_sec = rotation(sec_rotation_angle, "Y")*x_axis
 
-                glVertex3d(next_point_fst[0], next_point_fst[1], next_point_fst[2])
-                glVertex3d(next_point_sec[0], next_point_sec[1], next_point_sec[2])
+                    # this isn't needed when GL_NORMALIZE is set
+                    #n_fst = self.normalize(n_fst)
+                    #n_sec = self.normalize(n_sec)
+
+                    glNormal3d(n_fst.item(0), n_fst.item(1), n_fst.item(2))
+                    glVertex3d(curr_point_fst.item(0), curr_point_fst.item(1),
+                        curr_point_fst.item(2))
+
+                    glNormal3d(n_sec.item(0), n_sec.item(1), n_sec.item(2))
+                    glVertex3d(curr_point_sec.item(0), curr_point_sec.item(1),
+                        curr_point_sec.item(2))
+
+                # the tangent to the curve in p_next will have a direction
+                # approximated by p_next - p_curr
+                tg = matrix(p_next).transpose() - matrix(p_curr).transpose()
+
+                # the normal for p_next will be a vector that is perpendicular
+                # to its tangent line
+                n = (tg.item(1), -tg.item(0))
+                # n now lives on a 3D world
+                n = self.twodseq_to_vector(n)
+
+                # the normals will be this vector rotated accordingly
+                # and then normalized
+                n_fst = rotation(fst_rotation_angle, "Y")*n
+                n_sec = rotation(sec_rotation_angle, "Y")*n
+
+                # this isn't needed when GL_NORMALIZE is set
+                #n_fst = self.normalize(n_fst)
+                #n_sec = self.normalize(n_sec)
+
+                glNormal3d(n_fst.item(0), n_fst.item(1), n_fst.item(2))
+                glVertex3d(next_point_fst.item(0), next_point_fst.item(1),
+                    next_point_fst.item(2))
+
+                glNormal3d(n_sec.item(0), n_sec.item(1), n_sec.item(2))
+                glVertex3d(next_point_sec.item(0), next_point_sec.item(1),
+                    next_point_sec.item(2))
 
             glEnd()
 
@@ -283,9 +307,29 @@ class GLSurfaceOfRevolution(Drawable):
             fst_rotation_angle = sec_rotation_angle
             sec_rotation_angle += self.rotation_step
 
-    def precision_correction(self, iterable):
-        for i in range(len(iterable)):
-            x = iterable[i]
+    def normalize(self, v):
+        """Normalizes a three-dimensional vector.
+
+        This function expects the vector v to be a 3x1 or 4x1 matrix. If the
+        latter, the last row will be ignored for the calculation. Once the
+        normalised vector is obtained, a 4x1 matrix is returned, composed of
+        the normalised vector plus a 1 in the last row.
+        
+        """
+
+        v = matrix((v.item(0), v.item(1), v.item(2)))
+        norm = sqrt(dot(v, v.transpose()).item(0))
+        v_n = v/norm
+        return matrix((v_n.item(0), v_n.item(1), v_n.item(2), 1)).transpose()
+
+    def twodseq_to_vector(self, seq):
+        point = (seq[0], seq[1], 0, 1)
+        m = matrix(point)
+        return m.transpose()
+
+    def precision_correction(self, v):
+        for i in range(len(v)):
+            x = v.item(i)
 
             # see it as a positive number
             if x < 0:
@@ -293,19 +337,14 @@ class GLSurfaceOfRevolution(Drawable):
 
             # if it's too small, it's changed to zero
             if x < 0.000000001:
-                iterable[i] = 0
+                v.itemset(i, 0)
 
     def endpoint(self):
         return (0, self.function(1)[1], 0)
 
     @classmethod
     def generate(cls, bottom_radius, top_radius, height):
-        #function = lambda x: (bottom_radius, x*height)
+        function = lambda x: (bottom_radius, x*height)
 
-        def function(x):
-            if x > 1:
-                print "MAYOR!"
-            return (bottom_radius, x*height)
-
-        c = GLSurfaceOfRevolution(function, 1, 20)
+        c = GLSurfaceOfRevolution(function, 15, 20)
         return c
