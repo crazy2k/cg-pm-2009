@@ -33,4 +33,10 @@ def rotation(a, axis):
 def degree2radians(degree):
     return degree*pi/180
         
+def twodseq_to_vector(seq):
+    """Transform a two-dimensional sequence into a 4x1 matrix. The third
+    coordinate is set to 0, and the fourth to 1."""
+    point = (seq[0], seq[1], 0, 1)
+    m = matrix(point)
+    return m.transpose()
 

@@ -103,14 +103,14 @@ class GLSweptSurface(Drawable):
     
     def __init__(self, curve_function, direction_function, rotation_function,
         curve_eval_steps, surface_eval_steps):
-        """Construct a closed swept surface which will be drawn
+        """Construct a swept surface which will be drawn
         around the Y-axis using OpenGL.
         
         curve_function      -- function that defines the curve to be swept
         direction_function  -- function that defines the surface's direction
                                when drawing it
         rotation_function   -- function that defines how the curve will rotate
-                               while the surface is crated
+                               while the surface is created
         curve_eval_steps    -- integer number that defines de number of times
                                the curve will be evaluated
         surface_eval_steps  -- integer number that defines de number of times
@@ -127,6 +127,8 @@ class GLSweptSurface(Drawable):
         * a rotation matrix (might be a numpy.matrix) that will be applied
           in order to rotate the curve before translating it according to
           the direction_function, in the case of the rotation_function
+          (beware the curve will be rotated to be on XZ-plane before, so these
+          rotation matrices should rotate around the Y-axis)
 
         It should be noted that the parameter in the curve_function has a
         different meaning than in both the direction_function and the
@@ -143,7 +145,7 @@ class GLSweptSurface(Drawable):
         self.surface_eval_steps = surface_eval_steps
 
         self.curve_eval_step = 1.0/self.curve_eval_steps
-        self.surface_eval_step = 1/self.surface_eval_steps
+        self.surface_eval_step = 1.0/self.surface_eval_steps
     
     def draw(self):
 
@@ -151,37 +153,42 @@ class GLSweptSurface(Drawable):
         for i in range(self.curve_eval_steps):
             # p1 and p2 are two (general) contiguous points on the curve
             p = self.curve_function(curr_curve_eval_number)
-            p1 = (p[0], p[1], 0, 1)
+            p1 = twodseq_to_vector(p)
 
             curr_curve_eval_number += self.curve_eval_step
 
             p = self.curve_function(curr_curve_eval_number)
-            p2 = (p[0], p[1], 0, 1)
-            
-            # transform points into 1x4 matrixes
-            p1 = matrix(p1).transpose()
-            p2 = matrix(p2).transpose()
+            p2 = twodseq_to_vector(p)
+
+            # since the curve will be swept through the Y-axis, points have
+            # to be rotated 90 degrees around the X-axis (they're now points
+            # on the XZ-plane)
+            p1 = rotation(degree2radians(-90), "X")*p1
+            p2 = rotation(degree2radians(-90), "X")*p2
 
             curr_surface_eval_number = 0
-
             glBegin(GL_QUAD_STRIP)
             for j in range(self.surface_eval_steps):
 
-                # q1 and q2 are two contiguous points on a specific curve
+                # q1 and q2 will be two contiguous points on a specific curve
                 # on the surface
 
                 q1 = copy.copy(p1)
                 q2 = copy.copy(p2)
 
-                q1 = self.rotation_function(curr_surface_eval_number)*q1
-                q1 = self.direction_function(curr_surface_eval_number)*q1
+                rotation = self.rotation_function(curr_surface_eval_number)
+                translation = self.direction_function(curr_surface_eval_number)
 
-                q2 = self.rotation_function(curr_surface_eval_number)*q2
-                q2 = self.direction_function(curr_surface_eval_number)*q2
+                q1 = rotation*q1
+                q1 = translation*q1
 
-                # r1 and r2 are two contiguous points on the next curve
+                q2 = rotation*q2
+                q2 = translation*q2
+
+                # r1 and r2 will be two contiguous points on the next curve
                 # on the surface
 
+# rotate -90 in X
                 r1 = copy.copy(p1)
                 r2 = copy.copy(p2)
 
@@ -233,12 +240,12 @@ class GLSurfaceOfRevolution(Drawable):
                 # curr_point and next_point are two contiguous points on the
                 # curve that lies on the XY-plane
                 p_curr = self.function(curr_eval_number)
-                curr_point = self.twodseq_to_vector(p_curr)
+                curr_point = twodseq_to_vector(p_curr)
 
                 curr_eval_number += self.eval_step
 
                 p_next = self.function(curr_eval_number)
-                next_point = self.twodseq_to_vector(p_next)
+                next_point = twodseq_to_vector(p_next)
 
                 # get points on the first curve
                 curr_point_fst = rotation(fst_rotation_angle, "Y")*curr_point
@@ -276,13 +283,13 @@ class GLSurfaceOfRevolution(Drawable):
 
                 # the tangent to the curve in p_next will have a direction
                 # approximated by p_next - p_curr
-                tg = matrix(p_next).transpose() - matrix(p_curr).transpose()
+                tg = matrix(p_next) - matrix(p_curr)
 
                 # the normal for p_next will be a vector that is perpendicular
                 # to its tangent line
                 n = (tg.item(1), -tg.item(0))
                 # n now lives on a 3D world
-                n = self.twodseq_to_vector(n)
+                n = twodseq_to_vector(n)
 
                 # the normals will be this vector rotated accordingly
                 # and then normalized
@@ -322,10 +329,6 @@ class GLSurfaceOfRevolution(Drawable):
         v_n = v/norm
         return matrix((v_n.item(0), v_n.item(1), v_n.item(2), 1)).transpose()
 
-    def twodseq_to_vector(self, seq):
-        point = (seq[0], seq[1], 0, 1)
-        m = matrix(point)
-        return m.transpose()
 
     def precision_correction(self, v):
         for i in range(len(v)):
