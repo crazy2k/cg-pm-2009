@@ -3,7 +3,7 @@ from OpenGL.GLU import *
 
 from utils.transformations import *
 
-from numpy import pi, matrix, sin, size, sqrt, dot
+from numpy import pi, matrix, cross, size, sqrt, dot
 
 import random
 
@@ -146,68 +146,142 @@ class GLSweptSurface(Drawable):
 
         self.curve_eval_step = 1.0/self.curve_eval_steps
         self.surface_eval_step = 1.0/self.surface_eval_steps
-    
+
     def draw(self):
 
         curr_curve_eval_number = 0
-        for i in range(self.curve_eval_steps):
-            # p1 and p2 are two (general) contiguous points on the curve
-            p = self.curve_function(curr_curve_eval_number)
-            p1 = twodseq_to_vector(p)
+        while curr_curve_eval_number <= 1:
+            # p1 to p4 are (general) contiguous points on the curve
+            d = self.curve_eval_step
+            parms = (curr_curve_eval_number,
+                     curr_curve_eval_number + d,
+                     curr_curve_eval_number + 2*d,
+                     curr_curve_eval_number + 3*d)
 
-            curr_curve_eval_number += self.curve_eval_step
+            p1, p2, p3, p4 = self.evaluate_points(parms)
 
-            p = self.curve_function(curr_curve_eval_number)
-            p2 = twodseq_to_vector(p)
+            curr_curve_eval_number += d
 
             # since the curve will be swept through the Y-axis, points have
             # to be rotated 90 degrees around the X-axis (they're now points
             # on the XZ-plane)
-            p1 = rotation(degree2radians(-90), "X")*p1
-            p2 = rotation(degree2radians(-90), "X")*p2
+            vectors = (p1, p2, p3, p4)
+            angle = degree2radians(-90)
+            p1, p2, p3, p4 = [rotation(angle, "X")*v for v in vectors]
 
-            curr_surface_eval_number = 0
+            # the curr_surface_eval_number starts at a first nonexistent row;
+            # this is because the vertices we're going to 
+            curr_surface_eval_number = -self.surface_eval_step
             glBegin(GL_QUAD_STRIP)
-            for j in range(self.surface_eval_steps):
+            while curr_surface_eval_number <= 1:
+                # vm is a 3x4 array that will hold vectors which are in the
+                # context we need
+                #
+                #   vm =
+                #
+                #     2 +----------+----------+----------+
+                #       |    s1    |    s2    |    s3    |
+                #     1 +---------[+]--------[+]---------+
+                #       |    s4    |    s5    |    s6    |
+                #     0 +----------+----------+----------+
+                #       0          1          2          3
+                #
+                #   * "+" are vertices
+                #   * our current vertices (the ones we are going to draw)
+                #     are the ones located at (1, 1) and (1, 2), which will
+                #     be called s and t respectively
+                #   * s1 to s6 are surfaces going to be drawn
 
-                # q1 and q2 will be two contiguous points on a specific curve
-                # on the surface
+                vm = [[0]*4 for i in range(3)]
 
-                q1 = copy.copy(p1)
-                q2 = copy.copy(p2)
+                # vm is now filled accordingly
+                vectors = (p1, p2, p3, p4)
 
-                rotation = self.rotation_function(curr_surface_eval_number)
-                translation = self.direction_function(curr_surface_eval_number)
+                c = curr_surface_eval_number
+                for row in range(3):
+                    rotation = self.rotation_function(c)
+                    translation = self.direction_function(c)
+                    vm[row] =  [translation*rotation*v for v in vectors]
 
-                q1 = rotation*q1
-                q1 = translation*q1
+                    c += self.surface_eval_step
 
-                q2 = rotation*q2
-                q2 = translation*q2
+                # normals for each surface are calculated
+                normal = self.normal
 
-                # r1 and r2 will be two contiguous points on the next curve
-                # on the surface
+                s1_normal = normal(vm[2][1] - vm[1][0], vm[2][0] - vm[1][1])
+                s2_normal = normal(vm[2][2] - vm[1][1], vm[2][1] - vm[1][2])
+                s3_normal = normal(vm[2][3] - vm[1][2], vm[2][2] - vm[1][3])
+                s4_normal = normal(vm[1][1] - vm[0][0], vm[1][0] - vm[0][1])
+                s5_normal = normal(vm[1][2] - vm[0][1], vm[1][1] - vm[0][2])
+                s6_normal = normal(vm[1][3] - vm[0][2], vm[1][2] - vm[0][3])
 
-# rotate -90 in X
-                r1 = copy.copy(p1)
-                r2 = copy.copy(p2)
+                # s and t vertex receive the average of their adjacent normals
+                # as their normal values
+                s_adj = [s1_normal, s2_normal, s4_normal, s5_normal]
+                s_normal = self.vector_average(s_adj)
+                
+                t_adj = [s2_normal, s3_normal, s5_normal, s6_normal]
+                t_normal = self.vector_average(t_adj)
+
+                glNormal3d(s_normal.item(0), s_normal.item(1),
+                    s_normal.item(2))
+                glVertex3d(s.item(0), s.item(1), s.item(2))
+
+                glNormal3d(t_normal.item(0), t_normal.item(1),
+                    t_normal.item(2))
+                glVertex3d(t.item(0), t.item(1), t.item(2))
 
                 curr_surface_eval_number += self.surface_eval_step
 
-                r1 = self.rotation_function(curr_surface_eval_number)*r1
-                r1 = self.direction_function(curr_surface_eval_number)*r1
 
-                r2 = self.rotation_function(curr_surface_eval_number)*r2
-                r2 = self.direction_function(curr_surface_eval_number)*r2
+     def evaluate_points(self, parms):
+        """Given a sequence of parameters, returns a list of the
+        corresponding points that result from evaluating
+        self.curve_function on those parameters after preprocessing them.
+        The preprocessing takes out the integer part from the parameters."""
+        points = []
+        for parm in parms:
+            # we take out the integer part first
+            parm = parm - int(parm)
 
-                if j == 0:
-                    glVertex3d()
+            r = self.curve_function(parm)
+            v = twodseq_to_vector(r)
+            points.append(v)
+
+        return ptors in a higher row are supposed to be at a lower
+                        #     position on the surface (they have a lower value for
+                                        #     their Y-component)
+                                         
+
+    def vector_average(self, v_list):
+        """Receives a list of 1x3 matrices (vectors). It calculates the
+        average between those that aren't None."""
+        sum = matrix((0, 0, 0))
+        tot = 0
+        for v in v_list:
+            if v != None:
+                sum += v
+                tot += 1
+
+        return sum/tot
+
+    def normal(self, v1, v2):
+        """Receives two 1x3 matrices (vectors). If none of the two is none,
+        returns a third vector perpendicular to the ones given."""
+        if v1 != None and v2 != None:
+            return cross(v1, v2)
+        else:
+            return None
+
+
+ 
+                
 
 
 class GLSurfaceOfRevolution(Drawable):
     
     def __init__(self, function, eval_steps, rotation_steps):
-        """Construct a surface of revolution which will be drawn
+        """Construct a surface of revolution which will be draw
         around the Y-axis using OpenGL.
         
         function        -- function that defines the curve to be rotated
