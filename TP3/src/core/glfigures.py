@@ -160,17 +160,15 @@ class GLSweptSurface(Drawable):
 
             p1, p2, p3, p4 = self.evaluate_points(parms)
 
-            curr_curve_eval_number += d
-
             # since the curve will be swept through the Y-axis, points have
             # to be rotated 90 degrees around the X-axis (they're now points
             # on the XZ-plane)
-            vectors = (p1, p2, p3, p4)
             angle = degree2radians(-90)
-            p1, p2, p3, p4 = [rotation(angle, "X")*v for v in vectors]
+            p1, p2, p3, p4 = [rotation(angle, "X")*v for v in (p1, p2, p3, p4)]
 
             # the curr_surface_eval_number starts at a first nonexistent row;
-            # this is because the vertices we're going to 
+            # this is because the vertices we're going to give to OpenGL are
+            # the ones at the next row
             curr_surface_eval_number = -self.surface_eval_step
             glBegin(GL_QUAD_STRIP)
             while curr_surface_eval_number <= 1:
@@ -186,11 +184,11 @@ class GLSweptSurface(Drawable):
                 #     0 +----------+----------+----------+
                 #       0          1          2          3
                 #
-                #   * "+" are vertices
+                #   * "+" are vertices (or Nones, if 
                 #   * our current vertices (the ones we are going to draw)
                 #     are the ones located at (1, 1) and (1, 2), which will
                 #     be called s and t respectively
-                #   * s1 to s6 are surfaces going to be drawn
+                #   * s1 to s6 are surfaces
 
                 vm = [[0]*4 for i in range(3)]
 
@@ -199,24 +197,33 @@ class GLSweptSurface(Drawable):
 
                 c = curr_surface_eval_number
                 for row in range(3):
-                    rotation = self.rotation_function(c)
-                    translation = self.direction_function(c)
-                    vm[row] =  [translation*rotation*v for v in vectors]
+                    # if this row is a nonexistent row, it's filled with Nones
+                    if c == -self.surface_eval_step or c > 1:
+                        vm[row] = [None]*4
+                    # if it does exist, vectors are rotated, translated and
+                    # then stored in the matrix
+                    else:
+                        rot = self.rotation_function(c)
+                        trans = self.direction_function(c)
+                        vm[row] =  [trans*rot*v for v in vectors]
 
                     c += self.surface_eval_step
+
+                s = vm[1][1]
+                t = vm[1][2]
 
                 # normals for each surface are calculated
                 normal = self.normal
 
-                s1_normal = normal(vm[2][1] - vm[1][0], vm[2][0] - vm[1][1])
-                s2_normal = normal(vm[2][2] - vm[1][1], vm[2][1] - vm[1][2])
-                s3_normal = normal(vm[2][3] - vm[1][2], vm[2][2] - vm[1][3])
-                s4_normal = normal(vm[1][1] - vm[0][0], vm[1][0] - vm[0][1])
-                s5_normal = normal(vm[1][2] - vm[0][1], vm[1][1] - vm[0][2])
-                s6_normal = normal(vm[1][3] - vm[0][2], vm[1][2] - vm[0][3])
+                s1_normal = normal(vm[2][1], vm[1][0], vm[2][0], vm[1][1])
+                s2_normal = normal(vm[2][2], vm[1][1], vm[2][1], vm[1][2])
+                s3_normal = normal(vm[2][3], vm[1][2], vm[2][2], vm[1][3])
+                s4_normal = normal(vm[1][1], vm[0][0], vm[1][0], vm[0][1])
+                s5_normal = normal(vm[1][2], vm[0][1], vm[1][1], vm[0][2])
+                s6_normal = normal(vm[1][3], vm[0][2], vm[1][2], vm[0][3])
 
-                # s and t vertex receive the average of their adjacent normals
-                # as their normal values
+                # s and t vertices receive the average of the normals from the
+                # surfaces they compose as their normal values
                 s_adj = [s1_normal, s2_normal, s4_normal, s5_normal]
                 s_normal = self.vector_average(s_adj)
                 
@@ -231,52 +238,92 @@ class GLSweptSurface(Drawable):
                     t_normal.item(2))
                 glVertex3d(t.item(0), t.item(1), t.item(2))
 
+                # move one step forward on the surface
                 curr_surface_eval_number += self.surface_eval_step
 
+            # move one step forward on the curve
+            curr_curve_eval_number += self.curve_eval_step
 
-     def evaluate_points(self, parms):
+    def evaluate_points(self, parms):
         """Given a sequence of parameters, returns a list of the
-        corresponding points that result from evaluating
-        self.curve_function on those parameters after preprocessing them.
-        The preprocessing takes out the integer part from the parameters."""
+        corresponding points that result from evaluating self.curve_function
+        on those parameters after preprocessing them. The preprocessing takes
+        out the integer part from the parameters."""
         points = []
         for parm in parms:
             # we take out the integer part first
             parm = parm - int(parm)
 
             r = self.curve_function(parm)
-            v = twodseq_to_vector(r)
+            v = twodseq_to_4x1vector(r)
             points.append(v)
 
-        return ptors in a higher row are supposed to be at a lower
-                        #     position on the surface (they have a lower value for
-                                        #     their Y-component)
-                                         
+        return points
+                                        
 
     def vector_average(self, v_list):
-        """Receives a list of 1x3 matrices (vectors). It calculates the
-        average between those that aren't None."""
+        """Receives a list of 4x1 matrices (vectors). It calculates the
+        average between those that aren't None, ignoring the fourth component
+        of each vector."""
         sum = matrix((0, 0, 0))
         tot = 0
         for v in v_list:
             if v != None:
-                sum += v
+                p = (v.item(0), v.item(1), v.item(2))
+                v_small = matrix(p)
+                sum += v_small
                 tot += 1
 
         return sum/tot
 
-    def normal(self, v1, v2):
-        """Receives two 1x3 matrices (vectors). If none of the two is none,
-        returns a third vector perpendicular to the ones given."""
-        if v1 != None and v2 != None:
-            return cross(v1, v2)
-        else:
+    def normal(self, v1head, v1tail, v2head, v2tail):
+        """Receives four 4x1 matrices (vectors). If neither is None,
+        the following process takes place:
+            1. Two vectors are created:
+                a) v1head - v1tail
+                b) v2head - v2tail
+            2. The last component of the two 1x4 matrices is removed.
+            3. A new 1x3 vector, perpendicular to those resulting from 2 is
+               calculated.
+            4. A fourth component (a 1) is added to this new vector, and the
+               vector is returned."""
+       
+        if None in (v1head, v1tail, v2head, v2tail):
             return None
+        else:
+            v1 = v1head - v1tail
+            x1 = (v1.item(0), v1.item(1), v1.item(2))
+            v1 = matrix(x1)
 
+            v2 = v2head - v2tail
+            x2 = (v2.item(0), v2.item(1), v2.item(2))
+            v2 = matrix(x2)
 
+            v3 = cross(v1, v2)
+            p3 = (v3.item(0), v3.item(1), v3.item(2))
+            return threedseq_to_4x1vector(p3)
+
+    def endpoint(self):
+        p = (0, 0, 0)
+        pt = self.direction_function(1)*threedseq_to_4x1vector(p)
+        return (pt.item(0), pt.item(1), pt.item(2))
+
+    @classmethod
+    def generate(cls, bottom_radius, top_radius, height):
+        r = bottom_radius
+        circle_function = lambda x: (r*cos(x), r*sin(x))
+
+        def direction_function(x):
+            return translation((0, height*x, 0))
+
+        def rotation_function(x):
+            return IDENTITY_4
+
+        c = GLSweptSurface(circle_function,
+            direction_function, rotation_function,
+            curve_eval_steps = 5, surface_eval_steps = 3)
+        return c
  
-                
-
 
 class GLSurfaceOfRevolution(Drawable):
     
@@ -314,12 +361,12 @@ class GLSurfaceOfRevolution(Drawable):
                 # curr_point and next_point are two contiguous points on the
                 # curve that lies on the XY-plane
                 p_curr = self.function(curr_eval_number)
-                curr_point = twodseq_to_vector(p_curr)
+                curr_point = twodseq_to_4x1vector(p_curr)
 
                 curr_eval_number += self.eval_step
 
                 p_next = self.function(curr_eval_number)
-                next_point = twodseq_to_vector(p_next)
+                next_point = twodseq_to_4x1vector(p_next)
 
                 # get points on the first curve
                 curr_point_fst = rotation(fst_rotation_angle, "Y")*curr_point
@@ -363,7 +410,7 @@ class GLSurfaceOfRevolution(Drawable):
                 # to its tangent line
                 n = (tg.item(1), -tg.item(0))
                 # n now lives on a 3D world
-                n = twodseq_to_vector(n)
+                n = twodseq_to_4x1vector(n)
 
                 # the normals will be this vector rotated accordingly
                 # and then normalized
