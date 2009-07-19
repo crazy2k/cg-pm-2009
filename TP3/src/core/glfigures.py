@@ -3,7 +3,7 @@ from OpenGL.GLU import *
 
 from utils.transformations import *
 
-from numpy import pi, matrix, cross, size, sqrt, dot
+from numpy import pi, cross, size, sqrt, dot
 
 import random
 
@@ -150,7 +150,7 @@ class GLSweptSurface(Drawable):
     def draw(self):
 
         curr_curve_eval_number = 0
-        while curr_curve_eval_number <= 1:
+        while curr_curve_eval_number < 1:
             # p1 to p4 are (general) contiguous points on the curve
             d = self.curve_eval_step
             parms = (curr_curve_eval_number,
@@ -171,7 +171,7 @@ class GLSweptSurface(Drawable):
             # the ones at the next row
             curr_surface_eval_number = -self.surface_eval_step
             glBegin(GL_QUAD_STRIP)
-            while curr_surface_eval_number <= 1:
+            while curr_surface_eval_number < 1:
                 # vm is a 3x4 array that will hold vectors which are in the
                 # context we need
                 #
@@ -184,7 +184,7 @@ class GLSweptSurface(Drawable):
                 #     0 +----------+----------+----------+
                 #       0          1          2          3
                 #
-                #   * "+" are vertices (or Nones, if 
+                #   * "+" are vertices (or Nones) 
                 #   * our current vertices (the ones we are going to draw)
                 #     are the ones located at (1, 1) and (1, 2), which will
                 #     be called s and t respectively
@@ -230,6 +230,12 @@ class GLSweptSurface(Drawable):
                 t_adj = [s2_normal, s3_normal, s5_normal, s6_normal]
                 t_normal = self.vector_average(t_adj)
 
+                #print s_adj
+                #print t_adj
+                #print s_normal
+                #print t_normal
+                #print
+
                 glNormal3d(s_normal.item(0), s_normal.item(1),
                     s_normal.item(2))
                 glVertex3d(s.item(0), s.item(1), s.item(2))
@@ -240,6 +246,8 @@ class GLSweptSurface(Drawable):
 
                 # move one step forward on the surface
                 curr_surface_eval_number += self.surface_eval_step
+
+            glEnd()
 
             # move one step forward on the curve
             curr_curve_eval_number += self.curve_eval_step
@@ -260,48 +268,51 @@ class GLSweptSurface(Drawable):
 
         return points
                                         
-
-    def vector_average(self, v_list):
-        """Receives a list of 4x1 matrices (vectors). It calculates the
-        average between those that aren't None, ignoring the fourth component
-        of each vector."""
-        sum = matrix((0, 0, 0))
-        tot = 0
-        for v in v_list:
-            if v != None:
-                p = (v.item(0), v.item(1), v.item(2))
-                v_small = matrix(p)
-                sum += v_small
-                tot += 1
-
-        return sum/tot
-
     def normal(self, v1head, v1tail, v2head, v2tail):
         """Receives four 4x1 matrices (vectors). If neither is None,
         the following process takes place:
             1. Two vectors are created:
                 a) v1head - v1tail
                 b) v2head - v2tail
-            2. The last component of the two 1x4 matrices is removed.
-            3. A new 1x3 vector, perpendicular to those resulting from 2 is
+            2. The last component of the two 4x1 matrices is removed.
+            3. A new 3x1 vector, perpendicular to those resulting from 2 is
                calculated.
             4. A fourth component (a 1) is added to this new vector, and the
-               vector is returned."""
+               vector is returned.
+
+        """
        
         if None in (v1head, v1tail, v2head, v2tail):
             return None
         else:
             v1 = v1head - v1tail
             x1 = (v1.item(0), v1.item(1), v1.item(2))
-            v1 = matrix(x1)
+            v1 = my_matrix(x1)
 
             v2 = v2head - v2tail
             x2 = (v2.item(0), v2.item(1), v2.item(2))
-            v2 = matrix(x2)
+            v2 = my_matrix(x2)
 
             v3 = cross(v1, v2)
             p3 = (v3.item(0), v3.item(1), v3.item(2))
             return threedseq_to_4x1vector(p3)
+
+    def vector_average(self, v_list):
+        """Receives a list of 4x1 matrices (vectors). It calculates the
+        average between those that aren't None, ignoring the fourth component
+        of each vector. After that calculation, the resulting 3x1 matrix is
+        extended to a 4x1 matrix with 1 as its fourth component."""
+        sum = my_matrix((0, 0, 0))
+        tot = 0
+        for v in v_list:
+            if v != None:
+                p = (v.item(0), v.item(1), v.item(2))
+                v_1x3 = my_matrix(p)
+                sum += v_1x3
+                tot += 1
+
+        a = sum/tot
+        return threedseq_to_4x1vector((a.item(0), a.item(1), a.item(2)))
 
     def endpoint(self):
         p = (0, 0, 0)
@@ -310,7 +321,7 @@ class GLSweptSurface(Drawable):
 
     @classmethod
     def generate(cls, bottom_radius, top_radius, height):
-        r = bottom_radius
+        r = bottom_radius*2
         circle_function = lambda x: (r*cos(x), r*sin(x))
 
         def direction_function(x):
@@ -321,7 +332,7 @@ class GLSweptSurface(Drawable):
 
         c = GLSweptSurface(circle_function,
             direction_function, rotation_function,
-            curve_eval_steps = 5, surface_eval_steps = 3)
+            curve_eval_steps = 5, surface_eval_steps = 5)
         return c
  
 
@@ -386,7 +397,7 @@ class GLSurfaceOfRevolution(Drawable):
                 if j == 0:
                     # normals for the first two vertices will be the X-axis
                     # rotated accordingly and then normalized
-                    x_axis = matrix((1, 0, 0, 1)).transpose()
+                    x_axis = my_matrix((1, 0, 0, 1)).transpose()
                     n_fst = rotation(fst_rotation_angle, "Y")*x_axis
                     n_sec = rotation(sec_rotation_angle, "Y")*x_axis
 
@@ -404,7 +415,7 @@ class GLSurfaceOfRevolution(Drawable):
 
                 # the tangent to the curve in p_next will have a direction
                 # approximated by p_next - p_curr
-                tg = matrix(p_next) - matrix(p_curr)
+                tg = my_matrix(p_next) - my_matrix(p_curr)
 
                 # the normal for p_next will be a vector that is perpendicular
                 # to its tangent line
@@ -445,10 +456,11 @@ class GLSurfaceOfRevolution(Drawable):
         
         """
 
-        v = matrix((v.item(0), v.item(1), v.item(2)))
+        v = my_matrix((v.item(0), v.item(1), v.item(2)))
         norm = sqrt(dot(v, v.transpose()).item(0))
         v_n = v/norm
-        return matrix((v_n.item(0), v_n.item(1), v_n.item(2), 1)).transpose()
+        m = my_matrix((v_n.item(0), v_n.item(1), v_n.item(2), 1)).transpose()
+        return m
 
 
     def precision_correction(self, v):
