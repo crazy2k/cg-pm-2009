@@ -99,6 +99,43 @@ class GLCylinder(Drawable):
         return c
 
 
+class GLNURBS(Drawable):
+    
+    def __init__(self, sknots, tknots, c_points, height):
+        self.sknots = sknots
+        self.tknots = tknots
+        self.c_points = c_points
+        self.type = GL_MAP2_VERTEX_3
+        self.height = height
+
+        print "jaja"
+        self.nurb = gluNewNurbsRenderer()
+        print "jojo"
+
+    def draw(self):
+        return
+        print "a"
+        gluBeginSurface(self.nurb)
+        gluNurbsSurface(self.nurb, self.sknots, self.tknots, self.c_points,
+            self.type)
+        gluEndSurface(self.nurb)
+
+    def endpoint(self):
+        return (0, self.height, 0)
+
+
+    @classmethod
+    def generate(cls, bottom_radius, top_radius, height):
+        r = bottom_radius
+        c1 = [(r, 0, 0), (0, 0, -r), (-r, 0, 0), (0, 0, r)]
+        c2 = [(r, height, 0), (0, height, -r), (-r, height, 0), (0, height, r)]
+
+        m = [c1, c2]
+        print "papa"
+
+        return GLNURBS([0, 0, 0, 1, 2, 2, 2], [0, 0, 0, 1, 2, 2, 2], m, height)
+ 
+
 class GLSweptSurface(Drawable):
     
     def __init__(self, curve_function, direction_function, rotation_function,
@@ -230,12 +267,6 @@ class GLSweptSurface(Drawable):
                 t_adj = [s2_normal, s3_normal, s5_normal, s6_normal]
                 t_normal = self.vector_average(t_adj)
 
-                #print s_adj
-                #print t_adj
-                #print s_normal
-                #print t_normal
-                #print
-
                 glNormal3d(s_normal.item(0), s_normal.item(1),
                     s_normal.item(2))
                 glVertex3d(s.item(0), s.item(1), s.item(2))
@@ -302,16 +333,24 @@ class GLSweptSurface(Drawable):
         average between those that aren't None, ignoring the fourth component
         of each vector. After that calculation, the resulting 3x1 matrix is
         extended to a 4x1 matrix with 1 as its fourth component."""
+
+        k = 200
+
         sum = my_matrix((0, 0, 0))
         tot = 0
         for v in v_list:
             if v != None:
+                # v is multiplied by a factor to make its components bigger
+                # to reduce precision errors
+                v = k*v
+
                 p = (v.item(0), v.item(1), v.item(2))
                 v_1x3 = my_matrix(p)
+
                 sum += v_1x3
                 tot += 1
 
-        a = sum/tot
+        a = (sum/k)/tot
         return threedseq_to_4x1vector((a.item(0), a.item(1), a.item(2)))
 
     def endpoint(self):
