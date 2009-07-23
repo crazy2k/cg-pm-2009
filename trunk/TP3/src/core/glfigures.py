@@ -51,22 +51,47 @@ class GLSceneNode(SceneNode):
         glMultMatrixd(self.transformation.transpose())
 
         
-def generate_tree(actual_level, height, branch_height, min_cant, max_cant, bottom_radius, top_radius, angle, transformation, generate_trunk):
+def generate_tree(actual_level, height, primary_values, secondary_values, tertiary_values, transformation, generate_trunk, generate_leaf):
     # generate a node with a new trunk into it, and make
     # initial_transformation its associated transformation
+    if actual_level == 0:
+        values = primary_values
+    elif actual_level == 1:
+        values = secondary_values
+    else: #actual_level >= 2
+        values = tertiary_values
     
-    trunk = generate_trunk(bottom_radius, top_radius, branch_height)
+    if actual_level >= 2:
+        bottom_radius = values["initial_radius"] - values["radius_diff"]*(actual_level-2)
+    else:
+        bottom_radius = values["initial_radius"]
+    
+    trunk = generate_trunk(bottom_radius- values["radius_diff"], bottom_radius, values["branch_height"])
     node = GLSceneNode(transformation, trunk)
     
-    if actual_level < height:
-        cant = int(random.random()*float(max_cant - min_cant)) + min_cant
+    if actual_level >= 2:
+        leaf_trunk_radio = values["initial_radius"] - values["radius_diff"]*(height-2)
+        node.add_child(generate_trunk_leaf(values, generate_trunk, trunk.endpoint(), leaf_trunk_radio, generate_leaf))
+                
+    if actual_level < height - 1:
+        cant = int(random.random()*float(values["max_cant"] - values["min_cant"]) + values["min_cant"])
         for i in range (cant):
-                angle_x = int(random.random()*float(2*angle) - float(angle))
-                angle_z = int(random.random()*float(2*angle) - float(angle))
-                next_transformation = translation(trunk.endpoint()) * rotation(degree2radians(angle_z), "Z") * rotation(degree2radians(angle_x), "X")
-                node.add_child(generate_tree(actual_level + 1, height, branch_height, min_cant, max_cant, 2*bottom_radius - top_radius, bottom_radius, angle, next_transformation, generate_trunk))
+            angle_x = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
+            angle_z = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
+            next_transformation = translation(trunk.endpoint())*rotation(degree2radians(angle_z), "Z") * rotation(degree2radians(angle_x), "X")
+            node.add_child(generate_tree(actual_level + 1, height, primary_values, secondary_values, tertiary_values, next_transformation, generate_trunk, generate_leaf))
     return node
 
+def generate_trunk_leaf(values, generate_trunk, trunk_endpoint, leaf_trunk_radio, generate_leaf):
+    angle_x = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
+    angle_z = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
+    transformation = translation(trunk_endpoint)*rotation(degree2radians(angle_z), "Z")*rotation(degree2radians(angle_x), "X")
+    trunk = generate_trunk(leaf_trunk_radio,leaf_trunk_radio,values["branch_height"])
+    node = GLSceneNode(transformation, trunk)
+    leaf_node = GLSceneNode(transformation, generate_leaf(0.05,0.05,0.01))
+    node.add_child(leaf_node)
+    return node
+           
     
 class GLCylinder(Drawable):
 
@@ -94,10 +119,14 @@ class GLCylinder(Drawable):
         return (0, self.height, 0)
 
     @classmethod
-    def generate(cls, bottom_radius, top_radius, height):
+    def generate_trunk(cls, bottom_radius, top_radius, height):
         c = GLCylinder(bottom_radius, top_radius, height)
         return c
-
+    
+    def generate_leaf(cls, width, height):
+        function = lambda x: (0.01, x*1)
+        c = GLSurfaceOfRevolution(function, 1, 10)
+        return c
 
 class GLNURBS(Drawable):
     
@@ -521,8 +550,14 @@ class GLSurfaceOfRevolution(Drawable):
         return (0, self.function(1)[1], 0)
 
     @classmethod
-    def generate(cls, bottom_radius, top_radius, height):
+    def generate_trunk(cls, bottom_radius, top_radius, height):
         function = lambda x: (bottom_radius, x*height)
 
         c = GLSurfaceOfRevolution(function, 15, 20)
+        return c
+
+    @classmethod
+    def generate_leaf(cls, width, height):
+        function = lambda x: (0.01, x*1)
+        c = GLSurfaceOfRevolution(function, 1, 10)
         return c
