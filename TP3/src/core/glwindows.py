@@ -29,10 +29,14 @@ class GLFrame(wx.Frame):
         generate_surface = GLNURBS.generate
 
         self.glcanvas.add_figure(generate_tree(0, 3, 0.5, 3, 8, 0.04, 0.05, 40, IDENTITY_4, generate_surface))
+        primary_values = {"branch_height":1.2, "min_cant":6, "max_cant":7, "initial_radius":0.06, "radius_diff":0.01, "angle":45}
+        secondary_values = {"branch_height":0.5, "min_cant":2, "max_cant":4, "initial_radius":0.04, "radius_diff":0.01, "angle":40}
+        tertiary_values = {"branch_height":0.2, "min_cant":1, "max_cant":3, "initial_radius":0.03, "radius_diff":0.005, "angle":35}
+        
+        self.glcanvas.add_figure(generate_tree(0, 7, primary_values, secondary_values, tertiary_values, IDENTITY_4, generate_surface, generate_surface))
 
         self.Centre()
         self.Show(True)
-
 
 class DrawingGLCanvas(wx.glcanvas.GLCanvas):
     """A DrawingGLCanvas is basically a GLCanvas with some additional
@@ -165,7 +169,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
 
         # center (point at which the camera is aiming): always (0, 0, 0)
         # up vector: (0, 1, 0) (positive Y-axis)
-        gluLookAt(eye_x, eye_y, eye_z + 1, 0, 1, 0, 0, 1, 0)
+        gluLookAt(eye_x, eye_y, eye_z, 0, 1, 0, 0, 1, 0)
 
     def on_erase_background(self, event):
         # this is to avoid flickering on Win
