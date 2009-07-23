@@ -165,7 +165,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
 
         # center (point at which the camera is aiming): always (0, 0, 0)
         # up vector: (0, 1, 0) (positive Y-axis)
-        gluLookAt(eye_x, eye_y, eye_z, 0, 1, 0, 0, 1, 0)
+        gluLookAt(eye_x, eye_y, eye_z + 1, 0, 1, 0, 0, 1, 0)
 
     def on_erase_background(self, event):
         # this is to avoid flickering on Win
