@@ -108,13 +108,9 @@ class GLNURBS(Drawable):
         self.type = GL_MAP2_VERTEX_3
         self.height = height
 
-        print "jaja"
         self.nurb = gluNewNurbsRenderer()
-        print "jojo"
 
     def draw(self):
-        return
-        print "a"
         gluBeginSurface(self.nurb)
         gluNurbsSurface(self.nurb, self.sknots, self.tknots, self.c_points,
             self.type)
@@ -123,7 +119,6 @@ class GLNURBS(Drawable):
     def endpoint(self):
         return (0, self.height, 0)
 
-
     @classmethod
     def generate(cls, bottom_radius, top_radius, height):
         r = bottom_radius
@@ -131,7 +126,6 @@ class GLNURBS(Drawable):
         c2 = [(r, height, 0), (0, height, -r), (-r, height, 0), (0, height, r)]
 
         m = [c1, c2]
-        print "papa"
 
         return GLNURBS([0, 0, 0, 1, 2, 2, 2], [0, 0, 0, 1, 2, 2, 2], m, height)
  
