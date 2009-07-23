@@ -110,6 +110,14 @@ class GLNURBS(Drawable):
 
         self.nurb = gluNewNurbsRenderer()
 
+        def ne(error):
+            print error
+
+        #gluNurbsCallback(self.nurb, GLU_NURBS_BEGIN, ne)
+
+    def nurb_error(self, error):
+        print error
+
     def draw(self):
         gluBeginSurface(self.nurb)
         gluNurbsSurface(self.nurb, self.sknots, self.tknots, self.c_points,
@@ -121,13 +129,14 @@ class GLNURBS(Drawable):
 
     @classmethod
     def generate(cls, bottom_radius, top_radius, height):
+
         r = bottom_radius
         c1 = [(r, 0, 0), (0, 0, -r), (-r, 0, 0), (0, 0, r)]
         c2 = [(r, height, 0), (0, height, -r), (-r, height, 0), (0, height, r)]
 
         m = [c1, c2]
 
-        return GLNURBS([0, 0, 0, 1, 2, 2, 2], [0, 0, 0, 1, 2, 2, 2], m, height)
+        return GLNURBS([0, 0, 0, 0, 1, 1, 1, 1], [0, 0, 1, 1], m, height)
  
 
 class GLSweptSurface(Drawable):
