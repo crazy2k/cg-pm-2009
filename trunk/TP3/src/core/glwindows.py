@@ -28,7 +28,6 @@ class GLFrame(wx.Frame):
         #generate_surface = GLSweptSurface.generate
         generate_surface = GLNURBS.generate
 
-        self.glcanvas.add_figure(generate_tree(0, 3, 0.5, 3, 8, 0.04, 0.05, 40, IDENTITY_4, generate_surface))
         primary_values = {"branch_height":1.2, "min_cant":6, "max_cant":7, "initial_radius":0.06, "radius_diff":0.01, "angle":45}
         secondary_values = {"branch_height":0.5, "min_cant":2, "max_cant":4, "initial_radius":0.04, "radius_diff":0.01, "angle":40}
         tertiary_values = {"branch_height":0.2, "min_cant":1, "max_cant":3, "initial_radius":0.03, "radius_diff":0.005, "angle":35}
