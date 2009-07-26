@@ -139,14 +139,6 @@ class GLNURBS(Drawable):
 
         self.nurb = gluNewNurbsRenderer()
 
-        def ne(error):
-            print error
-
-        #gluNurbsCallback(self.nurb, GLU_NURBS_BEGIN, ne)
-
-    def nurb_error(self, error):
-        print error
-
     def draw(self):
         gluBeginSurface(self.nurb)
         gluNurbsSurface(self.nurb, self.sknots, self.tknots, self.c_points,
@@ -158,14 +150,32 @@ class GLNURBS(Drawable):
 
     @classmethod
     def generate(cls, bottom_radius, top_radius, height):
-
+                
         r = bottom_radius
-        c1 = [(r, 0, 0), (0, 0, -r), (-r, 0, 0), (0, 0, r)]
-        c2 = [(r, height, 0), (0, height, -r), (-r, height, 0), (0, height, r)]
+        c1 = [(-r, 0, 0), (-r, 0, r), (r, 0, r), (r, 0, -r), (-r, 0, -r), (-r, 0, 0)]
+        a = height/5
+        c2 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        a = height/4
+        c3 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        a = height/3
+        c4 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        a = height/2
+        c5 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        a = height
+        c6 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        m = [c1, c2, c3, c4, c5, c6]
 
-        m = [c1, c2]
+        knots = []
+        grade = 4
+        for i in range (0,grade + len(c1)):
+            if i < grade:
+                knots.append(0)    
+            elif i >= len(c1):
+                knots.append((len(c1) - grade) + 1)
+            else:
+                knots.append(i + 1 - grade)
 
-        return GLNURBS([0, 0, 0, 0, 1, 1, 1, 1], [0, 0, 1, 1], m, height)
+        return GLNURBS(knots, knots, m, height)
  
 
 class GLSweptSurface(Drawable):
