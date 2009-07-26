@@ -22,17 +22,17 @@ class GLFrame(wx.Frame):
         self.glcanvas = DrawingGLCanvas(self, attrib_list)
 
         #self.glcanvas.add_figure(GLAxis())
-        #generate_cylinder = GLCylinder.generate
+        generate_surface = GLCylinder.generate_trunk
 
-        #generate_surface = GLSurfaceOfRevolution.generate
+        #generate_surface = GLSurfaceOfRevolution.generate_trunk
         #generate_surface = GLSweptSurface.generate
-        generate_surface = GLNURBS.generate
+#        generate_surface = GLNURBS.generate
 
-        primary_values = {"branch_height":1.2, "min_cant":6, "max_cant":7, "initial_radius":0.06, "radius_diff":0.01, "angle":45}
+        primary_values = {"branch_height":1.2, "min_cant":6, "max_cant":7, "initial_radius":1, "radius_diff":0, "angle":45}
         secondary_values = {"branch_height":0.5, "min_cant":2, "max_cant":4, "initial_radius":0.04, "radius_diff":0.01, "angle":40}
         tertiary_values = {"branch_height":0.2, "min_cant":1, "max_cant":3, "initial_radius":0.03, "radius_diff":0.005, "angle":35}
         
-        self.glcanvas.add_figure(generate_tree(0, 7, primary_values, secondary_values, tertiary_values, IDENTITY_4, generate_surface, generate_surface))
+        self.glcanvas.add_figure(generate_tree(0, 1, primary_values, secondary_values, tertiary_values, IDENTITY_4, generate_surface, generate_surface))
 
         self.Centre()
         self.Show(True)
