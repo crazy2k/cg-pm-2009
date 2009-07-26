@@ -403,7 +403,7 @@ class GLSweptSurface(Drawable):
     @classmethod
     def generate(cls, bottom_radius, top_radius, height):
         r = bottom_radius*2
-        circle_function = lambda x: (r*cos(x), r*sin(x))
+        circle_function = lambda x: (r*cos(x*2*pi), r*sin(x*2*pi))
 
         def direction_function(x):
             return translation((0, height*x, 0))
