@@ -128,6 +128,46 @@ class GLCylinder(Drawable):
         c = GLSurfaceOfRevolution(function, 1, 10)
         return c
 
+class GLBezier(Drawable):
+    
+    def __init__(self, c_points, height):
+        self.c_points = c_points
+        self.type = GL_MAP2_VERTEX_3
+        self.height = height
+
+    def draw(self):
+        glEnable(self.type)
+        glEnable(GL_AUTO_NORMAL)
+        glMap2f(self.type, 
+                0.0, 1.0,  # U ranges 0..1 
+                0.0, 1.0,  # V ranges 0..1  
+                self.c_points)  # control points 
+        glMapGrid2f(5, 0.0, 1.0, 60, 0.0, 1.0)  # we tell OpenGL to iterate 
+        #across the full 0.0 to 1.0 range setup above with 5 rows and 6 columns
+        glEvalMesh2(GL_FILL,
+                0, 5,   # Starting at 0 mesh 5 steps (rows)
+                0, 60)  # Starting at 0 mesh 6 steps (columns)
+
+    def endpoint(self):
+        return (0, self.height, 0)
+
+    @classmethod
+    def generate(cls, bottom_radius, top_radius, height):
+        r = bottom_radius
+        c1 = [(-r, 0, 0), (-r, 0, r), (r, 0, r), (r, 0, -r), (-r, 0, -r), (-r, 0, 0)]
+        a = height/5
+        c2 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        a = height/4
+        c3 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        a = height/3
+        c4 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        a = height/2
+        c5 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        a = height
+        c6 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        m = [c1, c2, c3, c4, c5, c6]
+        return GLBezier(m, height)
+
 class GLNURBS(Drawable):
     
     def __init__(self, sknots, tknots, c_points, height):
