@@ -1,5 +1,6 @@
 import wx
 import wx.glcanvas
+import wx.xrc as xrc
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -34,6 +35,10 @@ class GLFrame(wx.Frame):
         tertiary_values = {"branch_height":0.2, "min_cant":1, "max_cant":3, "initial_radius":0.03, "radius_diff":0.005, "angle":35}
         
         self.glcanvas.add_figure(generate_tree(0, 1, primary_values, secondary_values, tertiary_values, IDENTITY_4, generate_surface, generate_surface))
+
+        self.res = xrc.XmlResource("view/panel.xrc")
+        self.panel = self.res.LoadPanel(self, "ID_WXPANEL")
+
 
         self.Centre()
         self.Show(True)
