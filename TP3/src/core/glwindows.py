@@ -20,26 +20,29 @@ class GLFrame(wx.Frame):
         attrib_list = (wx.glcanvas.WX_GL_RGBA, # RGBA
                        wx.glcanvas.WX_GL_DOUBLEBUFFER) # double-buffering
 
-        self.glcanvas = DrawingGLCanvas(self, attrib_list)
+        glcanvas_size = wx.Size(450, 450)
 
-        #self.glcanvas.add_figure(GLAxis())
-       # generate_surface = GLCylinder.generate_trunk
+        self.glcanvas = DrawingGLCanvas(self, attrib_list, glcanvas_size)
 
-        #generate_surface = GLSurfaceOfRevolution.generate_trunk
-#        generate_surface = GLSweptSurface.generate
-        #generate_surface = GLNURBS.generate
-        generate_surface = GLBezier.generate
+        generate_surface = GLCylinder.generate_trunk
 
-        primary_values = {"branch_height":1.2, "min_cant":6, "max_cant":7, "initial_radius":1, "radius_diff":0, "angle":45}
+        primary_values = {"branch_height":1.2, "min_cant":6, "max_cant":7, "initial_radius":0.06, "radius_diff":0.01, "angle":45}
         secondary_values = {"branch_height":0.5, "min_cant":2, "max_cant":4, "initial_radius":0.04, "radius_diff":0.01, "angle":40}
         tertiary_values = {"branch_height":0.2, "min_cant":1, "max_cant":3, "initial_radius":0.03, "radius_diff":0.005, "angle":35}
         
-        self.glcanvas.add_figure(generate_tree(0, 1, primary_values, secondary_values, tertiary_values, IDENTITY_4, generate_surface, generate_surface))
+        self.glcanvas.add_figure(generate_tree(0, 4, primary_values, secondary_values, tertiary_values, IDENTITY_4, generate_surface, generate_surface))
 
+        # panel is loaded
         self.res = xrc.XmlResource("view/panel.xrc")
         self.panel = self.res.LoadPanel(self, "ID_WXPANEL")
 
+        # sizer's creation
+        grid = wx.FlexGridSizer(rows = 0, cols = 2, vgap = 0, hgap = 0)
+        grid.Add(self.glcanvas)
+        grid.Add(self.panel)
 
+        # frame initialization
+        self.SetSizer(grid)
         self.Centre()
         self.Show(True)
 
@@ -58,9 +61,9 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
 
     """
 
-    def __init__(self, parent, attrib_list):
+    def __init__(self, parent, attrib_list, canvas_size):
         wx.glcanvas.GLCanvas.__init__(self, parent = parent,
-            attribList = attrib_list)
+            attribList = attrib_list, size = canvas_size)
 
         self.figures = []
 
@@ -89,6 +92,8 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
             width = size.GetWidth()
             height = size.GetHeight()
             glViewport(0, 0, width, height)
+
+            print "halloa!"
 
     def on_paint(self, event):
 
