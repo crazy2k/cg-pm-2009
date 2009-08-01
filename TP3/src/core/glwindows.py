@@ -11,6 +11,7 @@ from math import sin, cos, pi
 
 from utils.transformations import IDENTITY_4
 
+
 class GLFrame(wx.Frame):
 
     def __init__(self, id, title):
@@ -24,6 +25,7 @@ class GLFrame(wx.Frame):
 
         panel_w, panel_h = self.panel.GetSize().Get()
 
+        self.fp_sliders_settings = {}
         self.bind_panel_events(res)
 
         #
@@ -34,7 +36,7 @@ class GLFrame(wx.Frame):
 
         # size settings
         glcanvas_w = 500
-        glcanvas_h = panel_h
+        glcanvas_h = 500
         
         glcanvas_size = wx.Size(glcanvas_w, glcanvas_h)
 
@@ -54,14 +56,24 @@ class GLFrame(wx.Frame):
         grid.Add(self.panel)
 
         # frame initialization
-        self.SetSize(wx.Size(glcanvas_w + panel_w, panel_h))
+        self.SetSize(wx.Size(glcanvas_w + panel_w, glcanvas_h))
         self.SetSizer(grid)
         self.Centre()
         self.Show(True)
 
     def bind_panel_events(self, res):
+        # bind checkboxes' events
         self.Bind(wx.EVT_CHECKBOX, self.on_check_perspective,
             id = xrc.XRCID("ID_CHECKBOX_PERSPECTIVE"))
+        
+        # bind sliders' events
+        sliders_names = ["ID_PERSPECTIVE_FOVY", "ID_PERSPECTIVE_ASPECT",
+            "ID_PERSPECTIVE_ZNEAR", "ID_PERSPECTIVE_ZFAR"]
+
+        for s_name in sliders_names:
+            # all sliders' events are binded to the same function
+            self.Bind(wx.EVT_SCROLL, self.on_scroll_slider,
+                id = xrc.XRCID(s_name))
 
     def on_check_perspective(self, event):
         old_value = self.glcanvas.perspective_projection_enabled
@@ -69,33 +81,90 @@ class GLFrame(wx.Frame):
 
         self.glcanvas.Refresh()
 
-    def fill_panel(self):
-        def set_boxes_values(boxes, values):
-            length = len(boxes)
+    def on_scroll_slider(self, event):
+        # get slider's actual data
+        s_name = event.EventObject.GetName()
+        s_value = event.EventObject.GetValue()
 
-            if length != len(values):
-                raise Error("Number of boxes and number of values must match.")
-            for i in range(length):
-                box = xrc.XRCCTRL(self, boxes[i])
-                box.SetValue(values[i])
+        # get slider's settings
+        s_settings = self.fp_sliders_settings[s_name]
+        attr_name = s_settings["attr"]
+
+        # transform data to the real value
+        attr_value = s_settings["step"]*s_value
+        # update canvas' state
+        setattr(self.glcanvas, attr_name, attr_value)
+
+        # update accompanying text and canvas
+        self.update_acc_text(s_name, attr_value)
+        self.glcanvas.Refresh()
+
+    def update_acc_text(self, s_name, value):
+        text_ctrl = xrc.XRCCTRL(self, s_name + "_TEXT")
+        text_ctrl.SetValue(str(value))
+
+    def fill_panel(self):
+        def set_controls_values(settings_dict):
+            for k, v in settings_dict.iteritems():
+                ctrl = xrc.XRCCTRL(self, k)
+                ctrl.SetValue(v)
+
+        self.load_fp_sliders_settings()
 
         c = self.glcanvas
 
-        checkbox_perspective = xrc.XRCCTRL(self,
-            "ID_CHECKBOX_PERSPECTIVE")
+        # set actual values to sliders
+        for s_name, s_settings in self.fp_sliders_settings.iteritems():
+            slider = xrc.XRCCTRL(self, s_name)
 
-        state = c.perspective_projection_enabled
-        checkbox_perspective.SetValue(state)
+            # set min and max
+            mult = int(1/s_settings["step"])
+            slider.SetMin(mult*s_settings["min"])
+            slider.SetMax(mult*s_settings["max"])
 
-        boxes = ("ID_PERSPECTIVE_FOVY", "ID_PERSPECTIVE_ASPECT",
-            "ID_PERSPECTIVE_ZNEAR", "ID_PERSPECTIVE_ZFAR")
-        values = (c.perspective_projection_fovy,
-            c.perspective_projection_aspect,
-            c.perspective_projection_zNear,
-            c.perspective_projection_zFar)
-        set_boxes_values(boxes, values)
+            # set actual value
+            value_from_canvas = getattr(c, s_settings["attr"])
+            slider.SetValue(value_from_canvas*mult)
 
-    
+            # update accompanying text
+            self.update_acc_text(s_name, value_from_canvas)
+
+        # set actual values to the rest of controls
+        values = {
+            # Projections -> Perspective
+            "ID_CHECKBOX_PERSPECTIVE": c.perspective_projection_enabled,
+        }
+
+        set_controls_values(values)
+
+    def load_fp_sliders_settings(self):
+        self.fp_sliders_settings = {
+            "ID_PERSPECTIVE_FOVY": {
+                    "min": 0,
+                    "max": 180,
+                    "step": 0.1,
+                    "attr": "perspective_projection_fovy"
+            },
+            "ID_PERSPECTIVE_ASPECT": {
+                    "min": 0.1,
+                    "max": 50,
+                    "step": 0.001,
+                    "attr": "perspective_projection_aspect"
+            },
+            "ID_PERSPECTIVE_ZNEAR": {
+                    "min": 0,
+                    "max": 50,
+                    "step": 0.001,
+                    "attr": "perspective_projection_zNear"
+            },
+            "ID_PERSPECTIVE_ZFAR": {
+                    "min": 0,
+                    "max": 50,
+                    "step": 0.001,
+                    "attr": "perspective_projection_zFar"
+            }
+        }
+
     def fill_canvas(self):
         
         generate_trunk = GLCylinder.generate_trunk

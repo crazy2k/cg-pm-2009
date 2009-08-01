@@ -533,11 +533,29 @@
                                                             <object class="sizeritem">
                                                                 <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                 <border>5</border>
-                                                                <object class="wxSlider" name="ID_PERSPECTIVE_FOVY">
-                                                                    <style>wxSL_LABELS</style>
-                                                                    <value>0</value>
-                                                                    <min>0</min>
-                                                                    <max>360</max>
+                                                                <object class="wxFlexGridSizer">
+                                                                    <cols>2</cols>
+                                                                    <rows>0</rows>
+                                                                    <vgap>0</vgap>
+                                                                    <hgap>0</hgap>
+                                                                    <growablecols>0</growablecols>
+                                                                    <object class="sizeritem">
+                                                                        <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                        <border>5</border>
+                                                                        <object class="wxSlider" name="ID_PERSPECTIVE_FOVY">
+                                                                            <value>0</value>
+                                                                            <min>0</min>
+                                                                            <max>360</max>
+                                                                        </object>
+                                                                    </object>
+                                                                    <object class="sizeritem">
+                                                                        <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                        <border>5</border>
+                                                                        <object class="wxTextCtrl" name="ID_PERSPECTIVE_FOVY_TEXT">
+                                                                            <size>50,-1</size>
+                                                                            <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                        </object>
+                                                                    </object>
                                                                 </object>
                                                             </object>
                                                             <object class="sizeritem">
@@ -550,11 +568,29 @@
                                                             <object class="sizeritem">
                                                                 <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                 <border>5</border>
-                                                                <object class="wxSlider" name="ID_PERSPECTIVE_ASPECT">
-                                                                    <style>wxSL_LABELS</style>
-                                                                    <value>0</value>
-                                                                    <min>0</min>
-                                                                    <max>360</max>
+                                                                <object class="wxFlexGridSizer">
+                                                                    <cols>2</cols>
+                                                                    <rows>0</rows>
+                                                                    <vgap>0</vgap>
+                                                                    <hgap>0</hgap>
+                                                                    <growablecols>0</growablecols>
+                                                                    <object class="sizeritem">
+                                                                        <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                        <border>5</border>
+                                                                        <object class="wxSlider" name="ID_PERSPECTIVE_ASPECT">
+                                                                            <value>0</value>
+                                                                            <min>0</min>
+                                                                            <max>360</max>
+                                                                        </object>
+                                                                    </object>
+                                                                    <object class="sizeritem">
+                                                                        <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                        <border>5</border>
+                                                                        <object class="wxTextCtrl" name="ID_PERSPECTIVE_ASPECT_TEXT">
+                                                                            <size>50,-1</size>
+                                                                            <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                        </object>
+                                                                    </object>
                                                                 </object>
                                                             </object>
                                                             <object class="sizeritem">
@@ -567,11 +603,29 @@
                                                             <object class="sizeritem">
                                                                 <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                 <border>5</border>
-                                                                <object class="wxSlider" name="ID_PERSPECTIVE_ZNEAR">
-                                                                    <style>wxSL_LABELS</style>
-                                                                    <value>0</value>
-                                                                    <min>0</min>
-                                                                    <max>360</max>
+                                                                <object class="wxFlexGridSizer">
+                                                                    <cols>2</cols>
+                                                                    <rows>0</rows>
+                                                                    <vgap>0</vgap>
+                                                                    <hgap>0</hgap>
+                                                                    <growablecols>0</growablecols>
+                                                                    <object class="sizeritem">
+                                                                        <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                        <border>5</border>
+                                                                        <object class="wxSlider" name="ID_PERSPECTIVE_ZNEAR">
+                                                                            <value>0</value>
+                                                                            <min>0</min>
+                                                                            <max>360</max>
+                                                                        </object>
+                                                                    </object>
+                                                                    <object class="sizeritem">
+                                                                        <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                        <border>5</border>
+                                                                        <object class="wxTextCtrl" name="ID_PERSPECTIVE_ZNEAR_TEXT">
+                                                                            <size>50,-1</size>
+                                                                            <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                        </object>
+                                                                    </object>
                                                                 </object>
                                                             </object>
                                                             <object class="sizeritem">
@@ -584,11 +638,29 @@
                                                             <object class="sizeritem">
                                                                 <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                 <border>5</border>
-                                                                <object class="wxSlider" name="ID_PERSPECTIVE_ZFAR">
-                                                                    <style>wxSL_LABELS</style>
-                                                                    <value>0</value>
-                                                                    <min>0</min>
-                                                                    <max>360</max>
+                                                                <object class="wxFlexGridSizer">
+                                                                    <cols>2</cols>
+                                                                    <rows>0</rows>
+                                                                    <vgap>0</vgap>
+                                                                    <hgap>0</hgap>
+                                                                    <growablecols>0</growablecols>
+                                                                    <object class="sizeritem">
+                                                                        <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                        <border>5</border>
+                                                                        <object class="wxSlider" name="ID_PERSPECTIVE_ZFAR">
+                                                                            <value>0</value>
+                                                                            <min>0</min>
+                                                                            <max>360</max>
+                                                                        </object>
+                                                                    </object>
+                                                                    <object class="sizeritem">
+                                                                        <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                        <border>5</border>
+                                                                        <object class="wxTextCtrl" name="ID_PERSPECTIVE_ZFAR_TEXT">
+                                                                            <size>50,-1</size>
+                                                                            <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                        </object>
+                                                                    </object>
                                                                 </object>
                                                             </object>
                                                         </object>
