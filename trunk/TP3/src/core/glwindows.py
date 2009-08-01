@@ -167,7 +167,7 @@ class GLFrame(wx.Frame):
 
     def fill_canvas(self):
         
-        generate_trunk = GLCylinder.generate_trunk
+        generate_trunk = GLSurfaceOfRevolution.generate_trunk
         generate_leaf = GLBezier.generate_leaf
         
         primary_values = {
