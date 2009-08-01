@@ -454,7 +454,7 @@ class GLSweptSurface(Drawable):
 
     @classmethod
     def generate_trunk(cls, bottom_radius, top_radius, height):
-        r = bottom_radius*2
+        r = bottom_radius
         circle_function = lambda x: (r*cos(x*2*pi), r*sin(x*2*pi))
 
         def direction_function(x):
@@ -615,5 +615,5 @@ class GLSurfaceOfRevolution(Drawable):
     def generate_trunk(cls, bottom_radius, top_radius, height):
         function = lambda x: (bottom_radius, x*height)
 
-        c = GLSurfaceOfRevolution(function, 15, 20)
+        c = GLSurfaceOfRevolution(function, 5, 5)
         return c
