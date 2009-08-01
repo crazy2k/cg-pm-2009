@@ -8,7 +8,7 @@ if __name__ == "__main__":
 
     app = wx.App()
 
-    GLFrame(-1, "Visualizador y editor de arbolitos", (1000, 450))
+    GLFrame(-1, "Visualizador y editor de arbolitos")
 
     app.MainLoop()
 
