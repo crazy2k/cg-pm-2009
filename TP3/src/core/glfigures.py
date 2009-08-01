@@ -88,7 +88,7 @@ def generate_trunk_leaf(values, generate_trunk, trunk_endpoint, leaf_trunk_radio
     transformation = translation(trunk_endpoint)*rotation(degree2radians(angle_z), "Z")*rotation(degree2radians(angle_x), "X")
     trunk = generate_trunk(leaf_trunk_radio,leaf_trunk_radio,values["branch_height"])
     node = GLSceneNode(transformation, trunk)
-    leaf_node = GLSceneNode(transformation, generate_leaf(0.05,0.05,0.01))
+    leaf_node = GLSceneNode(transformation, generate_leaf(0.1,0.1,0.3))
     node.add_child(leaf_node)
     return node
            
@@ -122,12 +122,6 @@ class GLCylinder(Drawable):
     def generate_trunk(cls, bottom_radius, top_radius, height):
         c = GLCylinder(bottom_radius, top_radius, height)
         return c
-    
-    def generate_leaf(cls, width, height):
-        function = lambda x: (0.01, x*1)
-        c = GLSurfaceOfRevolution(function, 1, 10)
-        return c
-
 class GLBezier(Drawable):
     
     def __init__(self, c_points, height):
@@ -147,27 +141,43 @@ class GLBezier(Drawable):
         glEvalMesh2(GL_FILL,
                 0, 5,   # Starting at 0 mesh 5 steps (rows)
                 0, 60)  # Starting at 0 mesh 6 steps (columns)
+        glDisable(GL_AUTO_NORMAL)
 
     def endpoint(self):
         return (0, self.height, 0)
 
     @classmethod
-    def generate(cls, bottom_radius, top_radius, height):
+    def generate_trunk(cls, bottom_radius, top_radius, height):
         r = bottom_radius
-        c1 = [(-r, 0, 0), (-r, 0, r), (r, 0, r), (r, 0, -r), (-r, 0, -r), (-r, 0, 0)]
-        a = height/5
-        c2 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
-        a = height/4
-        c3 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
-        a = height/3
-        c4 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
-        a = height/2
-        c5 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
-        a = height
-        c6 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        
+        def circle(a):
+            return [(-r,a,0),(-r,a,-r),(r,a,-r),(r,a,r),(-r,a,r),(-r,a,0)]
+        
+        c1 = circle(0)
+        c2 = circle(0)
+        c3 = circle(0)
+        c4 = circle(height)
+        c5 = circle(height)
+        c6 = circle(height) 
+        
         m = [c1, c2, c3, c4, c5, c6]
         return GLBezier(m, height)
+    
+    @classmethod
+    def generate_leaf(cls, mayor_radius, minor_radius, height):
 
+        def leaf(a, b, c):
+            return [(-a,b,0),(0,b,-c),(a*2,b,0),(0,b,c),(-a,b,0)]
+        
+        c1 = leaf(0,0,0)
+        c2 = leaf(mayor_radius/2,height/2,minor_radius/2)
+        c3 = leaf(mayor_radius,height/2,minor_radius)
+        c4 = leaf(mayor_radius/2,height/2,minor_radius/2)
+        c5 = leaf(0,height,0)
+        m = [c1,c2,c3,c4,c5]
+        return GLBezier(m, height)
+        
+    
 class GLNURBS(Drawable):
     
     def __init__(self, sknots, tknots, c_points, height):
@@ -180,29 +190,31 @@ class GLNURBS(Drawable):
         self.nurb = gluNewNurbsRenderer()
 
     def draw(self):
+        glEnable(GL_AUTO_NORMAL)
         gluBeginSurface(self.nurb)
         gluNurbsSurface(self.nurb, self.sknots, self.tknots, self.c_points,
             self.type)
         gluEndSurface(self.nurb)
+        glDisable(GL_AUTO_NORMAL)
 
     def endpoint(self):
         return (0, self.height, 0)
 
     @classmethod
-    def generate(cls, bottom_radius, top_radius, height):
+    def generate_trunk(cls, bottom_radius, top_radius, height):
                 
         r = bottom_radius
-        c1 = [(-r, 0, 0), (-r, 0, r), (r, 0, r), (r, 0, -r), (-r, 0, -r), (-r, 0, 0)]
-        a = height/5
-        c2 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
-        a = height/4
-        c3 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
-        a = height/3
-        c4 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
-        a = height/2
-        c5 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
-        a = height
-        c6 = [(-r, a, 0), (-r, a, r), (r, a, r), (r, a, -r), (-r, a, -r), (-r, a, 0)]
+        h = height
+        
+        def cylinder_column(x,z):
+            return [(x,0,z),(x,h/5,z),(x,h/4,z),(x,h/3,z),(x,h/2,z),(x,h,z)]
+        
+        c1 = cylinder_column(-r,0)
+        c2 = cylinder_column(-r,r)
+        c3 = cylinder_column(r,r)
+        c4 = cylinder_column(r,-r)
+        c5 = cylinder_column(-r,-r)
+        c6 = cylinder_column(-r,0)
         m = [c1, c2, c3, c4, c5, c6]
 
         knots = []
@@ -441,7 +453,7 @@ class GLSweptSurface(Drawable):
         return (pt.item(0), pt.item(1), pt.item(2))
 
     @classmethod
-    def generate(cls, bottom_radius, top_radius, height):
+    def generate_trunk(cls, bottom_radius, top_radius, height):
         r = bottom_radius*2
         circle_function = lambda x: (r*cos(x*2*pi), r*sin(x*2*pi))
 
@@ -604,10 +616,4 @@ class GLSurfaceOfRevolution(Drawable):
         function = lambda x: (bottom_radius, x*height)
 
         c = GLSurfaceOfRevolution(function, 15, 20)
-        return c
-
-    @classmethod
-    def generate_leaf(cls, width, height):
-        function = lambda x: (0.01, x*1)
-        c = GLSurfaceOfRevolution(function, 1, 10)
         return c

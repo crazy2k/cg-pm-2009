@@ -97,8 +97,10 @@ class GLFrame(wx.Frame):
 
     
     def fill_canvas(self):
-        generate_surface = GLCylinder.generate_trunk
-
+        
+        generate_trunk = GLCylinder.generate_trunk
+        generate_leaf = GLBezier.generate_leaf
+        
         primary_values = {
             "branch_height": 1.2,
             "min_cant": 6,
@@ -126,9 +128,9 @@ class GLFrame(wx.Frame):
         
         self.glcanvas.add_figure(
             generate_tree(
-                0, 4, primary_values, secondary_values,
-                tertiary_values, IDENTITY_4, generate_surface,
-                generate_surface
+                0, 6, primary_values, secondary_values,
+                tertiary_values, IDENTITY_4, generate_trunk,
+                generate_leaf
             )
         )
 
