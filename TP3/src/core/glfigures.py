@@ -51,11 +51,12 @@ class GLSceneNode(SceneNode):
         glMultMatrixd(self.transformation.transpose())
 
         
-def generate_tree(actual_level, height, primary_values, secondary_values, tertiary_values, transformation, generate_trunk, generate_leaf):
+def generate_tree(actual_level, height, primary_values, secondary_values, tertiary_values, transformation, generate_trunk, generate_leaf, seed):
     # generate a node with a new trunk into it, and make
     # initial_transformation its associated transformation
     if actual_level == 0:
         values = primary_values
+        random.seed(seed)
     elif actual_level == 1:
         values = secondary_values
     else: #actual_level >= 2
@@ -66,7 +67,7 @@ def generate_tree(actual_level, height, primary_values, secondary_values, tertia
     else:
         bottom_radius = values["initial_radius"]
     
-    trunk = generate_trunk(bottom_radius- values["radius_diff"], bottom_radius, values["branch_height"])
+    trunk = generate_trunk(bottom_radius - values["radius_diff"], bottom_radius, values["branch_height"])
     node = GLSceneNode(transformation, trunk)
     
     if actual_level >= 2:
@@ -79,7 +80,7 @@ def generate_tree(actual_level, height, primary_values, secondary_values, tertia
             angle_x = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
             angle_z = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
             next_transformation = translation(trunk.endpoint())*rotation(degree2radians(angle_z), "Z") * rotation(degree2radians(angle_x), "X")
-            node.add_child(generate_tree(actual_level + 1, height, primary_values, secondary_values, tertiary_values, next_transformation, generate_trunk, generate_leaf))
+            node.add_child(generate_tree(actual_level + 1, height, primary_values, secondary_values, tertiary_values, next_transformation, generate_trunk, generate_leaf, None))
     return node
 
 def generate_trunk_leaf(values, generate_trunk, trunk_endpoint, leaf_trunk_radio, generate_leaf):
