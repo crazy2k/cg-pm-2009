@@ -12,6 +12,16 @@ from math import sin, cos, pi
 from utils.transformations import IDENTITY_4
 
 
+def gen_def_get(name):
+    def def_get(self):
+        return getattr(self, "_" + name)
+    return def_get
+
+def gen_def_set(name):
+    def def_set(self, value):
+        setattr(self, "_" + name, value)
+    return def_set
+
 class GLFrame(wx.Frame):
 
     def __init__(self, id, title):
@@ -30,9 +40,25 @@ class GLFrame(wx.Frame):
         #       "has_dependents": <True if other sliders depend on this
         #           slider's attribute value; False otherwise>
         #   },
+        #   ...
+        # }
 
         self.fp_sliders_settings = {}
         self.load_fp_sliders_settings()
+
+        self.checkboxes_settings = {
+            "ID_CHECKBOX_PERSPECTIVE": {
+                "dest": "canvas",
+                "attr": "perspective_projection_enabled",
+                "has_dependents": True
+            },
+            "ID_CHECKBOX_ORTHO": {
+                "dest": "canvas",
+                "attr": "perspective_projection_enabled",
+                "attr": "ortho_projection_enabled",
+                "has_dependents": True
+            }
+        }
 
         # panel loading from XRC
         res = xrc.XmlResource("view/panel.xrc")
@@ -75,78 +101,47 @@ class GLFrame(wx.Frame):
 
     def bind_panel_events(self, res):
         # bind checkboxes' events
-        self.Bind(wx.EVT_CHECKBOX, self.on_check_perspective,
-            id = xrc.XRCID("ID_CHECKBOX_PERSPECTIVE"))
-        self.Bind(wx.EVT_CHECKBOX, self.on_check_ortho,
-            id = xrc.XRCID("ID_CHECKBOX_ORTHO"))
+        cb_names = [c for c in self.checkboxes_settings.iterkeys()]
+        for c_name in cb_names:
+            self.Bind(wx.EVT_CHECKBOX, self.on_check,
+                id = xrc.XRCID(c_name))
         
         # bind sliders' events
         sliders_names = [s for s in self.fp_sliders_settings.iterkeys()]
-
         for s_name in sliders_names:
             # all sliders' events are binded to the same function
             self.Bind(wx.EVT_SCROLL, self.on_scroll_slider,
                 id = xrc.XRCID(s_name))
 
-    def on_check_perspective(self, event):
-        # toggle option value
-        self._toggle_canvas_perspective()
-       
-        # toggle other projections
-        self._toggle_canvas_ortho()
-
-        self._update_checkboxes_values()
-
+    def _set_canvas_option(self, attr_name, attr_value):
+        setattr(self.glcanvas, attr_name, attr_value)
         self.glcanvas.Refresh()
 
-    def on_check_ortho(self, event):
-        # toggle option value
-        self._toggle_canvas_ortho()
-       
-        # toggle other projections
-        self._toggle_canvas_perspective()
-
-        self._update_checkboxes_values()
-
+    def _set_tree_option(self, attr_name, attr_value):
+        setattr(self.tree_settings, attr_name, attr_value)
+        self.glcanvas.clear()
+        self.fill_canvas()
         self.glcanvas.Refresh()
 
-    def _toggle_canvas_perspective(self):
-        old_value = self.glcanvas.perspective_projection_enabled
-        self.glcanvas.perspective_projection_enabled = not old_value
+    def on_check(self, event):
+        # get checkbox's actual data
+        c_name = event.EventObject.GetName()
+        c_value = event.EventObject.GetValue()
 
-    def _toggle_canvas_ortho(self):
-        old_value = self.glcanvas.ortho_projection_enabled
-        self.glcanvas.ortho_projection_enabled = not old_value
+        c_settings = self.checkboxes_settings[c_name]
 
-    def _update_checkboxes_values(self):
-        c = self.glcanvas
-        values = {
-            "ID_CHECKBOX_PERSPECTIVE": c.perspective_projection_enabled,
-            "ID_CHECKBOX_ORTHO": c.ortho_projection_enabled
-        }
+        attr_name = c_settings["attr"]
 
-        self._set_controls_values(values)
+        # update canvas'/tree's state
+        if c_settings["dest"] == "canvas":
+            self._set_canvas_option(attr_name, c_value)
+        elif c_settings["dest"] == "tree":
+            self._set_tree_option(attr_name, c_value)
+
+        if c_settings["has_dependents"]:
+            self.fill_panel()
 
     def on_scroll_slider(self, event):
-        def set_canvas_option(attr_name, attr_value):
-            setattr(self.glcanvas, attr_name, attr_value)
-            self.glcanvas.Refresh()
-
-        def set_tree_option(attr_name, attr_value):
-            setattr(self.tree_settings, attr_name, attr_value)
-            self.glcanvas.clear()
-            self.fill_canvas()
-            self.glcanvas.Refresh()
-
-        def get_value(name):
-            s_settings = fp_sliders_settings[name]
-            if s_settings["dest"] == "canvas":
-                obj = self.glcanvas
-            elif s_settings["dest"] == "tree":
-                obj = self
-
-            return getattr(self.glcanvas, s_settings["attr"])
-
         # get slider's actual data
         s_name = event.EventObject.GetName()
         s_value = event.EventObject.GetValue()
@@ -158,17 +153,18 @@ class GLFrame(wx.Frame):
         # transform data to the real value
         attr_value = s_settings["step"]*s_value
 
-        # update canvas' state
+        # update canvas'/tree's state
         if s_settings["dest"] == "canvas":
-            set_canvas_option(attr_name, attr_value)
+            self._set_canvas_option(attr_name, attr_value)
         elif s_settings["dest"] == "tree":
-            set_tree_option(attr_name, attr_value)
+            self._set_tree_option(attr_name, attr_value)
 
+        # if the control has dependents, we update the whole panel
         if s_settings["has_dependents"]:
             self.fill_panel()
-        
-        # update accompanying text and canvas
-        self.update_acc_text(s_name, attr_value)
+        # else we update the accompanying text only
+        else:
+            self.update_acc_text(s_name, attr_value)
 
     def update_acc_text(self, s_name, value):
         text_ctrl = xrc.XRCCTRL(self, s_name + "_TEXT")
@@ -181,8 +177,6 @@ class GLFrame(wx.Frame):
 
     def fill_panel(self):
 
-        c = self.glcanvas
-
         # set values to sliders
         for s_name, s_settings in self.fp_sliders_settings.iteritems():
             slider = xrc.XRCCTRL(self, s_name)
@@ -194,7 +188,7 @@ class GLFrame(wx.Frame):
 
             # set actual value
             if s_settings["dest"] == "canvas":
-                value = getattr(c, s_settings["attr"])
+                value = getattr(self.glcanvas, s_settings["attr"])
             elif s_settings["dest"] == "tree":
                 value = getattr(self.tree_settings, s_settings["attr"])
             
@@ -203,9 +197,20 @@ class GLFrame(wx.Frame):
             # update accompanying text
             self.update_acc_text(s_name, value)
 
+        # set values to checkboxes
+        for c_name, c_settings in self.checkboxes_settings.iteritems():
+            cb = xrc.XRCCTRL(self, c_name)
+
+            # set actual value
+            if c_settings["dest"] == "canvas":
+                value = getattr(self.glcanvas, c_settings["attr"])
+            elif c_settings["dest"] == "tree":
+                value = getattr(self.tree_settings, c_settings["attr"])
+            
+            cb.SetValue(value)
+
         # set actual values to the rest of controls
 
-        self._update_checkboxes_values()
        
     def load_fp_sliders_settings(self):
         self.fp_sliders_settings = {
@@ -341,7 +346,7 @@ class GLFrame(wx.Frame):
             },
             "ID_BRANCH2_RADIUS": {
                     "min": 0,
-                    "max": 10,
+                    "max": 0.2,
                     "step": 0.001,
                     "attr": "branch2_radius",
                     "dest": "tree",
@@ -439,7 +444,7 @@ class GLFrame(wx.Frame):
         generate_tree(). Parameters passed to generate_tree() are obtained
         from .tree_settings."""
         
-        generate_trunk = GLSurfaceOfRevolution.generate_trunk
+        generate_trunk = GLCylinder.generate_trunk
         generate_leaf = GLBezier.generate_leaf
 
         s = self.tree_settings
@@ -516,16 +521,6 @@ class TreeSettings(object):
         list_full_props = lambda attrs: ["branch" + str(i) + "_" + attr \
             for attr in attrs for i in (1, 2, 3)]
 
-        def gen_def_get(name):
-            def def_get(self):
-                return getattr(self, "_" + name)
-            return def_get
-
-        def gen_def_set(name):
-            def def_set(self, value):
-                setattr(self, "_" + name, value)
-            return def_set
-
         # properties that don't have dependents get default getters and setters
         for p in list_full_props(trouble_free):
             setattr(TreeSettings, p, property(fget = gen_def_get(p),
@@ -539,6 +534,9 @@ class TreeSettings(object):
 
 
     def set_branch1_radius(self, s, value):
+
+        print vars()
+
         self._branch1_radius = value
 
         self.branch2_radius = self.branch1_radius - self.branch1_narrowing
@@ -565,12 +563,7 @@ class TreeSettings(object):
         self._branch3_narrowing = value
 
 
-        
-
-
-
-
-class DrawingGLCanvas(wx.glcanvas.GLCanvas):
+class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
     """A DrawingGLCanvas is basically a GLCanvas with some additional
     behaviour.
 
@@ -598,6 +591,22 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
 
         self.radian_unit = pi/180
 
+        # properties that don't have dependents get default getters and setters
+        for p in ["perspective_projection_fovy", "perspective_projection_aspect",
+            "perspective_projection_zNear", "perspective_projection_zFar",
+            "ortho_projection_left", "ortho_projection_right",
+            "ortho_projection_bottom", "ortho_projection_top",
+            "ortho_projection_nearVal", "ortho_projection_farVal"]:
+            setattr(DrawingGLCanvas, p, property(fget = gen_def_get(p),
+                fset = gen_def_set(p)))
+
+        # properties that _have_ dependents get a default getter but they get
+        # a special setter, called set_<property name>
+        for p in ["perspective_projection_enabled",
+            "ortho_projection_enabled"]:
+            setattr(DrawingGLCanvas, p, property(fget = gen_def_get(p),
+                fset = getattr(self, "set_" + p)))
+
         # the canvas has its default state when created
         self.restore_default_state()
 
@@ -610,19 +619,33 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas):
         self.figures = []
 
     def restore_default_state(self):
-        self.perspective_projection_enabled = ppe = True
-        self.perspective_projection_fovy = 45
-        self.perspective_projection_aspect = 1
-        self.perspective_projection_zNear = 0.1
-        self.perspective_projection_zFar = 1000
+        self._perspective_projection_enabled = ppe = True
+        self._perspective_projection_fovy = 45
+        self._perspective_projection_aspect = 1
+        self._perspective_projection_zNear = 0.1
+        self._perspective_projection_zFar = 1000
 
-        self.ortho_projection_enabled = not ppe
-        self.ortho_projection_left = 0
-        self.ortho_projection_right = 1
-        self.ortho_projection_bottom = 0
-        self.ortho_projection_top = 1
-        self.ortho_projection_nearVal = 0.1
-        self.ortho_projection_farVal = 1000
+        self._ortho_projection_enabled = not ppe
+        self._ortho_projection_left = 0
+        self._ortho_projection_right = 1
+        self._ortho_projection_bottom = 0
+        self._ortho_projection_top = 1
+        self._ortho_projection_nearVal = 0.1
+        self._ortho_projection_farVal = 1000
+
+    def set_perspective_projection_enabled(self, s, value):
+        self._perspective_projection_enabled = value
+
+        nvalue = not value
+        if self.ortho_projection_enabled != nvalue:
+            self.ortho_projection_enabled = not value
+
+    def set_ortho_projection_enabled(self, s, value):
+        self._ortho_projection_enabled = value
+
+        nvalue = not value
+        if self.perspective_projection_enabled != nvalue:
+            self.perspective_projection_enabled = not value
 
     def add_figure(self, figure):
         self.figures.append(figure)
