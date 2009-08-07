@@ -22,6 +22,11 @@ def gen_def_set(name):
         setattr(self, "_" + name, value)
     return def_set
 
+
+def initialize_attributes(obj, attr_list):
+    for attr in attr_list:
+        setattr(obj, attr, 0)
+
 class GLFrame(wx.Frame):
 
     def __init__(self, id, title):
@@ -46,19 +51,8 @@ class GLFrame(wx.Frame):
         self.fp_sliders_settings = {}
         self.load_fp_sliders_settings()
 
-        self.checkboxes_settings = {
-            "ID_CHECKBOX_PERSPECTIVE": {
-                "dest": "canvas",
-                "attr": "perspective_projection_enabled",
-                "has_dependents": True
-            },
-            "ID_CHECKBOX_ORTHO": {
-                "dest": "canvas",
-                "attr": "perspective_projection_enabled",
-                "attr": "ortho_projection_enabled",
-                "has_dependents": True
-            }
-        }
+        self.checkboxes_settings = {}
+        self.load_checkboxes_settings()
 
         # panel loading from XRC
         res = xrc.XmlResource("view/panel.xrc")
@@ -210,8 +204,12 @@ class GLFrame(wx.Frame):
             cb.SetValue(value)
 
         # set actual values to the rest of controls
+        light_sources = self.glcanvas.get_light_sources()
 
-       
+        choice = xrc.XRCCTRL(self, "ID_CHOICE_LIGHT_SOURCE")
+        choice.Clear()
+        choice.AppendItems(light_sources)
+
     def load_fp_sliders_settings(self):
         self.fp_sliders_settings = {
             "ID_PERSPECTIVE_FOVY": {
@@ -247,32 +245,32 @@ class GLFrame(wx.Frame):
                     "has_dependents": False
             },
             "ID_ORTHO_VL": {
-                    "min": -20,
-                    "max": 20,
+                    "min": -10,
+                    "max": 10,
                     "step": 0.01,
                     "attr": "ortho_projection_left",
                     "dest": "canvas",
                     "has_dependents": False
             },
             "ID_ORTHO_VR": {
-                    "min": -20,
-                    "max": 20,
+                    "min": -10,
+                    "max": 10,
                     "step": 0.01,
                     "attr": "ortho_projection_right",
                     "dest": "canvas",
                     "has_dependents": False
             },
             "ID_ORTHO_HB": {
-                    "min": -20,
-                    "max": 20,
+                    "min": -10,
+                    "max": 10,
                     "step": 0.01,
                     "attr": "ortho_projection_bottom",
                     "dest": "canvas",
                     "has_dependents": False
             },
             "ID_ORTHO_HT": {
-                    "min": -20,
-                    "max": 20,
+                    "min": -10,
+                    "max": 10,
                     "step": 0.01,
                     "attr": "ortho_projection_top",
                     "dest": "canvas",
@@ -433,8 +431,23 @@ class GLFrame(wx.Frame):
                     "dest": "tree",
                     "has_dependents": False
             },
-
         }
+
+    def load_checkboxes_settings(self):
+        self.checkboxes_settings = {
+            "ID_CHECKBOX_PERSPECTIVE": {
+                "dest": "canvas",
+                "attr": "perspective_projection_enabled",
+                "has_dependents": True
+            },
+            "ID_CHECKBOX_ORTHO": {
+                "dest": "canvas",
+                "attr": "perspective_projection_enabled",
+                "attr": "ortho_projection_enabled",
+                "has_dependents": True
+            }
+        }
+
 
     def fill_canvas(self):
         """Fill the canvas in .glcanvas with objects using its .add_figure
@@ -489,29 +502,6 @@ class TreeSettings(object):
         import time
         self.current_seed = time.time()
 
-        self.height = 6
-
-        self._branch1_size = 1.2
-        self._branch1_radius = 0.06
-        self._branch1_narrowing = 0.01
-        self._branch1_branches_maxangle = 45
-        self._branch1_branches_min = 6
-        self._branch1_branches_max = 7
-
-        self._branch2_size = 0.5
-        self._branch2_radius = 0.04
-        self._branch2_narrowing = 0.01
-        self._branch2_branches_maxangle = 40
-        self._branch2_branches_min = 2
-        self._branch2_branches_max = 4
-
-        self._branch3_size = 0.2
-        self._branch3_radius = 0.03
-        self._branch3_narrowing = 0.005
-        self._branch3_branches_maxangle = 35
-        self._branch3_branches_min = 1
-        self._branch3_branches_max = 3
-
         # properties that don't have dependents
         trouble_free = ["size", "branches_maxangle",
             "branches_min", "branches_max"]
@@ -521,17 +511,45 @@ class TreeSettings(object):
         list_full_props = lambda attrs: ["branch" + str(i) + "_" + attr \
             for attr in attrs for i in (1, 2, 3)]
 
+        full_trouble_free = list_full_props(trouble_free)
+        full_troubled = list_full_props(troubled)
+
         # properties that don't have dependents get default getters and setters
-        for p in list_full_props(trouble_free):
+        for p in full_trouble_free:
             setattr(TreeSettings, p, property(fget = gen_def_get(p),
                 fset = gen_def_set(p)))
 
         # properties that _have_ dependents get a default getter but their get
         # a special setter, called set_<property name>
-        for p in list_full_props(troubled):
+        for p in full_troubled:
             setattr(TreeSettings, p, property(fget = gen_def_get(p),
                 fset = getattr(self, "set_" + p)))
 
+        initialize_attributes(self, ["_" + p for p in \
+            full_trouble_free + full_troubled])
+
+        self.height = 6
+
+        self.branch1_size = 1.2
+        self.branch1_radius = 0.06
+        self.branch1_narrowing = 0.01
+        self.branch1_branches_maxangle = 45
+        self.branch1_branches_min = 6
+        self.branch1_branches_max = 7
+
+        self.branch2_size = 0.5
+        self.branch2_radius = 0.04
+        self.branch2_narrowing = 0.01
+        self.branch2_branches_maxangle = 40
+        self.branch2_branches_min = 2
+        self.branch2_branches_max = 4
+
+        self.branch3_size = 0.2
+        self.branch3_radius = 0.03
+        self.branch3_narrowing = 0.005
+        self.branch3_branches_maxangle = 35
+        self.branch3_branches_min = 1
+        self.branch3_branches_max = 3
 
     def set_branch1_radius(self, s, value):
 
@@ -591,21 +609,28 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
 
         self.radian_unit = pi/180
 
+        trouble_free = ["perspective_projection_fovy",
+            "perspective_projection_aspect", "perspective_projection_zNear",
+            "perspective_projection_zFar", "ortho_projection_left",
+            "ortho_projection_right", "ortho_projection_bottom",
+            "ortho_projection_top", "ortho_projection_nearVal",
+            "ortho_projection_farVal"]
+
         # properties that don't have dependents get default getters and setters
-        for p in ["perspective_projection_fovy", "perspective_projection_aspect",
-            "perspective_projection_zNear", "perspective_projection_zFar",
-            "ortho_projection_left", "ortho_projection_right",
-            "ortho_projection_bottom", "ortho_projection_top",
-            "ortho_projection_nearVal", "ortho_projection_farVal"]:
+        for p in trouble_free:
             setattr(DrawingGLCanvas, p, property(fget = gen_def_get(p),
                 fset = gen_def_set(p)))
 
+        troubled = ["perspective_projection_enabled",
+            "ortho_projection_enabled"]
+
         # properties that _have_ dependents get a default getter but they get
         # a special setter, called set_<property name>
-        for p in ["perspective_projection_enabled",
-            "ortho_projection_enabled"]:
+        for p in troubled:
             setattr(DrawingGLCanvas, p, property(fget = gen_def_get(p),
                 fset = getattr(self, "set_" + p)))
+
+        initialize_attributes(self, ["_" + p for p in trouble_free + troubled])
 
         # the canvas has its default state when created
         self.restore_default_state()
@@ -619,19 +644,21 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         self.figures = []
 
     def restore_default_state(self):
-        self._perspective_projection_enabled = ppe = True
-        self._perspective_projection_fovy = 45
-        self._perspective_projection_aspect = 1
-        self._perspective_projection_zNear = 0.1
-        self._perspective_projection_zFar = 1000
+        self.perspective_projection_enabled = ppe = True
+        self.perspective_projection_fovy = 45
+        self.perspective_projection_aspect = 1
+        self.perspective_projection_zNear = 0.1
+        self.perspective_projection_zFar = 1000
 
-        self._ortho_projection_enabled = not ppe
-        self._ortho_projection_left = 0
-        self._ortho_projection_right = 1
-        self._ortho_projection_bottom = 0
-        self._ortho_projection_top = 1
-        self._ortho_projection_nearVal = 0.1
-        self._ortho_projection_farVal = 1000
+        self.ortho_projection_enabled = not ppe
+        self.ortho_projection_left = -2
+        self.ortho_projection_right = 2
+        self.ortho_projection_bottom = -2
+        self.ortho_projection_top = 2.5
+        self.ortho_projection_nearVal = 0.1
+        self.ortho_projection_farVal = 1000
+
+        self.light0_enabled = True
 
     def set_perspective_projection_enabled(self, s, value):
         self._perspective_projection_enabled = value
@@ -685,7 +712,6 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
             glOrtho(self.ortho_projection_left, self.ortho_projection_right,
                 self.ortho_projection_bottom, self.ortho_projection_top,
                 self.ortho_projection_nearVal, self.ortho_projection_farVal)
-
 
         # modelview matrix
         glMatrixMode(GL_MODELVIEW)
@@ -776,3 +802,6 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
 
         self.Refresh()
 
+    def get_light_sources(self):
+        light_sources = ["GL_LIGHT" + str(i) for i in range(8)]
+        return light_sources
