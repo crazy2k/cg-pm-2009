@@ -30,7 +30,7 @@ class SceneNode:
         glPushMatrix()
 
         self.apply_transformation()
-
+        
         self.obj.draw()
 
         for s in self.children:
@@ -110,6 +110,7 @@ class GLCylinder(Drawable):
         gluQuadricTexture(quad, False)
         
         glRotatef(-90, 1, 0, 0)
+        
         gluCylinder(quad, self.top_radius, self.bottom_radius, self.height, 26, 4)
         
         gluDeleteQuadric(quad)
@@ -123,6 +124,7 @@ class GLCylinder(Drawable):
     def generate_trunk(cls, bottom_radius, top_radius, height):
         c = GLCylinder(bottom_radius, top_radius, height)
         return c
+    
 class GLBezier(Drawable):
     
     def __init__(self, c_points, height):
@@ -146,26 +148,46 @@ class GLBezier(Drawable):
 
     def endpoint(self):
         return (0, self.height, 0)
-
-    @classmethod
-    def generate_trunk(cls, bottom_radius, top_radius, height):
-        r = bottom_radius
-        
-        def circle(a):
-            return [(-r,a,0),(-r,a,-r),(r,a,-r),(r,a,r),(-r,a,r),(-r,a,0)]
-        
-        c1 = circle(0)
-        c2 = circle(0)
-        c3 = circle(0)
-        c4 = circle(height)
-        c5 = circle(height)
-        c6 = circle(height) 
-        
-        m = [c1, c2, c3, c4, c5, c6]
-        return GLBezier(m, height)
+    
+    def get_end(self):
+        return self.c_points[0]
     
     @classmethod
-    def generate_leaf(cls, mayor_radius, minor_radius, height):
+    def generate_trunk(cls, top_radius, bottom_radius, height):
+        
+        def circle(a,r):
+            return [(-r,a,0),(-r,a,-r),(r,a,-r),(r,a,r),(-r,a,r),(-r,a,0)]
+        
+    #    def extend4(m):
+     #       n = []
+      #      for i in range (len(m)):
+       #         n = n+[[m[i][0],m[i][1],m[i][2],1]]
+        #    return n
+        
+    #    def narrow3(m):
+     #       n = []
+      #      for i in range (len(m)):
+       #         n = n+[[(m[i][0],m[i][1],m[i][2])]]
+        #    return n
+    
+        c1 = circle(0, bottom_radius)
+        c2 = circle(height*0.2, bottom_radius*4)
+        c3 = circle(height*0.4, bottom_radius)
+        c4 = circle(height*0.6, bottom_radius*4)
+        c5 = circle(height*0.8, bottom_radius)
+        c6 = circle(height, top_radius)
+        
+        m = [c1, c2, c3, c4, c5, c6]
+        
+     #   t = glGetDoublev(GL_MODELVIEW_MATRIX)
+        
+     #   c1 = narrow3((matrix(t)*matrix(extend4(c6)).transpose()).transpose().tolist())
+        
+        return GLBezier(m, height)
+    
+
+    @classmethod
+    def generate_leaf(cls, minor_radius, mayor_radius, height):
 
         def leaf(a, b, c):
             return [(-a,b,0),(0,b,-c),(a*2,b,0),(0,b,c),(-a,b,0)]
@@ -176,6 +198,7 @@ class GLBezier(Drawable):
         c4 = leaf(mayor_radius/2,height/2,minor_radius/2)
         c5 = leaf(0,height,0)
         m = [c1,c2,c3,c4,c5]
+        
         return GLBezier(m, height)
         
     
@@ -202,20 +225,25 @@ class GLNURBS(Drawable):
         return (0, self.height, 0)
 
     @classmethod
-    def generate_trunk(cls, bottom_radius, top_radius, height):
+    def generate_trunk(cls, top_radius, bottom_radius, height):
                 
         r = bottom_radius
+        t = top_radius
         h = height
         
-        def cylinder_column(x,z):
-            return [(x,0,z),(x,h/5,z),(x,h/4,z),(x,h/3,z),(x,h/2,z),(x,h,z)]
+        def cylinder_column(x,z,a,b):
+            
+            return [(x,0,z),(x+a,h*0.2,z),(x,h*0.4,z),(x,h*0.6,z+b),(x,h*0.8,z),(x,h,z)]
         
-        c1 = cylinder_column(-r,0)
-        c2 = cylinder_column(-r,r)
-        c3 = cylinder_column(r,r)
-        c4 = cylinder_column(r,-r)
-        c5 = cylinder_column(-r,-r)
-        c6 = cylinder_column(-r,0)
+        a = random.random()/10 - 0.05
+        b = random.random()/10 - 0.05
+        
+        c1 = cylinder_column(-r,0,a,b)
+        c2 = cylinder_column(-r,r,a,b)
+        c3 = cylinder_column(r,r,a,b)
+        c4 = cylinder_column(r,-r,a,b)
+        c5 = cylinder_column(-r,-r,a,b)
+        c6 = cylinder_column(-r,0,a,b)
         m = [c1, c2, c3, c4, c5, c6]
 
         knots = []
