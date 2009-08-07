@@ -38,6 +38,8 @@ class GLFrame(wx.Frame):
         #       "min": <minimum possible value for this option>,
         #       "max": <maximum possible value for this option>,
         #       "step": <step value (might be a float)>,
+        #       "condition": <frame's attribute whose value will be used to
+        #           replace the string "XXX" in attr's value; or None>
         #       "dest": <"canvas" or "tree"; represents the object whose
         #           attribute (given in "attr") will change according to
         #           the slider's value>,
@@ -54,6 +56,8 @@ class GLFrame(wx.Frame):
         self.checkboxes_settings = {}
         self.load_checkboxes_settings()
 
+        self.current_light = 0
+
         # panel loading from XRC
         res = xrc.XmlResource("view/panel.xrc")
         self.panel = res.LoadPanel(self, "ID_WXPANEL")
@@ -66,7 +70,7 @@ class GLFrame(wx.Frame):
                        wx.glcanvas.WX_GL_DOUBLEBUFFER) # double-buffering
 
         glcanvas_w = 500
-        glcanvas_h = 500
+        glcanvas_h = panel_h
         glcanvas_size = wx.Size(glcanvas_w, glcanvas_h)
 
         self.glcanvas = DrawingGLCanvas(self, attrib_list, glcanvas_size)
@@ -88,7 +92,7 @@ class GLFrame(wx.Frame):
         grid.Add(self.panel)
 
         # frame initialization
-        self.SetSize(wx.Size(glcanvas_w + panel_w, glcanvas_h))
+        self.SetSize(wx.Size(glcanvas_w + panel_w, max(glcanvas_h, panel_h)))
         self.SetSizer(grid)
         self.Centre()
         self.Show(True)
@@ -107,6 +111,11 @@ class GLFrame(wx.Frame):
             self.Bind(wx.EVT_SCROLL, self.on_scroll_slider,
                 id = xrc.XRCID(s_name))
 
+        # bind choice's event
+        self.Bind(wx.EVT_CHOICE, self.on_choice,
+            id = xrc.XRCID("ID_CHOICE_LIGHT_SOURCE"))
+
+
     def _set_canvas_option(self, attr_name, attr_value):
         setattr(self.glcanvas, attr_name, attr_value)
         self.glcanvas.Refresh()
@@ -116,6 +125,11 @@ class GLFrame(wx.Frame):
         self.glcanvas.clear()
         self.fill_canvas()
         self.glcanvas.Refresh()
+
+    def on_choice(self, event):
+        self.current_light = event.GetInt()
+
+        self.fill_panel()
 
     def on_check(self, event):
         # get checkbox's actual data
@@ -143,6 +157,11 @@ class GLFrame(wx.Frame):
         # get slider's settings
         s_settings = self.fp_sliders_settings[s_name]
         attr_name = s_settings["attr"]
+
+        # if there's a condition, attribute's name is changed accordingly
+        cond = s_settings["condition"]
+        if cond is not None:
+            attr_name = attr_name.replace("XXX", str(getattr(self, cond)))
 
         # transform data to the real value
         attr_value = s_settings["step"]*s_value
@@ -180,11 +199,18 @@ class GLFrame(wx.Frame):
             slider.SetMin(mult*s_settings["min"])
             slider.SetMax(mult*s_settings["max"])
 
+            attr_name = s_settings["attr"]
+
+            # if there's a condition, attribute's name is changed accordingly
+            cond = s_settings["condition"]
+            if cond is not None:
+                attr_name = attr_name.replace("XXX", str(getattr(self, cond)))
+
             # set actual value
             if s_settings["dest"] == "canvas":
-                value = getattr(self.glcanvas, s_settings["attr"])
+                value = getattr(self.glcanvas, attr_name)
             elif s_settings["dest"] == "tree":
-                value = getattr(self.tree_settings, s_settings["attr"])
+                value = getattr(self.tree_settings, attr_name)
             
             slider.SetValue(value*mult)
 
@@ -209,6 +235,27 @@ class GLFrame(wx.Frame):
         choice = xrc.XRCCTRL(self, "ID_CHOICE_LIGHT_SOURCE")
         choice.Clear()
         choice.AppendItems(light_sources)
+        choice.SetSelection(self.current_light)
+
+        # set values to colour pickers
+        cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_AMBIENT")
+        col = wx.Colour(self.glcanvas.light0_nat_ambient[0],
+                self.glcanvas.light0_nat_ambient[1],
+                self.glcanvas.light0_nat_ambient[2])
+        cpkr.SetColour(col)
+
+        cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_DIFFUSE")
+        col = wx.Colour(self.glcanvas.light0_nat_diffuse[0],
+                self.glcanvas.light0_nat_diffuse[1],
+                self.glcanvas.light0_nat_diffuse[2])
+        cpkr.SetColour(col)
+
+        cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_SPECULAR")
+        col = wx.Colour(self.glcanvas.light0_nat_specular[0],
+                self.glcanvas.light0_nat_specular[1],
+                self.glcanvas.light0_nat_specular[2])
+        cpkr.SetColour(col)
+        
 
     def load_fp_sliders_settings(self):
         self.fp_sliders_settings = {
@@ -216,6 +263,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 180,
                     "step": 0.1,
+                    "condition": None,
                     "attr": "perspective_projection_fovy",
                     "dest": "canvas",
                     "has_dependents": False
@@ -224,6 +272,7 @@ class GLFrame(wx.Frame):
                     "min": 0.1,
                     "max": 50,
                     "step": 0.001,
+                    "condition": None,
                     "attr": "perspective_projection_aspect",
                     "dest": "canvas",
                     "has_dependents": False
@@ -232,6 +281,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 0.01,
+                    "condition": None,
                     "attr": "perspective_projection_zNear",
                     "dest": "canvas",
                     "has_dependents": False
@@ -240,6 +290,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 0.01,
+                    "condition": None,
                     "attr": "perspective_projection_zFar",
                     "dest": "canvas",
                     "has_dependents": False
@@ -248,6 +299,7 @@ class GLFrame(wx.Frame):
                     "min": -10,
                     "max": 10,
                     "step": 0.01,
+                    "condition": None,
                     "attr": "ortho_projection_left",
                     "dest": "canvas",
                     "has_dependents": False
@@ -256,6 +308,7 @@ class GLFrame(wx.Frame):
                     "min": -10,
                     "max": 10,
                     "step": 0.01,
+                    "condition": None,
                     "attr": "ortho_projection_right",
                     "dest": "canvas",
                     "has_dependents": False
@@ -264,6 +317,7 @@ class GLFrame(wx.Frame):
                     "min": -10,
                     "max": 10,
                     "step": 0.01,
+                    "condition": None,
                     "attr": "ortho_projection_bottom",
                     "dest": "canvas",
                     "has_dependents": False
@@ -272,6 +326,7 @@ class GLFrame(wx.Frame):
                     "min": -10,
                     "max": 10,
                     "step": 0.01,
+                    "condition": None,
                     "attr": "ortho_projection_top",
                     "dest": "canvas",
                     "has_dependents": False
@@ -280,6 +335,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 1,
+                    "condition": None,
                     "attr": "height",
                     "dest": "tree",
                     "has_dependents": False
@@ -289,6 +345,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 10,
                     "step": 0.001,
+                    "condition": None,
                     "attr": "branch1_size",
                     "dest": "tree",
                     "has_dependents": False
@@ -297,6 +354,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 0.2,
                     "step": 0.001,
+                    "condition": None,
                     "attr": "branch1_radius",
                     "dest": "tree",
                     "has_dependents": True,
@@ -305,6 +363,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 0.1,
                     "step": 0.001,
+                    "condition": None,
                     "attr": "branch1_narrowing",
                     "dest": "tree",
                     "has_dependents": True
@@ -313,6 +372,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 1,
+                    "condition": None,
                     "attr": "branch1_branches_max",
                     "dest": "tree",
                     "has_dependents": False
@@ -321,6 +381,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 1,
+                    "condition": None,
                     "attr": "branch1_branches_min",
                     "dest": "tree",
                     "has_dependents": False
@@ -329,6 +390,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 0.01,
+                    "condition": None,
                     "attr": "branch1_branches_maxangle",
                     "dest": "tree",
                     "has_dependents": False
@@ -338,6 +400,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 10,
                     "step": 0.001,
+                    "condition": None,
                     "attr": "branch2_size",
                     "dest": "tree",
                     "has_dependents": False
@@ -346,6 +409,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 0.2,
                     "step": 0.001,
+                    "condition": None,
                     "attr": "branch2_radius",
                     "dest": "tree",
                     "has_dependents": False
@@ -354,6 +418,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 0.1,
                     "step": 0.001,
+                    "condition": None,
                     "attr": "branch2_narrowing",
                     "dest": "tree",
                     "has_dependents": True
@@ -362,6 +427,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 1,
+                    "condition": None,
                     "attr": "branch2_branches_max",
                     "dest": "tree",
                     "has_dependents": False
@@ -370,6 +436,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 1,
+                    "condition": None,
                     "attr": "branch2_branches_min",
                     "dest": "tree",
                     "has_dependents": False
@@ -378,6 +445,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 0.01,
+                    "condition": None,
                     "attr": "branch2_branches_maxangle",
                     "dest": "tree",
                     "has_dependents": False
@@ -387,6 +455,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 10,
                     "step": 0.001,
+                    "condition": None,
                     "attr": "branch3_size",
                     "dest": "tree",
                     "has_dependents": False
@@ -395,6 +464,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 10,
                     "step": 0.001,
+                    "condition": None,
                     "attr": "branch3_radius",
                     "dest": "tree",
                     "has_dependents": False
@@ -403,6 +473,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 0.1,
                     "step": 0.001,
+                    "condition": None,
                     "attr": "branch3_narrowing",
                     "dest": "tree",
                     "has_dependents": True
@@ -411,6 +482,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 1,
+                    "condition": None,
                     "attr": "branch3_branches_max",
                     "dest": "tree",
                     "has_dependents": False
@@ -419,6 +491,7 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 1,
+                    "condition": None,
                     "attr": "branch3_branches_min",
                     "dest": "tree",
                     "has_dependents": False
@@ -427,8 +500,81 @@ class GLFrame(wx.Frame):
                     "min": 0,
                     "max": 50,
                     "step": 0.01,
+                    "condition": None,
                     "attr": "branch3_branches_maxangle",
                     "dest": "tree",
+                    "has_dependents": False
+            },
+            "ID_POS_X": {
+                    "min": -10,
+                    "max": 10,
+                    "step": 0.01,
+                    "condition": "current_light",
+                    "attr": "lightXXX_pos_x",
+                    "dest": "canvas",
+                    "has_dependents": False
+            },
+            "ID_POS_Y": {
+                    "min": -10,
+                    "max": 10,
+                    "step": 0.01,
+                    "condition": "current_light",
+                    "attr": "lightXXX_pos_y",
+                    "dest": "canvas",
+                    "has_dependents": False
+            },
+            "ID_POS_Z": {
+                    "min": -10,
+                    "max": 10,
+                    "step": 0.01,
+                    "condition": "current_light",
+                    "attr": "lightXXX_pos_z",
+                    "dest": "canvas",
+                    "has_dependents": False
+            },
+            "ID_DIR_X": {
+                    "min": -10,
+                    "max": 10,
+                    "step": 0.01,
+                    "condition": "current_light",
+                    "attr": "lightXXX_dir_x",
+                    "dest": "canvas",
+                    "has_dependents": False
+            },
+            "ID_DIR_Y": {
+                    "min": -10,
+                    "max": 10,
+                    "step": 0.01,
+                    "condition": "current_light",
+                    "attr": "lightXXX_dir_y",
+                    "dest": "canvas",
+                    "has_dependents": False
+            },
+            "ID_DIR_Z": {
+                    "min": -10,
+                    "max": 10,
+                    "step": 0.01,
+                    "condition": "current_light",
+                    "attr": "lightXXX_dir_z",
+                    "dest": "canvas",
+                    "has_dependents": False
+            },
+            "ID_LIGHT_EXP": {
+                    "min": 0,
+                    "max": 128,
+                    "step": 0.01,
+                    "condition": "current_light",
+                    "attr": "lightXXX_exponent",
+                    "dest": "canvas",
+                    "has_dependents": False
+            },
+            "ID_LIGHT_MAXANGLE": {
+                    "min": 0,
+                    "max": 90,
+                    "step": 0.01,
+                    "condition": "current_light",
+                    "attr": "lightXXX_maxangle",
+                    "dest": "canvas",
                     "has_dependents": False
             },
         }
@@ -659,6 +805,18 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         self.ortho_projection_farVal = 1000
 
         self.light0_enabled = True
+        self.light0_nat_ambient = (255, 0, 0)
+        self.light0_nat_diffuse = (0, 255, 0)
+        self.light0_nat_specular = (0, 0, 255)
+        self.light0_exponent = 10
+        self.light0_maxangle = 45
+        self.light0_pos_x = 0
+        self.light0_pos_y = 0
+        self.light0_pos_z = 10
+        self.light0_dir_x = 0
+        self.light0_dir_y = 0
+        self.light0_dir_z = -1
+
 
     def set_perspective_projection_enabled(self, s, value):
         self._perspective_projection_enabled = value
