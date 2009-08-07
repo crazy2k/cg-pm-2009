@@ -8,6 +8,7 @@
                 <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                 <border>5</border>
                 <object class="wxNotebook" name="ID_NOTEBOOK">
+                    <size>600,-1</size>
                     <style>wxBK_DEFAULT</style>
                     <object class="notebookpage">
                         <label>Propiedades del árbol</label>
@@ -1266,21 +1267,23 @@
                                     </object>
                                 </object>
                                 <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                                    <flag>wxGROW|wxALL</flag>
                                     <border>5</border>
                                     <object class="wxFlexGridSizer">
                                         <cols>2</cols>
                                         <rows>0</rows>
                                         <vgap>0</vgap>
                                         <hgap>0</hgap>
+                                        <growablecols>0,1</growablecols>
                                         <object class="sizeritem">
-                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                             <border>5</border>
                                             <object class="wxFlexGridSizer">
                                                 <cols>1</cols>
                                                 <rows>0</rows>
                                                 <vgap>0</vgap>
                                                 <hgap>0</hgap>
+                                                <growablecols>0</growablecols>
                                                 <object class="sizeritem">
                                                     <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                     <border>5</border>
@@ -1290,19 +1293,20 @@
                                                     </object>
                                                 </object>
                                                 <object class="sizeritem">
-                                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                     <border>5</border>
                                                     <object class="wxStaticBoxSizer" name="wxID_ANY">
                                                         <orient>wxVERTICAL</orient>
                                                         <label>Naturaleza</label>
                                                         <object class="sizeritem">
-                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                                                            <flag>wxGROW|wxALL</flag>
                                                             <border>5</border>
                                                             <object class="wxFlexGridSizer">
                                                                 <cols>2</cols>
                                                                 <rows>0</rows>
                                                                 <vgap>0</vgap>
                                                                 <hgap>0</hgap>
+                                                                <growablecols>0,1</growablecols>
                                                                 <object class="sizeritem">
                                                                     <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                     <border>5</border>
@@ -1318,7 +1322,7 @@
                                                                         <object class="sizeritem">
                                                                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                             <border>5</border>
-                                                                            <object class="wxTextCtrl" name="ID_CPICKER_PLACEHOLDER">
+                                                                            <object class="wxColourPickerCtrl" name="ID_CPICKER_NAT_AMBIENT">
                                                                                 <size>32,-1</size>
                                                                             </object>
                                                                         </object>
@@ -1339,7 +1343,7 @@
                                                                         <object class="sizeritem">
                                                                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                             <border>5</border>
-                                                                            <object class="wxTextCtrl" name="ID_TEXTCTRL9">
+                                                                            <object class="wxColourPickerCtrl" name="ID_CPICKER_NAT_DIFFUSE">
                                                                                 <size>32,-1</size>
                                                                             </object>
                                                                         </object>
@@ -1360,8 +1364,97 @@
                                                                         <object class="sizeritem">
                                                                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                             <border>5</border>
-                                                                            <object class="wxTextCtrl" name="ID_TEXTCTRL12">
+                                                                            <object class="wxColourPickerCtrl" name="ID_CPICKER_NAT_SPECULAR">
                                                                                 <size>32,-1</size>
+                                                                            </object>
+                                                                        </object>
+                                                                    </object>
+                                                                </object>
+                                                            </object>
+                                                        </object>
+                                                    </object>
+                                                </object>
+                                                <object class="sizeritem">
+                                                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                    <border>5</border>
+                                                    <object class="wxStaticBoxSizer" name="wxID_ANY">
+                                                        <orient>wxVERTICAL</orient>
+                                                        <label>Distribución</label>
+                                                        <object class="sizeritem">
+                                                            <flag>wxGROW|wxALL</flag>
+                                                            <border>5</border>
+                                                            <object class="wxFlexGridSizer">
+                                                                <cols>2</cols>
+                                                                <rows>0</rows>
+                                                                <vgap>0</vgap>
+                                                                <hgap>0</hgap>
+                                                                <growablecols>0,1</growablecols>
+                                                                <object class="sizeritem">
+                                                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <border>5</border>
+                                                                    <object class="wxStaticText" name="wxID_STATIC">
+                                                                        <label>Exponente:</label>
+                                                                    </object>
+                                                                </object>
+                                                                <object class="sizeritem">
+                                                                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <border>5</border>
+                                                                    <object class="wxFlexGridSizer">
+                                                                        <cols>2</cols>
+                                                                        <rows>0</rows>
+                                                                        <vgap>0</vgap>
+                                                                        <hgap>0</hgap>
+                                                                        <growablecols>0</growablecols>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxSlider" name="ID_LIGHT_EXP">
+                                                                                <value>0</value>
+                                                                                <min>0</min>
+                                                                                <max>360</max>
+                                                                            </object>
+                                                                        </object>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxTextCtrl" name="ID_LIGHT_EXP_TEXT">
+                                                                                <size>50,-1</size>
+                                                                                <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                            </object>
+                                                                        </object>
+                                                                    </object>
+                                                                </object>
+                                                                <object class="sizeritem">
+                                                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <border>5</border>
+                                                                    <object class="wxStaticText" name="wxID_STATIC">
+                                                                        <label>Ángulo máximo:</label>
+                                                                    </object>
+                                                                </object>
+                                                                <object class="sizeritem">
+                                                                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <border>5</border>
+                                                                    <object class="wxFlexGridSizer">
+                                                                        <cols>2</cols>
+                                                                        <rows>0</rows>
+                                                                        <vgap>0</vgap>
+                                                                        <hgap>0</hgap>
+                                                                        <growablecols>0</growablecols>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxSlider" name="ID_LIGHT_MAXANGLE">
+                                                                                <value>0</value>
+                                                                                <min>0</min>
+                                                                                <max>360</max>
+                                                                            </object>
+                                                                        </object>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxTextCtrl" name="ID_LIGHT_MAXANGLE_TEXT">
+                                                                                <size>50,-1</size>
+                                                                                <style>wxTE_READONLY|wxTE_RIGHT</style>
                                                                             </object>
                                                                         </object>
                                                                     </object>
@@ -1373,121 +1466,271 @@
                                             </object>
                                         </object>
                                         <object class="sizeritem">
-                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                             <border>5</border>
                                             <object class="wxStaticBoxSizer" name="wxID_ANY">
                                                 <orient>wxVERTICAL</orient>
-                                                <label>Posicionamiento y distribución</label>
+                                                <label>Posicionamiento</label>
                                                 <object class="sizeritem">
-                                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                                                    <flag>wxGROW|wxALL</flag>
                                                     <border>5</border>
                                                     <object class="wxFlexGridSizer">
-                                                        <cols>2</cols>
+                                                        <cols>1</cols>
                                                         <rows>0</rows>
                                                         <vgap>0</vgap>
                                                         <hgap>0</hgap>
+                                                        <growablecols>0</growablecols>
                                                         <object class="sizeritem">
-                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                            <flag>wxALIGN_LEFT|wxALIGN_TOP|wxALL</flag>
                                                             <border>5</border>
                                                             <object class="wxStaticText" name="wxID_STATIC">
-                                                                <label>Posición (X, Y, Z):</label>
+                                                                <label>Posición:</label>
                                                             </object>
                                                         </object>
                                                         <object class="sizeritem">
-                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                             <border>5</border>
-                                                            <object class="wxBoxSizer">
-                                                                <orient>wxHORIZONTAL</orient>
+                                                            <object class="wxFlexGridSizer">
+                                                                <cols>2</cols>
+                                                                <rows>0</rows>
+                                                                <vgap>0</vgap>
+                                                                <hgap>0</hgap>
+                                                                <growablecols>1</growablecols>
                                                                 <object class="sizeritem">
-                                                                    <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                     <border>5</border>
-                                                                    <object class="wxTextCtrl" name="ID_TEXTCTRL">
-                                                                        <size>32,-1</size>
+                                                                    <object class="wxStaticText" name="wxID_STATIC">
+                                                                        <label>X:</label>
                                                                     </object>
                                                                 </object>
                                                                 <object class="sizeritem">
-                                                                    <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                     <border>5</border>
-                                                                    <object class="wxTextCtrl" name="ID_TEXTCTRL1">
-                                                                        <size>32,-1</size>
+                                                                    <object class="wxFlexGridSizer">
+                                                                        <cols>2</cols>
+                                                                        <rows>0</rows>
+                                                                        <vgap>0</vgap>
+                                                                        <hgap>0</hgap>
+                                                                        <growablecols>0</growablecols>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxSlider" name="ID_POS_X">
+                                                                                <value>0</value>
+                                                                                <min>0</min>
+                                                                                <max>360</max>
+                                                                            </object>
+                                                                        </object>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxTextCtrl" name="ID_POS_X_TEXT">
+                                                                                <size>50,-1</size>
+                                                                                <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                            </object>
+                                                                        </object>
                                                                     </object>
                                                                 </object>
                                                                 <object class="sizeritem">
-                                                                    <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                     <border>5</border>
-                                                                    <object class="wxTextCtrl" name="ID_TEXTCTRL2">
-                                                                        <size>32,-1</size>
+                                                                    <object class="wxStaticText" name="wxID_STATIC">
+                                                                        <label>Y:</label>
+                                                                    </object>
+                                                                </object>
+                                                                <object class="sizeritem">
+                                                                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <border>5</border>
+                                                                    <object class="wxFlexGridSizer">
+                                                                        <cols>2</cols>
+                                                                        <rows>0</rows>
+                                                                        <vgap>0</vgap>
+                                                                        <hgap>0</hgap>
+                                                                        <growablecols>0</growablecols>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxSlider" name="ID_POS_Y">
+                                                                                <value>0</value>
+                                                                                <min>0</min>
+                                                                                <max>360</max>
+                                                                            </object>
+                                                                        </object>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxTextCtrl" name="ID_POS_Y_TEXT">
+                                                                                <size>50,-1</size>
+                                                                                <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                            </object>
+                                                                        </object>
+                                                                    </object>
+                                                                </object>
+                                                                <object class="sizeritem">
+                                                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <border>5</border>
+                                                                    <object class="wxStaticText" name="wxID_STATIC">
+                                                                        <label>Z:</label>
+                                                                    </object>
+                                                                </object>
+                                                                <object class="sizeritem">
+                                                                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <border>5</border>
+                                                                    <object class="wxFlexGridSizer">
+                                                                        <cols>2</cols>
+                                                                        <rows>0</rows>
+                                                                        <vgap>0</vgap>
+                                                                        <hgap>0</hgap>
+                                                                        <growablecols>0</growablecols>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxSlider" name="ID_POS_Z">
+                                                                                <value>0</value>
+                                                                                <min>0</min>
+                                                                                <max>360</max>
+                                                                            </object>
+                                                                        </object>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxTextCtrl" name="ID_POS_Z_TEXT">
+                                                                                <size>50,-1</size>
+                                                                                <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                            </object>
+                                                                        </object>
                                                                     </object>
                                                                 </object>
                                                             </object>
                                                         </object>
                                                         <object class="sizeritem">
-                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                            <border>5</border>
+                                                            <object class="wxStaticLine" name="wxID_STATIC">
+                                                                <style>wxLI_HORIZONTAL</style>
+                                                            </object>
+                                                        </object>
+                                                        <object class="sizeritem">
+                                                            <flag>wxALIGN_LEFT|wxALIGN_TOP|wxALL</flag>
                                                             <border>5</border>
                                                             <object class="wxStaticText" name="wxID_STATIC">
                                                                 <label>Dirección:</label>
                                                             </object>
                                                         </object>
                                                         <object class="sizeritem">
-                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                             <border>5</border>
-                                                            <object class="wxBoxSizer">
-                                                                <orient>wxHORIZONTAL</orient>
+                                                            <object class="wxFlexGridSizer">
+                                                                <cols>2</cols>
+                                                                <rows>0</rows>
+                                                                <vgap>0</vgap>
+                                                                <hgap>0</hgap>
+                                                                <growablecols>1</growablecols>
                                                                 <object class="sizeritem">
-                                                                    <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                     <border>5</border>
-                                                                    <object class="wxTextCtrl" name="ID_TEXTCTRL3">
-                                                                        <size>32,-1</size>
+                                                                    <object class="wxStaticText" name="wxID_STATIC">
+                                                                        <label>X:</label>
                                                                     </object>
                                                                 </object>
                                                                 <object class="sizeritem">
-                                                                    <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                     <border>5</border>
-                                                                    <object class="wxTextCtrl" name="ID_TEXTCTRL4">
-                                                                        <size>32,-1</size>
+                                                                    <object class="wxFlexGridSizer">
+                                                                        <cols>2</cols>
+                                                                        <rows>0</rows>
+                                                                        <vgap>0</vgap>
+                                                                        <hgap>0</hgap>
+                                                                        <growablecols>0</growablecols>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxSlider" name="ID_DIR_X">
+                                                                                <value>0</value>
+                                                                                <min>0</min>
+                                                                                <max>360</max>
+                                                                            </object>
+                                                                        </object>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxTextCtrl" name="ID_DIR_X_TEXT">
+                                                                                <size>50,-1</size>
+                                                                                <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                            </object>
+                                                                        </object>
                                                                     </object>
                                                                 </object>
                                                                 <object class="sizeritem">
-                                                                    <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                     <border>5</border>
-                                                                    <object class="wxTextCtrl" name="ID_TEXTCTRL5">
-                                                                        <size>32,-1</size>
+                                                                    <object class="wxStaticText" name="wxID_STATIC">
+                                                                        <label>Y:</label>
                                                                     </object>
                                                                 </object>
-                                                            </object>
-                                                        </object>
-                                                        <object class="sizeritem">
-                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                                                            <border>5</border>
-                                                            <object class="wxStaticText" name="wxID_STATIC">
-                                                                <label>Exponente:</label>
-                                                            </object>
-                                                        </object>
-                                                        <object class="sizeritem">
-                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                                                            <border>5</border>
-                                                            <object class="wxSpinCtrl" name="ID_SPINCTRL35">
-                                                                <style>wxSP_ARROW_KEYS</style>
-                                                                <value>0</value>
-                                                                <min>0</min>
-                                                                <max>100</max>
-                                                            </object>
-                                                        </object>
-                                                        <object class="sizeritem">
-                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                                                            <border>5</border>
-                                                            <object class="wxStaticText" name="wxID_STATIC">
-                                                                <label>Ángulo máximo:</label>
-                                                            </object>
-                                                        </object>
-                                                        <object class="sizeritem">
-                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                                                            <border>5</border>
-                                                            <object class="wxSpinCtrl" name="ID_SPINCTRL27">
-                                                                <style>wxSP_ARROW_KEYS</style>
-                                                                <value>0</value>
-                                                                <min>0</min>
-                                                                <max>100</max>
+                                                                <object class="sizeritem">
+                                                                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <border>5</border>
+                                                                    <object class="wxFlexGridSizer">
+                                                                        <cols>2</cols>
+                                                                        <rows>0</rows>
+                                                                        <vgap>0</vgap>
+                                                                        <hgap>0</hgap>
+                                                                        <growablecols>0</growablecols>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxSlider" name="ID_DIR_Y">
+                                                                                <value>0</value>
+                                                                                <min>0</min>
+                                                                                <max>360</max>
+                                                                            </object>
+                                                                        </object>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxTextCtrl" name="ID_DIR_Y_TEXT">
+                                                                                <size>50,-1</size>
+                                                                                <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                            </object>
+                                                                        </object>
+                                                                    </object>
+                                                                </object>
+                                                                <object class="sizeritem">
+                                                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <border>5</border>
+                                                                    <object class="wxStaticText" name="wxID_STATIC">
+                                                                        <label>Z:</label>
+                                                                    </object>
+                                                                </object>
+                                                                <object class="sizeritem">
+                                                                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                    <border>5</border>
+                                                                    <object class="wxFlexGridSizer">
+                                                                        <cols>2</cols>
+                                                                        <rows>0</rows>
+                                                                        <vgap>0</vgap>
+                                                                        <hgap>0</hgap>
+                                                                        <growablecols>0</growablecols>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxSlider" name="ID_DIR_Z">
+                                                                                <value>0</value>
+                                                                                <min>0</min>
+                                                                                <max>360</max>
+                                                                            </object>
+                                                                        </object>
+                                                                        <object class="sizeritem">
+                                                                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                                                            <border>5</border>
+                                                                            <object class="wxTextCtrl" name="ID_DIR_Z_TEXT">
+                                                                                <size>50,-1</size>
+                                                                                <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                            </object>
+                                                                        </object>
+                                                                    </object>
+                                                                </object>
                                                             </object>
                                                         </object>
                                                     </object>
