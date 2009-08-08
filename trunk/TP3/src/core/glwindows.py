@@ -115,6 +115,12 @@ class GLFrame(wx.Frame):
         self.Bind(wx.EVT_CHOICE, self.on_choice,
             id = xrc.XRCID("ID_CHOICE_LIGHT_SOURCE"))
 
+        # bind colour pickers' events
+        for picker_name in ["ID_CPICKER_NAT_AMBIENT",
+            "ID_CPICKER_NAT_DIFFUSE", "ID_CPICKER_NAT_SPECULAR"]:
+            self.Bind(wx.EVT_COLOURPICKER_CHANGED, self.on_pick,
+                id = xrc.XRCID(picker_name))
+
 
     def _set_canvas_option(self, attr_name, attr_value):
         setattr(self.glcanvas, attr_name, attr_value)
@@ -124,6 +130,17 @@ class GLFrame(wx.Frame):
         setattr(self.tree_settings, attr_name, attr_value)
         self.glcanvas.clear()
         self.fill_canvas()
+        self.glcanvas.Refresh()
+
+    def on_pick(self, event):
+        cpkr = event.EventObject
+        col = cpkr.GetColour()
+        name = cpkr.GetName()
+
+        prop = name.lower()[11:]
+        setattr(self.glcanvas, "light" + str(self.current_light) + "_" + prop,
+            col.Get())
+
         self.glcanvas.Refresh()
 
     def on_choice(self, event):
@@ -139,6 +156,11 @@ class GLFrame(wx.Frame):
         c_settings = self.checkboxes_settings[c_name]
 
         attr_name = c_settings["attr"]
+
+        # if there's a condition, attribute's name is changed accordingly
+        cond = c_settings["condition"]
+        if cond is not None:
+            attr_name = attr_name.replace("XXX", str(getattr(self, cond)))
 
         # update canvas'/tree's state
         if c_settings["dest"] == "canvas":
@@ -221,11 +243,18 @@ class GLFrame(wx.Frame):
         for c_name, c_settings in self.checkboxes_settings.iteritems():
             cb = xrc.XRCCTRL(self, c_name)
 
+            attr_name = c_settings["attr"]
+
+            # if there's a condition, attribute's name is changed accordingly
+            cond = c_settings["condition"]
+            if cond is not None:
+                attr_name = attr_name.replace("XXX", str(getattr(self, cond)))
+
             # set actual value
             if c_settings["dest"] == "canvas":
-                value = getattr(self.glcanvas, c_settings["attr"])
+                value = getattr(self.glcanvas, attr_name)
             elif c_settings["dest"] == "tree":
-                value = getattr(self.tree_settings, c_settings["attr"])
+                value = getattr(self.tree_settings, attr_name)
             
             cb.SetValue(value)
 
@@ -238,22 +267,29 @@ class GLFrame(wx.Frame):
         choice.SetSelection(self.current_light)
 
         # set values to colour pickers
+
+        def get_colour(propertie):
+            """Get (r, g, b) tuple which represents the colour of the given
+            propertie for the light currently selected."""
+            ln = str(self.current_light)
+            return getattr(self.glcanvas, "light" + ln + "_" + propertie)
+
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_AMBIENT")
-        col = wx.Colour(self.glcanvas.light0_nat_ambient[0],
-                self.glcanvas.light0_nat_ambient[1],
-                self.glcanvas.light0_nat_ambient[2])
+        col = wx.Colour(get_colour("nat_ambient")[0],
+                get_colour("nat_ambient")[1],
+                get_colour("nat_ambient")[2])
         cpkr.SetColour(col)
 
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_DIFFUSE")
-        col = wx.Colour(self.glcanvas.light0_nat_diffuse[0],
-                self.glcanvas.light0_nat_diffuse[1],
-                self.glcanvas.light0_nat_diffuse[2])
+        col = wx.Colour(get_colour("nat_diffuse")[0],
+                get_colour("nat_diffuse")[1],
+                get_colour("nat_diffuse")[2])
         cpkr.SetColour(col)
 
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_SPECULAR")
-        col = wx.Colour(self.glcanvas.light0_nat_specular[0],
-                self.glcanvas.light0_nat_specular[1],
-                self.glcanvas.light0_nat_specular[2])
+        col = wx.Colour(get_colour("nat_specular")[0],
+                get_colour("nat_specular")[1],
+                get_colour("nat_specular")[2])
         cpkr.SetColour(col)
         
 
@@ -583,14 +619,21 @@ class GLFrame(wx.Frame):
         self.checkboxes_settings = {
             "ID_CHECKBOX_PERSPECTIVE": {
                 "dest": "canvas",
+                "condition": None,
                 "attr": "perspective_projection_enabled",
                 "has_dependents": True
             },
             "ID_CHECKBOX_ORTHO": {
                 "dest": "canvas",
-                "attr": "perspective_projection_enabled",
+                "condition": None,
                 "attr": "ortho_projection_enabled",
                 "has_dependents": True
+            },
+            "ID_CHECKBOX_LIGHT_ENABLE": {
+                "dest": "canvas",
+                "condition": "current_light",
+                "attr": "lightXXX_enabled",
+                "has_dependents": False
             }
         }
 
@@ -805,9 +848,9 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         self.ortho_projection_farVal = 1000
 
         self.light0_enabled = True
-        self.light0_nat_ambient = (255, 0, 0)
-        self.light0_nat_diffuse = (0, 255, 0)
-        self.light0_nat_specular = (0, 0, 255)
+        self.light0_nat_ambient = (150, 150, 150)
+        self.light0_nat_diffuse = (150, 150, 150)
+        self.light0_nat_specular = (200, 200, 200)
         self.light0_exponent = 10
         self.light0_maxangle = 45
         self.light0_pos_x = 0
@@ -816,6 +859,26 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         self.light0_dir_x = 0
         self.light0_dir_y = 0
         self.light0_dir_z = -1
+
+        lighting_default_values = {
+            "enabled": False,
+            "nat_ambient": (255, 255, 0),
+            "nat_diffuse": (0, 0, 255),
+            "nat_specular": (255, 0, 255),
+            "exponent": 10,
+            "maxangle": 45,
+            "pos_x": 0,
+            "pos_y": 10,
+            "pos_z": 0,
+            "dir_x": 0,
+            "dir_y": -1,
+            "dir_z": 0
+        }
+
+        for i in range(1, 8):
+            for p in lighting_default_values.iterkeys():
+                setattr(self, "light" + str(i) + "_" + p,
+                    lighting_default_values[p])
 
 
     def set_perspective_projection_enabled(self, s, value):
@@ -857,6 +920,8 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         if not self.context_initialized:
             self.initialize_context()
 
+        self.setup_lighting()
+
         # projection matrix
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
@@ -887,6 +952,61 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
 
         self.SwapBuffers()
 
+    def setup_lighting(self):
+        # Lighting settings
+        glEnable(GL_LIGHTING)
+
+        #glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, 50)
+
+        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
+        glEnable(GL_COLOR_MATERIAL)
+
+        glColor3f(float(55)/255, float(35)/255, 0)
+
+        int_col_to_fp = lambda col: tuple([float(x)/255 for x in col])
+
+        for li in self.get_light_sources():
+            l = getattr(OpenGL.GL, li)
+
+            clean_lower_li = li.lower()[3:]
+
+            full_prop_name = lambda prop: clean_lower_li + "_" + prop
+
+            pos_x = getattr(self, full_prop_name("pos_x"))
+            pos_y = getattr(self, full_prop_name("pos_y"))
+            pos_z = getattr(self, full_prop_name("pos_z"))
+            glLightfv(l, GL_POSITION, (pos_x, pos_y, pos_z, 1))
+
+            nat_ambient = getattr(self, full_prop_name("nat_ambient"))
+            nat_ambient = int_col_to_fp(nat_ambient)
+            glLightfv(l, GL_AMBIENT, nat_ambient + (1,))
+
+            nat_diffuse = getattr(self, full_prop_name("nat_diffuse"))
+            nat_diffuse = int_col_to_fp(nat_diffuse)
+            glLightfv(l, GL_DIFFUSE, nat_diffuse + (1,))
+
+            nat_specular = getattr(self, full_prop_name("nat_specular"))
+            nat_specular = int_col_to_fp(nat_specular)
+            glLightfv(l, GL_SPECULAR, nat_specular + (1,))
+
+            dir_x = getattr(self, full_prop_name("dir_x"))
+            dir_y = getattr(self, full_prop_name("dir_y"))
+            dir_z = getattr(self, full_prop_name("dir_z"))
+            glLightfv(l, GL_SPOT_DIRECTION, (dir_x, dir_y, dir_z, 1))
+
+            exp = getattr(self, full_prop_name("exponent"))
+            glLightfv(l, GL_SPOT_EXPONENT, exp)
+
+            maxangle = getattr(self, full_prop_name("maxangle"))
+            glLightfv(l, GL_SPOT_CUTOFF, maxangle)
+
+
+            light_enabled = getattr(self, full_prop_name("enabled"))
+            if light_enabled:
+                glEnable(l)
+            else:
+                glDisable(l)
+
     def initialize_context(self):
         # all normal vectors will be normalised
         glEnable(GL_NORMALIZE)
@@ -896,7 +1016,6 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         # specify (0, 0, 0, 1) as clear values (for glClear())
         glClearColor(0, 0, 0, 1)
 
-        
         # enable depth test (otherwise, the depth buffer is not updated)
         glEnable(GL_DEPTH_TEST)
         # pixel passes if "incoming depth <= stored depth"
@@ -904,15 +1023,6 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
 
         # nicest opt. as quality of color and texture coordinate interpolation
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST)
-
-        # Lighting settings
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, 50)
-        glLightfv(GL_LIGHT0, GL_POSITION, (0, 0, 10, 0))
-        glLightfv(GL_LIGHT0, GL_AMBIENT, (0.5, 0.5, 0.5, 1))
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, (1, 1, 1, 1))
-
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
 
         self.context_initialized = True
 

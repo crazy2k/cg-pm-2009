@@ -70,9 +70,9 @@ def generate_tree(actual_level, height, primary_values, secondary_values, tertia
     trunk = generate_trunk(bottom_radius - values["radius_diff"], bottom_radius, values["branch_height"])
     node = GLSceneNode(transformation, trunk)
     
-    if actual_level >= 2:
-        leaf_trunk_radio = values["initial_radius"] - values["radius_diff"]*(height-2)
-        node.add_child(generate_trunk_leaf(values, generate_trunk, trunk.endpoint(), leaf_trunk_radio, generate_leaf))
+    #if actual_level >= 2:
+    #    leaf_trunk_radio = values["initial_radius"] - values["radius_diff"]*(height-2)
+    #    node.add_child(generate_trunk_leaf(values, generate_trunk, trunk.endpoint(), leaf_trunk_radio, generate_leaf))
                 
     if actual_level < height - 1:
         cant = int(random.random()*float(values["max_cant"] - values["min_cant"]) + values["min_cant"])
