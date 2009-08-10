@@ -16,10 +16,10 @@ class Drawable:
 
 class SceneNode:
     
-    def __init__(self, transformation, obj):
+    def __init__(self, transformation, obj, color):
         self.transformation = transformation
         self.obj = obj
-
+        self.color = color
         self.children = []
 
     def add_child(self, child):
@@ -31,6 +31,8 @@ class SceneNode:
 
         self.apply_transformation()
         
+        glColor3f(self.color[0], self.color[1], self.color[2])
+	
         self.obj.draw()
 
         for s in self.children:
@@ -44,14 +46,14 @@ class SceneNode:
 
 class GLSceneNode(SceneNode):
     
-    def __init__(self, transformation, obj):
-        SceneNode.__init__(self, transformation, obj)
+    def __init__(self, transformation, obj, color):
+        SceneNode.__init__(self, transformation, obj, color)
 
     def apply_transformation(self):
         glMultMatrixd(self.transformation.transpose())
 
         
-def generate_tree(actual_level, height, primary_values, secondary_values, tertiary_values, transformation, generate_trunk, generate_leaf, seed):
+def generate_tree(actual_level, height, primary_values, secondary_values, tertiary_values, transformation, generate_trunk, generate_leaf, seed, trunk_color, leaves_color):
     # generate a node with a new trunk into it, and make
     # initial_transformation its associated transformation
     if actual_level == 0:
@@ -68,11 +70,11 @@ def generate_tree(actual_level, height, primary_values, secondary_values, tertia
         bottom_radius = values["initial_radius"]
     
     trunk = generate_trunk(bottom_radius - values["radius_diff"], bottom_radius, values["branch_height"])
-    node = GLSceneNode(transformation, trunk)
+    node = GLSceneNode(transformation, trunk, trunk_color)
     
-    #if actual_level >= 2:
-    #    leaf_trunk_radio = values["initial_radius"] - values["radius_diff"]*(height-2)
-    #    node.add_child(generate_trunk_leaf(values, generate_trunk, trunk.endpoint(), leaf_trunk_radio, generate_leaf))
+    if actual_level >= 2:
+        leaf_trunk_radio = values["initial_radius"] - values["radius_diff"]*(height-2)
+        node.add_child(generate_trunk_leaf(values, generate_trunk, trunk.endpoint(), trunk_color, leaf_trunk_radio, generate_leaf, leaves_color))
                 
     if actual_level < height - 1:
         cant = int(random.random()*float(values["max_cant"] - values["min_cant"]) + values["min_cant"])
@@ -80,16 +82,16 @@ def generate_tree(actual_level, height, primary_values, secondary_values, tertia
             angle_x = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
             angle_z = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
             next_transformation = translation(trunk.endpoint())*rotation(degree2radians(angle_z), "Z") * rotation(degree2radians(angle_x), "X")
-            node.add_child(generate_tree(actual_level + 1, height, primary_values, secondary_values, tertiary_values, next_transformation, generate_trunk, generate_leaf, None))
+            node.add_child(generate_tree(actual_level + 1, height, primary_values, secondary_values, tertiary_values, next_transformation, generate_trunk, generate_leaf, None, trunk_color, leaves_color))
     return node
 
-def generate_trunk_leaf(values, generate_trunk, trunk_endpoint, leaf_trunk_radio, generate_leaf):
+def generate_trunk_leaf(values, generate_trunk, trunk_endpoint, trunk_color, leaf_trunk_radio, generate_leaf, leaves_color):
     angle_x = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
     angle_z = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
     transformation = translation(trunk_endpoint)*rotation(degree2radians(angle_z), "Z")*rotation(degree2radians(angle_x), "X")
     trunk = generate_trunk(leaf_trunk_radio,leaf_trunk_radio,values["branch_height"])
-    node = GLSceneNode(transformation, trunk)
-    leaf_node = GLSceneNode(transformation, generate_leaf(0.1,0.1,0.3))
+    node = GLSceneNode(transformation, trunk, trunk_color)
+    leaf_node = GLSceneNode(transformation, generate_leaf(0.1,0.1,0.3), leaves_color)
     node.add_child(leaf_node)
     return node
            
@@ -198,6 +200,8 @@ class GLBezier(Drawable):
         c4 = leaf(mayor_radius/2,height/2,minor_radius/2)
         c5 = leaf(0,height,0)
         m = [c1,c2,c3,c4,c5]
+
+
         
         return GLBezier(m, height)
         
