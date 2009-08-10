@@ -116,11 +116,11 @@ class GLFrame(wx.Frame):
             id = xrc.XRCID("ID_CHOICE_LIGHT_SOURCE"))
 
         # bind colour pickers' events
-        for picker_name in ["ID_CPICKER_NAT_AMBIENT",
-            "ID_CPICKER_NAT_DIFFUSE", "ID_CPICKER_NAT_SPECULAR"]:
+        pickers = ["NAT_AMBIENT", "NAT_DIFFUSE", "NAT_SPECULAR", "TREE_TRUNK",
+            "TREE_LEAVES"]
+        for picker_name in ["ID_CPICKER_" + p for p in pickers]:
             self.Bind(wx.EVT_COLOURPICKER_CHANGED, self.on_pick,
                 id = xrc.XRCID(picker_name))
-
 
     def _set_canvas_option(self, attr_name, attr_value):
         setattr(self.glcanvas, attr_name, attr_value)
@@ -137,11 +137,19 @@ class GLFrame(wx.Frame):
         col = cpkr.GetColour()
         name = cpkr.GetName()
 
-        prop = name.lower()[11:]
-        setattr(self.glcanvas, "light" + str(self.current_light) + "_" + prop,
-            col.Get())
+        if "NAT" in name:
+            prop = name.lower()[11:]
+            setattr(self.glcanvas, "light" + str(self.current_light) + \
+                "_" + prop, col.Get())
 
-        self.glcanvas.Refresh()
+            self.glcanvas.Refresh()
+        elif "TREE" in name:
+            if "TRUNK" in name:
+                attr_name = "trunk_color"
+            elif "LEAVES" in name:
+                attr_name = "leaves_color"
+            
+            self._set_tree_option(attr_name, [float(x)/255 for x in col.Get()])
 
     def on_choice(self, event):
         self.current_light = event.GetInt()
@@ -291,7 +299,14 @@ class GLFrame(wx.Frame):
                 get_colour("nat_specular")[1],
                 get_colour("nat_specular")[2])
         cpkr.SetColour(col)
+
+        cpkr = xrc.XRCCTRL(self, "ID_CPICKER_TREE_TRUNK")
+        cpkr.SetColour([x*255 for x in self.tree_settings.trunk_color])
         
+        cpkr = xrc.XRCCTRL(self, "ID_CPICKER_TREE_LEAVES")
+        cpkr.SetColour([x*255 for x in self.tree_settings.leaves_color])
+        
+
 
     def load_fp_sliders_settings(self):
         self.fp_sliders_settings = {
@@ -682,7 +697,8 @@ class GLFrame(wx.Frame):
             generate_tree(
                 0, s.height, primary_values,
                 secondary_values, tertiary_values,
-                IDENTITY_4, generate_trunk, generate_leaf, s.current_seed
+                IDENTITY_4, generate_trunk, generate_leaf, s.current_seed,
+                s.trunk_color, s.leaves_color
             )
         )
 
@@ -718,6 +734,9 @@ class TreeSettings(object):
             full_trouble_free + full_troubled])
 
         self.height = 6
+
+        self.trunk_color = (float(55)/255, float(35)/255, 0)
+        self.leaves_color = (float(50)/255, float(200)/255, float(50)/255)
 
         self.branch1_size = 1.2
         self.branch1_radius = 0.06
@@ -960,8 +979,6 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
 
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         glEnable(GL_COLOR_MATERIAL)
-
-        glColor3f(float(55)/255, float(35)/255, 0)
 
         int_col_to_fp = lambda col: tuple([float(x)/255 for x in col])
 
