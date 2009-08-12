@@ -34,15 +34,15 @@ class GLFrame(wx.Frame):
 
         # .fp_sliders_settings is a dictionary with the shape:
         # {
-        #   "SLIDER_NAME": {
+        #   "<slider's name>": {
         #       "min": <minimum possible value for this option>,
         #       "max": <maximum possible value for this option>,
         #       "step": <step value (might be a float)>,
-        #       "condition": <frame's attribute whose value will be used to
-        #           replace the string "XXX" in attr's value; or None>
         #       "dest": <"canvas" or "tree"; represents the object whose
         #           attribute (given in "attr") will change according to
         #           the slider's value>,
+        #       "condition": <frame's attribute whose value will be used to
+        #           replace the string "XXX" in attr's value; or None>
         #       "attr": <name of the attribute that is going to be changed>,
         #       "has_dependents": <True if other sliders depend on this
         #           slider's attribute value; False otherwise>
@@ -53,9 +53,26 @@ class GLFrame(wx.Frame):
         self.fp_sliders_settings = {}
         self.load_fp_sliders_settings()
 
+        # .checkboxes_settings is a dictionary with the shape:
+        # {
+        #   "<checkbox's name>": {
+        #       "dest": "<"canvas" or "tree"; represents the object whose
+        #           attribute (given in "attr") will change according to
+        #           the slider's value>",
+        #       "condition": <frame's attribute whose value will be used to
+        #           replace the string "XXX" in attr's value; or None>,
+        #       "attr": <name of the attribute that is going to be changed>,
+        #       "has_dependents": <True if other sliders depend on this
+        #           slider's attribute value; False otherwise>
+        #   },
+        #   ...
+        # }
+
         self.checkboxes_settings = {}
         self.load_checkboxes_settings()
 
+        # .cuurent_light represents the light that is currently selected in
+        # the dialog (valid values are 0 to 7)
         self.current_light = 0
 
         # panel loading from XRC
@@ -98,85 +115,121 @@ class GLFrame(wx.Frame):
         self.Show(True)
 
     def bind_panel_events(self, res):
+        "Bind all panel's events with their respective event handlers."
+    
+        def bind(elem_names, event, event_handler):
+            for elem_name in elem_names:
+                self.Bind(event, event_handler, id = xrc.XRCID(elem_name)
+
         # bind checkboxes' events
-        cb_names = [c for c in self.checkboxes_settings.iterkeys()]
-        for c_name in cb_names:
-            self.Bind(wx.EVT_CHECKBOX, self.on_check,
-                id = xrc.XRCID(c_name))
+        cb_names = self.checkboxes_settings.iterkeys()
+        bind(cb_names, wx.EVT_CHECKBOX, self.on_check)
         
         # bind sliders' events
-        sliders_names = [s for s in self.fp_sliders_settings.iterkeys()]
-        for s_name in sliders_names:
-            # all sliders' events are binded to the same function
-            self.Bind(wx.EVT_SCROLL, self.on_scroll_slider,
-                id = xrc.XRCID(s_name))
+        sliders_names = self.fp_sliders_settings.iterkeys()
+        bind(sliders_names, wx.EVT_SCROLL, self.on_scroll_slider)
 
         # bind choice's event
-        self.Bind(wx.EVT_CHOICE, self.on_choice,
-            id = xrc.XRCID("ID_CHOICE_LIGHT_SOURCE"))
+        choices_names = ["ID_CHOICE_LIGHT_SOURCE"]
+        bind(choices_names, wx.EVT_CHOICE, self.on_choice)
 
         # bind colour pickers' events
-        pickers = ["NAT_AMBIENT", "NAT_DIFFUSE", "NAT_SPECULAR", "TREE_TRUNK",
-            "TREE_LEAVES"]
-        for picker_name in ["ID_CPICKER_" + p for p in pickers]:
-            self.Bind(wx.EVT_COLOURPICKER_CHANGED, self.on_pick,
-                id = xrc.XRCID(picker_name))
+        pickers_suffixes = ["NAT_AMBIENT", "NAT_DIFFUSE", "NAT_SPECULAR",
+            "TREE_TRUNK", "TREE_LEAVES"]
+        pickers_names = ["ID_CPICKER_" + p for p in pickers_suffixes]
+        bind(pickers_names, wx.EVT_COLOURPICKER_CHANGED, self.on_pick)
 
-    def _set_canvas_option(self, attr_name, attr_value):
+    def _get_final_attr_name(self, settings):
+        """Get final attribute's name from settings dictionary.
+
+        If the condition (given in settings["condition"]) is None, the
+        value contained in settings["attr"] is returned. Otherwise, the
+        following actions take place:
+        * attribute's name (attr_name) is obtained from settings["attr"]
+        * the value (cond_value) of GLFrame's attribute whose name is in
+          settings["condition"] is obtained
+        * attr_name is processed and the result is returned
+        
+        Processing means replacing each ocurrence of the string "XXX" in
+        attr_name with cond_value.
+
+        """
+        cond = settings["condition"]
+        if cond is not None:
+            cond_value = str(getattr(self, cond))
+
+            attr_name = settings["attr"]
+
+            attr_name = attr_name.replace(old = "XXX", new = cond_value)
+            
+            return attr_name
+
+    def _set_attr(self, settings, attr_name, attr_value):
+        dest = settings["dest"]
+        if dest == "tree":
+            _set_tree_attr(attr_name, attr_value)
+        elif dest == "canvas":
+            _set_canvas_attr(attr_name, attr_value)
+
+    def _set_canvas_attr(self, attr_name, attr_value):
         setattr(self.glcanvas, attr_name, attr_value)
         self.glcanvas.Refresh()
 
-    def _set_tree_option(self, attr_name, attr_value):
+    def _set_tree_attr(self, attr_name, attr_value):
         setattr(self.tree_settings, attr_name, attr_value)
         self.glcanvas.clear()
         self.fill_canvas()
         self.glcanvas.Refresh()
 
-    def on_pick(self, event):
-        cpkr = event.EventObject
-        col = cpkr.GetColour()
-        name = cpkr.GetName()
-
-        if "NAT" in name:
-            prop = name.lower()[11:]
-            setattr(self.glcanvas, "light" + str(self.current_light) + \
-                "_" + prop, col.Get())
-
-            self.glcanvas.Refresh()
-        elif "TREE" in name:
-            if "TRUNK" in name:
-                attr_name = "trunk_color"
-            elif "LEAVES" in name:
-                attr_name = "leaves_color"
-            
-            self._set_tree_option(attr_name, [float(x)/255 for x in col.Get()])
-
-    def on_choice(self, event):
-        self.current_light = event.GetInt()
-
-        self.fill_panel()
-
     def on_check(self, event):
-        # get checkbox's actual data
+        "Attend checkboxes' events."
+
+        # get checkbox's data
         c_name = event.EventObject.GetName()
         c_value = event.EventObject.GetValue()
 
         c_settings = self.checkboxes_settings[c_name]
 
-        attr_name = c_settings["attr"]
-
-        # if there's a condition, attribute's name is changed accordingly
-        cond = c_settings["condition"]
-        if cond is not None:
-            attr_name = attr_name.replace("XXX", str(getattr(self, cond)))
+        # get the processed (if needed) attribute's name
+        attr_name = self._get_final_attr_name(c_settings)
 
         # update canvas'/tree's state
-        if c_settings["dest"] == "canvas":
-            self._set_canvas_option(attr_name, c_value)
-        elif c_settings["dest"] == "tree":
-            self._set_tree_option(attr_name, c_value)
+        self._set_attr(c_settings, attr_name, c_value)
 
         if c_settings["has_dependents"]:
+            self.fill_panel()
+
+    def on_pick(self, event):
+        "Attend color pickers' events."
+
+        cpkr = event.EventObject
+        col = cpkr.GetColour()
+        name = cpkr.GetName()
+
+        if name.startswith("ID_CPICKER_NAT"):
+            prop = name.replace("ID_CPICKER_", "")
+            curr_light = str(self.current_light)
+
+            self._set_canvas_option("light" + curr_light + "_" + prop,
+                col.Get())
+
+        elif name.startswith("ID_CPICKER_TREE"):
+            if name.startswith("ID_CPICKER_TREE_TRUNK"):
+                attr_name = "trunk_color"
+            elif name.startswith("ID_CPICKER_TREE_LEAVES"):
+                attr_name = "leaves_color"
+
+            normalised_color = [float(x)/255 for x in col.Get()]
+            self._set_tree_option(attr_name, normalised_color)
+
+    def on_choice(self, event):
+        "Attend choice controls' events."
+
+        choice_ctrl = event.EventObject
+        name = choice_ctrl.GetName()
+
+        if name == "ID_CHOICE_LIGHT_SOURCE":
+            self.current_light = event.GetInt()
             self.fill_panel()
 
     def on_scroll_slider(self, event):
