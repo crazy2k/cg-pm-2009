@@ -119,7 +119,7 @@ class GLFrame(wx.Frame):
     
         def bind(elem_names, event, event_handler):
             for elem_name in elem_names:
-                self.Bind(event, event_handler, id = xrc.XRCID(elem_name)
+                self.Bind(event, event_handler, id = xrc.XRCID(elem_name))
 
         # bind checkboxes' events
         cb_names = self.checkboxes_settings.iterkeys()
@@ -154,22 +154,22 @@ class GLFrame(wx.Frame):
         attr_name with cond_value.
 
         """
+        attr_name = settings["attr"]
+
         cond = settings["condition"]
         if cond is not None:
             cond_value = str(getattr(self, cond))
 
-            attr_name = settings["attr"]
-
-            attr_name = attr_name.replace(old = "XXX", new = cond_value)
+            attr_name = attr_name.replace("XXX", cond_value)
             
-            return attr_name
+        return attr_name
 
     def _set_attr(self, settings, attr_name, attr_value):
         dest = settings["dest"]
         if dest == "tree":
-            _set_tree_attr(attr_name, attr_value)
+            self._set_tree_attr(attr_name, attr_value)
         elif dest == "canvas":
-            _set_canvas_attr(attr_name, attr_value)
+            self._set_canvas_attr(attr_name, attr_value)
 
     def _set_canvas_attr(self, attr_name, attr_value):
         setattr(self.glcanvas, attr_name, attr_value)
@@ -233,27 +233,22 @@ class GLFrame(wx.Frame):
             self.fill_panel()
 
     def on_scroll_slider(self, event):
+        "Attend sliders' events."
+
         # get slider's actual data
         s_name = event.EventObject.GetName()
         s_value = event.EventObject.GetValue()
 
         # get slider's settings
         s_settings = self.fp_sliders_settings[s_name]
-        attr_name = s_settings["attr"]
 
-        # if there's a condition, attribute's name is changed accordingly
-        cond = s_settings["condition"]
-        if cond is not None:
-            attr_name = attr_name.replace("XXX", str(getattr(self, cond)))
+        attr_name = self._get_final_attr_name(s_settings)
 
         # transform data to the real value
         attr_value = s_settings["step"]*s_value
 
         # update canvas'/tree's state
-        if s_settings["dest"] == "canvas":
-            self._set_canvas_option(attr_name, attr_value)
-        elif s_settings["dest"] == "tree":
-            self._set_tree_option(attr_name, attr_value)
+        self._set_attr(s_settings, attr_name, attr_value)
 
         # if the control has dependents, we update the whole panel
         if s_settings["has_dependents"]:
@@ -266,12 +261,8 @@ class GLFrame(wx.Frame):
         text_ctrl = xrc.XRCCTRL(self, s_name + "_TEXT")
         text_ctrl.SetValue(str(value))
 
-    def _set_controls_values(self, settings_dict):
-        for k, v in settings_dict.iteritems():
-            ctrl = xrc.XRCCTRL(self, k)
-            ctrl.SetValue(v)
-
     def fill_panel(self):
+        "Fill the panel with current canvas' and tree's state."
 
         # set values to sliders
         for s_name, s_settings in self.fp_sliders_settings.iteritems():
@@ -282,12 +273,7 @@ class GLFrame(wx.Frame):
             slider.SetMin(mult*s_settings["min"])
             slider.SetMax(mult*s_settings["max"])
 
-            attr_name = s_settings["attr"]
-
-            # if there's a condition, attribute's name is changed accordingly
-            cond = s_settings["condition"]
-            if cond is not None:
-                attr_name = attr_name.replace("XXX", str(getattr(self, cond)))
+            attr_name = self._get_final_attr_name(s_settings)
 
             # set actual value
             if s_settings["dest"] == "canvas":
@@ -304,12 +290,7 @@ class GLFrame(wx.Frame):
         for c_name, c_settings in self.checkboxes_settings.iteritems():
             cb = xrc.XRCCTRL(self, c_name)
 
-            attr_name = c_settings["attr"]
-
-            # if there's a condition, attribute's name is changed accordingly
-            cond = c_settings["condition"]
-            if cond is not None:
-                attr_name = attr_name.replace("XXX", str(getattr(self, cond)))
+            attr_name = self._get_final_attr_name(c_settings)
 
             # set actual value
             if c_settings["dest"] == "canvas":
@@ -319,7 +300,7 @@ class GLFrame(wx.Frame):
             
             cb.SetValue(value)
 
-        # set actual values to the rest of controls
+        # set values to the choice control
         light_sources = self.glcanvas.get_light_sources()
 
         choice = xrc.XRCCTRL(self, "ID_CHOICE_LIGHT_SOURCE")
@@ -329,28 +310,25 @@ class GLFrame(wx.Frame):
 
         # set values to colour pickers
 
-        def get_colour(propertie):
+        def get_current_light_colour(propertie):
             """Get (r, g, b) tuple which represents the colour of the given
             propertie for the light currently selected."""
             ln = str(self.current_light)
             return getattr(self.glcanvas, "light" + ln + "_" + propertie)
 
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_AMBIENT")
-        col = wx.Colour(get_colour("nat_ambient")[0],
-                get_colour("nat_ambient")[1],
-                get_colour("nat_ambient")[2])
+        r, g, b = get_current_light_colour("nat_ambient")
+        col = wx.Colour(r, g, b)
         cpkr.SetColour(col)
 
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_DIFFUSE")
-        col = wx.Colour(get_colour("nat_diffuse")[0],
-                get_colour("nat_diffuse")[1],
-                get_colour("nat_diffuse")[2])
+        r, g, b = get_current_light_colour("nat_diffuse")
+        col = wx.Colour(r, g, b)
         cpkr.SetColour(col)
 
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_SPECULAR")
-        col = wx.Colour(get_colour("nat_specular")[0],
-                get_colour("nat_specular")[1],
-                get_colour("nat_specular")[2])
+        r, g, b = get_current_light_colour("nat_specular")
+        col = wx.Colour(r, g, b)
         cpkr.SetColour(col)
 
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_TREE_TRUNK")
@@ -358,8 +336,6 @@ class GLFrame(wx.Frame):
         
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_TREE_LEAVES")
         cpkr.SetColour([x*255 for x in self.tree_settings.leaves_color])
-        
-
 
     def load_fp_sliders_settings(self):
         self.fp_sliders_settings = {
@@ -777,7 +753,7 @@ class TreeSettings(object):
             setattr(TreeSettings, p, property(fget = gen_def_get(p),
                 fset = gen_def_set(p)))
 
-        # properties that _have_ dependents get a default getter but their get
+        # properties that _have_ dependents get a default getter but they get
         # a special setter, called set_<property name>
         for p in full_troubled:
             setattr(TreeSettings, p, property(fget = gen_def_get(p),
@@ -1025,10 +1001,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         self.SwapBuffers()
 
     def setup_lighting(self):
-        # Lighting settings
         glEnable(GL_LIGHTING)
-
-        #glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, 50)
 
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         glEnable(GL_COLOR_MATERIAL)
@@ -1038,6 +1011,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         for li in self.get_light_sources():
             l = getattr(OpenGL.GL, li)
 
+            # if li is GL_LIGHT0, then clean_lower_li is light0
             clean_lower_li = li.lower()[3:]
 
             full_prop_name = lambda prop: clean_lower_li + "_" + prop
@@ -1070,7 +1044,6 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
             maxangle = getattr(self, full_prop_name("maxangle"))
             glLightfv(l, GL_SPOT_CUTOFF, maxangle)
 
-
             light_enabled = getattr(self, full_prop_name("enabled"))
             if light_enabled:
                 glEnable(l)
@@ -1080,6 +1053,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
     def initialize_context(self):
         # all normal vectors will be normalised
         glEnable(GL_NORMALIZE)
+
         # smooth shading: colors of vertices are interpolated
         glShadeModel(GL_SMOOTH)
 
@@ -1117,8 +1091,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         eye_y = radius*sin(azimuth)*sin(inclination)
         eye_z = radius*cos(inclination)
 
-
-        # center (point at which the camera is aiming): always (0, 0, 0)
+        # center (point at which the camera is aiming): (0, 1, 0)
         # up vector: (0, 1, 0) (positive Y-axis)
         gluLookAt(eye_x, eye_y, eye_z, 0, 1, 0, 0, 1, 0)
 
