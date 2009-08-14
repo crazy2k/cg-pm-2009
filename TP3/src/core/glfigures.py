@@ -68,49 +68,88 @@ class GLSceneNode(SceneNode):
         glMultMatrixd(self.transformation.transpose())
 
 
-
-        
 def generate_tree(actual_level, height, primary_values, secondary_values, tertiary_values, transformation, generate_trunk, generate_leaf, seed, trunk_color, leaves_color):
     # generate a node with a new trunk into it, and make
     # initial_transformation its associated transformation
+    
+    #caso: rama primaria
     if actual_level == 0:
         values = primary_values
+        bottom_radius = values["initial_radius"]
         random.seed(seed)
+        
+    #caso: rama secundaria
     elif actual_level == 1:
         values = secondary_values
-    else: #actual_level >= 2
-        values = tertiary_values
-    
-    if actual_level >= 2:
-        bottom_radius = values["initial_radius"] - values["radius_diff"]*(actual_level-2)
-    else:
         bottom_radius = values["initial_radius"]
     
-    trunk = generate_trunk(bottom_radius - values["radius_diff"], bottom_radius, values["branch_height"])
-    node = GLSceneNode(transformation, trunk, trunk_color)
+    #caso: rama terciaria
+    else: #actual_level >= 2
+        values = tertiary_values
+        initial_radius = values["initial_radius"]
+        diff = values["radius_diff"]
+        actual_terciary_level = actual_level-2
+        bottom_radius = initial_radius - diff*actual_terciary_level
     
-    if actual_level >= 2:
-        leaf_trunk_radio = values["initial_radius"] - values["radius_diff"]*(height-2)
-        node.add_child(generate_trunk_leaf(values, generate_trunk, trunk.endpoint(), trunk_color, leaf_trunk_radio, generate_leaf, leaves_color))
+    #armamos el tronco y lo metemos en un nodo de la escena
+    top_radius = bottom_radius - values["radius_diff"]
+    trunk = generate_trunk(top_radius, bottom_radius, values["branch_height"])
+    node = GLSceneNode(transformation, trunk, trunk_color)
+    endpoint = trunk.endpoint()
+    
+    #caso ramas terciarias
+    if actual_level >= 2:    
+        leaf = generate_leaf_node(values, endpoint, generate_leaf, leaves_color)
+        node.add_child(leaf)
                 
     if actual_level < height - 1:
-        cant = int(random.random()*float(values["max_cant"] - values["min_cant"]) + values["min_cant"])
+        
+        #cantidad aleatoria de troncos hijos
+        max_cant = values["max_cant"]
+        min_cant = values["min_cant"]
+        cant = int(random.random()*float(max_cant - min_cant)) + min_cant
+        
+        #para cada arbol hijo
         for i in range (cant):
-            angle_x = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
-            angle_z = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
-            next_transformation = translation(trunk.endpoint())*rotation(degree2radians(angle_z), "Z") * rotation(degree2radians(angle_x), "X")
-            node.add_child(generate_tree(actual_level + 1, height, primary_values, secondary_values, tertiary_values, next_transformation, generate_trunk, generate_leaf, None, trunk_color, leaves_color))
+        
+            #creamos una transformacion random para el arbol
+            transformation = generate_random_transformation(endpoint, values["angle"]) 
+            
+            #armamos el arbol y lo agregamos a un nodo de escena
+            tree = generate_tree(actual_level + 1, height, primary_values, 
+                secondary_values, tertiary_values, transformation, 
+                generate_trunk, generate_leaf, None, trunk_color, leaves_color)
+            node.add_child(tree)
+    
     return node
+  
+def generate_random_transformation(height, max_angle):    
 
-def generate_trunk_leaf(values, generate_trunk, trunk_endpoint, trunk_color, leaf_trunk_radio, generate_leaf, leaves_color):
-    angle_x = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
-    angle_z = int(random.random()*float(2*values["angle"]) - float(values["angle"]))
-    transformation = translation(trunk_endpoint)*rotation(degree2radians(angle_z), "Z")*rotation(degree2radians(angle_x), "X")
-    trunk = generate_trunk(leaf_trunk_radio,leaf_trunk_radio,values["branch_height"])
-    node = GLSceneNode(transformation, trunk, trunk_color)
-    leaf_node = GLSceneNode(transformation, generate_leaf(0.1,0.07,0.2), leaves_color)
-    node.add_child(leaf_node)
-    return node
+    def generate_random_angle(max_angle):
+        return int(random.random()*float(2*max_angle) - float(max_angle))    
+ 
+    #angulo de rotacion en x al azar
+    angle_x = generate_random_angle(max_angle)
+    
+    #angulo de rotacion en y al azar
+    angle_z = generate_random_angle(max_angle)
+    
+    #armamos la transformacion que ira asociada a la nueva hoja
+    z_rotation = rotation(degree2radians(angle_z), "Z")
+    x_rotation = rotation(degree2radians(angle_x), "X")
+    return translation(height)*z_rotation*x_rotation    
+    
+   
+def generate_leaf_node(values, trunk_endpoint, generate_leaf, leaves_color):
+    
+    #armamos una transformacion al azar
+    transformation = generate_random_transformation(trunk_endpoint, values["angle"])
+    
+    #creamos la hoja y la metemos en un nodo de la escena
+    leaf = generate_leaf(0.1,0.07,0.2)
+    leaf_node = GLSceneNode(transformation, leaf, leaves_color)
+    
+    return leaf_node
            
     
 class GLCylinder(Drawable):
@@ -158,15 +197,9 @@ class GLBezier(Drawable):
     def draw(self):
         glEnable(self.type)
         glEnable(GL_AUTO_NORMAL)
-        glMap2f(self.type, 
-                0.0, 1.0,  # U ranges 0..1 
-                0.0, 1.0,  # V ranges 0..1  
-                self.c_points)  # control points 
-        glMapGrid2f(5, 0.0, 1.0, 60, 0.0, 1.0)  # we tell OpenGL to iterate 
-        #across the full 0.0 to 1.0 range setup above with 5 rows and 6 columns
-        glEvalMesh2(GL_FILL,
-                0, 5,   # Starting at 0 mesh 5 steps (rows)
-                0, 60)  # Starting at 0 mesh 6 steps (columns)
+        glMap2f(self.type, 0.0, 1.0, 0.0, 1.0, self.c_points)  
+        glMapGrid2f(5, 0.0, 1.0, 60, 0.0, 1.0)
+        glEvalMesh2(GL_FILL, 0, 5, 0, 60)
         glDisable(GL_AUTO_NORMAL)
 
     def endpoint(self):
@@ -180,18 +213,6 @@ class GLBezier(Drawable):
         
         def circle(a,r):
             return [(-r,a,0),(-r,a,-r),(r,a,-r),(r,a,r),(-r,a,r),(-r,a,0)]
-        
-    #    def extend4(m):
-     #       n = []
-      #      for i in range (len(m)):
-       #         n = n+[[m[i][0],m[i][1],m[i][2],1]]
-        #    return n
-        
-    #    def narrow3(m):
-     #       n = []
-      #      for i in range (len(m)):
-       #         n = n+[[(m[i][0],m[i][1],m[i][2])]]
-        #    return n
     
         c1 = circle(0, bottom_radius)
         c2 = circle(height*0.2, bottom_radius*4)
@@ -201,10 +222,6 @@ class GLBezier(Drawable):
         c6 = circle(height, top_radius)
         
         m = [c1, c2, c3, c4, c5, c6]
-        
-     #   t = glGetDoublev(GL_MODELVIEW_MATRIX)
-        
-     #   c1 = narrow3((matrix(t)*matrix(extend4(c6)).transpose()).transpose().tolist())
         
         return GLBezier(m, height)
     
@@ -220,10 +237,9 @@ class GLBezier(Drawable):
         c3 = leaf(mayor_radius,height/2,minor_radius)
         c4 = leaf(mayor_radius/2,height/2,minor_radius/2)
         c5 = leaf(0,height,0)
+        
         m = [c1,c2,c3,c4,c5]
 
-
-        
         return GLBezier(m, height)
         
     
