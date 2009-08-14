@@ -50,3 +50,8 @@ def threedseq_to_4x1vector(seq):
     m = my_matrix(point)
     return m.transpose()
 
+def int_col_to_fp(col):
+    return tuple([float(x)/255 for x in col])
+
+def fp_col_to_int(col):
+    return tuple([int(x*255) for x in col])
