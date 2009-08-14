@@ -12,21 +12,6 @@ from math import sin, cos, pi
 from utils.transformations import IDENTITY_4
 
 
-def gen_def_get(name):
-    def def_get(self):
-        return getattr(self, "_" + name)
-    return def_get
-
-def gen_def_set(name):
-    def def_set(self, value):
-        setattr(self, "_" + name, value)
-    return def_set
-
-
-def initialize_attributes(obj, attr_list):
-    for attr in attr_list:
-        setattr(obj, attr, 0)
-
 class GLFrame(wx.Frame):
 
     def __init__(self, id, title):
@@ -207,11 +192,12 @@ class GLFrame(wx.Frame):
         name = cpkr.GetName()
 
         if name.startswith("ID_CPICKER_NAT"):
-            prop = name.replace("ID_CPICKER_", "")
+            prop = name.replace("ID_CPICKER_", "").lower()
             curr_light = str(self.current_light)
 
-            self._set_canvas_option("light" + curr_light + "_" + prop,
-                col.Get())
+            normalised_color = int_col_to_fp(col.Get())
+            self._set_canvas_attr("light" + curr_light + "_" + prop,
+                normalised_color)
 
         elif name.startswith("ID_CPICKER_TREE"):
             if name.startswith("ID_CPICKER_TREE_TRUNK"):
@@ -219,8 +205,8 @@ class GLFrame(wx.Frame):
             elif name.startswith("ID_CPICKER_TREE_LEAVES"):
                 attr_name = "leaves_color"
 
-            normalised_color = [float(x)/255 for x in col.Get()]
-            self._set_tree_option(attr_name, normalised_color)
+            normalised_color = int_col_to_fp(col.Get())
+            self._set_tree_attr(attr_name, normalised_color)
 
     def on_choice(self, event):
         "Attend choice controls' events."
@@ -317,25 +303,25 @@ class GLFrame(wx.Frame):
             return getattr(self.glcanvas, "light" + ln + "_" + propertie)
 
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_AMBIENT")
-        r, g, b = get_current_light_colour("nat_ambient")
+        r, g, b = fp_col_to_int(get_current_light_colour("nat_ambient"))
         col = wx.Colour(r, g, b)
         cpkr.SetColour(col)
 
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_DIFFUSE")
-        r, g, b = get_current_light_colour("nat_diffuse")
+        r, g, b = fp_col_to_int(get_current_light_colour("nat_diffuse"))
         col = wx.Colour(r, g, b)
         cpkr.SetColour(col)
 
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_NAT_SPECULAR")
-        r, g, b = get_current_light_colour("nat_specular")
+        r, g, b = fp_col_to_int(get_current_light_colour("nat_specular"))
         col = wx.Colour(r, g, b)
         cpkr.SetColour(col)
 
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_TREE_TRUNK")
-        cpkr.SetColour([x*255 for x in self.tree_settings.trunk_color])
+        cpkr.SetColour(fp_col_to_int(self.tree_settings.trunk_color))
         
         cpkr = xrc.XRCCTRL(self, "ID_CPICKER_TREE_LEAVES")
-        cpkr.SetColour([x*255 for x in self.tree_settings.leaves_color])
+        cpkr.SetColour(fp_col_to_int(self.tree_settings.leaves_color))
 
     def load_fp_sliders_settings(self):
         self.fp_sliders_settings = {
@@ -687,8 +673,10 @@ class GLFrame(wx.Frame):
         method.
 
         So far, the only added object is a tree generated using
-        generate_tree(). Parameters passed to generate_tree() are obtained
-        from .tree_settings."""
+        core.glfigures.generate_tree(). Parameters passed to generate_tree()
+        are obtained from .tree_settings.
+        
+        """
         
         generate_trunk = GLCylinder.generate_trunk
         generate_leaf = GLBezier.generate_leaf
@@ -764,8 +752,8 @@ class TreeSettings(object):
 
         self.height = 6
 
-        self.trunk_color = (float(55)/255, float(35)/255, 0)
-        self.leaves_color = (float(50)/255, float(200)/255, float(50)/255)
+        self.trunk_color = int_col_to_fp((55, 35, 0))
+        self.leaves_color = int_col_to_fp((50, 200, 50))
 
         self.branch1_size = 1.2
         self.branch1_radius = 0.06
@@ -828,7 +816,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
     * Repaint event -- OpenGL context initialization takes place if needed,
                        some settings are updated (like the camera position)
                        and all figures added with .add_figure() are drawn
-                       (their .draw() method is called)
+                       (their .paint() method is called)
     * UI events     -- user-interface related events are handled
 
     """
@@ -896,9 +884,9 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         self.ortho_projection_farVal = 1000
 
         self.light0_enabled = True
-        self.light0_nat_ambient = (150, 150, 150)
-        self.light0_nat_diffuse = (150, 150, 150)
-        self.light0_nat_specular = (200, 200, 200)
+        self.light0_nat_ambient = int_col_to_fp((150, 150, 150))
+        self.light0_nat_diffuse = int_col_to_fp((150, 150, 150))
+        self.light0_nat_specular = int_col_to_fp((200, 200, 200))
         self.light0_exponent = 10
         self.light0_maxangle = 45
         self.light0_pos_x = 0
@@ -910,9 +898,9 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
 
         lighting_default_values = {
             "enabled": False,
-            "nat_ambient": (255, 255, 0),
-            "nat_diffuse": (0, 0, 255),
-            "nat_specular": (255, 0, 255),
+            "nat_ambient": int_col_to_fp((100, 100, 100)),
+            "nat_diffuse": int_col_to_fp((200, 200, 200)),
+            "nat_specular": int_col_to_fp((200, 200, 200)),
             "exponent": 10,
             "maxangle": 45,
             "pos_x": 0,
@@ -1006,8 +994,6 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         glEnable(GL_COLOR_MATERIAL)
 
-        int_col_to_fp = lambda col: tuple([float(x)/255 for x in col])
-
         for li in self.get_light_sources():
             l = getattr(OpenGL.GL, li)
 
@@ -1022,15 +1008,12 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
             glLightfv(l, GL_POSITION, (pos_x, pos_y, pos_z, 1))
 
             nat_ambient = getattr(self, full_prop_name("nat_ambient"))
-            nat_ambient = int_col_to_fp(nat_ambient)
             glLightfv(l, GL_AMBIENT, nat_ambient + (1,))
 
             nat_diffuse = getattr(self, full_prop_name("nat_diffuse"))
-            nat_diffuse = int_col_to_fp(nat_diffuse)
             glLightfv(l, GL_DIFFUSE, nat_diffuse + (1,))
 
             nat_specular = getattr(self, full_prop_name("nat_specular"))
-            nat_specular = int_col_to_fp(nat_specular)
             glLightfv(l, GL_SPECULAR, nat_specular + (1,))
 
             dir_x = getattr(self, full_prop_name("dir_x"))
@@ -1116,3 +1099,24 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
     def get_light_sources(self):
         light_sources = ["GL_LIGHT" + str(i) for i in range(8)]
         return light_sources
+
+def gen_def_get(name):
+    "Generate a 'default getter' for the attribute named '_' + name."
+    def def_get(self):
+        return getattr(self, "_" + name)
+    return def_get
+
+def gen_def_set(name):
+    def def_set(self, value):
+        setattr(self, "_" + name, value)
+    return def_set
+
+def initialize_attributes(obj, attr_list):
+    for attr in attr_list:
+        setattr(obj, attr, 0)
+
+def int_col_to_fp(col):
+    return tuple([float(x)/255 for x in col])
+
+def fp_col_to_int(col):
+    return tuple([int(x*255) for x in col])
