@@ -115,6 +115,8 @@ def generate_trunk_leaf(values, generate_trunk, trunk_endpoint, trunk_color, lea
     
 class GLCylinder(Drawable):
 
+    name = "Superficie de cilindro"
+
     def __init__(self, bottom_radius, top_radius, height):
         self.bottom_radius = bottom_radius
         self.top_radius = top_radius
@@ -145,6 +147,8 @@ class GLCylinder(Drawable):
         return c
     
 class GLBezier(Drawable):
+
+    name = "Superficie de Bezier"
     
     def __init__(self, c_points, height):
         self.c_points = c_points
@@ -224,6 +228,8 @@ class GLBezier(Drawable):
         
     
 class GLNURBS(Drawable):
+
+    name = "Superficie NURBS"
     
     def __init__(self, sknots, tknots, c_points, height):
         self.sknots = sknots
@@ -281,6 +287,8 @@ class GLNURBS(Drawable):
  
 
 class GLSweptSurface(Drawable):
+
+    name = "Superficie de barrido"
     
     def __init__(self, curve_function, direction_function, rotation_function,
         curve_eval_steps, surface_eval_steps):
@@ -520,6 +528,8 @@ class GLSweptSurface(Drawable):
  
 
 class GLSurfaceOfRevolution(Drawable):
+
+    name = "Superficie de revolucion"
     
     def __init__(self, function, eval_steps, rotation_steps):
         """Construct a surface of revolution which will be draw
