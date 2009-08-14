@@ -409,7 +409,7 @@ class GLFrame(wx.Frame):
 
             "ID_BRANCH1_SIZE": {
                     "min": 0,
-                    "max": 10,
+                    "max": 3,
                     "step": 0.001,
                     "condition": None,
                     "attr": "branch1_size",
@@ -418,7 +418,7 @@ class GLFrame(wx.Frame):
             },
             "ID_BRANCH1_RADIUS": {
                     "min": 0,
-                    "max": 0.2,
+                    "max": 0.1,
                     "step": 0.001,
                     "condition": None,
                     "attr": "branch1_radius",
@@ -426,7 +426,7 @@ class GLFrame(wx.Frame):
                     "has_dependents": True,
             },
             "ID_BRANCH1_NARROWING": {
-                    "min": 0,
+                    "min": 0.001,
                     "max": 0.1,
                     "step": 0.001,
                     "condition": None,
@@ -441,7 +441,7 @@ class GLFrame(wx.Frame):
                     "condition": None,
                     "attr": "branch1_branches_max",
                     "dest": "tree",
-                    "has_dependents": False
+                    "has_dependents": True
             },
             "ID_BRANCH1_BRANCHES_MIN": {
                     "min": 0,
@@ -450,7 +450,7 @@ class GLFrame(wx.Frame):
                     "condition": None,
                     "attr": "branch1_branches_min",
                     "dest": "tree",
-                    "has_dependents": False
+                    "has_dependents": True
             },
             "ID_BRANCH1_BRANCHES_MAXANGLE": {
                     "min": 0,
@@ -464,7 +464,7 @@ class GLFrame(wx.Frame):
 
             "ID_BRANCH2_SIZE": {
                     "min": 0,
-                    "max": 10,
+                    "max": 3,
                     "step": 0.001,
                     "condition": None,
                     "attr": "branch2_size",
@@ -473,7 +473,7 @@ class GLFrame(wx.Frame):
             },
             "ID_BRANCH2_RADIUS": {
                     "min": 0,
-                    "max": 0.2,
+                    "max": 0.1,
                     "step": 0.001,
                     "condition": None,
                     "attr": "branch2_radius",
@@ -481,7 +481,7 @@ class GLFrame(wx.Frame):
                     "has_dependents": False
             },
             "ID_BRANCH2_NARROWING": {
-                    "min": 0,
+                    "min": 0.001,
                     "max": 0.1,
                     "step": 0.001,
                     "condition": None,
@@ -519,7 +519,7 @@ class GLFrame(wx.Frame):
 
             "ID_BRANCH3_SIZE": {
                     "min": 0,
-                    "max": 10,
+                    "max": 3,
                     "step": 0.001,
                     "condition": None,
                     "attr": "branch3_size",
@@ -528,7 +528,7 @@ class GLFrame(wx.Frame):
             },
             "ID_BRANCH3_RADIUS": {
                     "min": 0,
-                    "max": 10,
+                    "max": 0.1,
                     "step": 0.001,
                     "condition": None,
                     "attr": "branch3_radius",
@@ -536,7 +536,7 @@ class GLFrame(wx.Frame):
                     "has_dependents": False
             },
             "ID_BRANCH3_NARROWING": {
-                    "min": 0,
+                    "min": 0.001,
                     "max": 0.1,
                     "step": 0.001,
                     "condition": None,
@@ -725,10 +725,9 @@ class TreeSettings(object):
         self.current_seed = time.time()
 
         # properties that don't have dependents
-        trouble_free = ["size", "branches_maxangle",
-            "branches_min", "branches_max"]
+        trouble_free = ["size", "branches_maxangle"]
         # properties that have dependents
-        troubled = ["radius", "narrowing"]
+        troubled = ["radius", "narrowing", "branches_min", "branches_max"]
 
         list_full_props = lambda attrs: ["branch" + str(i) + "_" + attr \
             for attr in attrs for i in (1, 2, 3)]
@@ -755,53 +754,110 @@ class TreeSettings(object):
         self.trunk_color = int_col_to_fp((55, 35, 0))
         self.leaves_color = int_col_to_fp((50, 200, 50))
 
-        self.branch1_size = 1.2
-        self.branch1_radius = 0.06
-        self.branch1_narrowing = 0.01
-        self.branch1_branches_maxangle = 45
-        self.branch1_branches_min = 6
-        self.branch1_branches_max = 7
+        self._branch1_size = 1.2
+        self._branch1_radius = 0.06
+        self._branch1_narrowing = 0.021
+        self._branch1_branches_maxangle = 45
+        self._branch1_branches_min = 6
+        self._branch1_branches_max = 7
 
-        self.branch2_size = 0.5
-        self.branch2_radius = 0.04
-        self.branch2_narrowing = 0.01
-        self.branch2_branches_maxangle = 40
-        self.branch2_branches_min = 2
-        self.branch2_branches_max = 4
+        self._branch2_size = 0.5
+        self._branch2_radius = 0.039
+        self._branch2_narrowing = 0.01
+        self._branch2_branches_maxangle = 40
+        self._branch2_branches_min = 2
+        self._branch2_branches_max = 4
 
-        self.branch3_size = 0.2
-        self.branch3_radius = 0.03
-        self.branch3_narrowing = 0.005
-        self.branch3_branches_maxangle = 35
-        self.branch3_branches_min = 1
-        self.branch3_branches_max = 3
+        self._branch3_size = 0.2
+        self._branch3_radius = 0.029
+        self._branch3_narrowing = 0.005
+        self._branch3_branches_maxangle = 35
+        self._branch3_branches_min = 1
+        self._branch3_branches_max = 3
+
+    def _get_height_calc(self):
+        c = self.branch1_narrowing + self.branch2_narrowing - self.branch1_radius
+        d = -self.branch3_narrowing
+
+        r = float(c)/d + 2
+
+        if int(r) == r:
+            # border case
+            r -= 1
+        else:
+            r = int(r)
+
+        return r
 
     def set_branch1_radius(self, value):
-
         self._branch1_radius = value
 
+        self.height = self._get_height_calc()
+
         self.branch2_radius = self.branch1_radius - self.branch1_narrowing
+
+    def set_branch1_narrowing(self, value):
+        self._branch1_narrowing = value
+
+        self.height = self._get_height_calc()
+
+        self.branch2_radius = self.branch1_radius - self.branch1_narrowing
+
+    def set_branch1_branches_max(self, value):
+        self._branch1_branches_max = value
+
+        if value < self.branch1_branches_min:
+            self.branch1_branches_min = value
+
+    def set_branch1_branches_min(self, value):
+        self._branch1_branches_min = value
+        
+        if value > self.branch1_branches_max:
+            self.branch1_branches_max = value
 
     def set_branch2_radius(self, value):
         self._branch2_radius = value
 
         self.branch3_radius = self.branch2_radius - self.branch2_narrowing
 
-    def set_branch3_radius(self, value):
-        self._branch3_radius = value
-
-    def set_branch1_narrowing(self, value):
-        self._branch1_narrowing = value
-
-        self.branch2_radius = self.branch1_radius - self.branch1_narrowing
-
     def set_branch2_narrowing(self, value):
         self._branch2_narrowing = value
 
+        self.height = self._get_height_calc()
+
         self.branch3_radius = self.branch2_radius - self.branch2_narrowing
+
+    def set_branch2_branches_max(self, value):
+        self._branch1_branches_max = value
+
+        if value < self.branch1_branches_min:
+            self.branch1_branches_min = value
+
+    def set_branch2_branches_min(self, value):
+        self._branch1_branches_min = value
+        
+        if value > self.branch1_branches_max:
+            self.branch1_branches_max = value
+
+    def set_branch3_radius(self, value):
+        self._branch3_radius = value
 
     def set_branch3_narrowing(self, value):
         self._branch3_narrowing = value
+
+        self.height = self._get_height_calc()
+
+    def set_branch3_branches_max(self, value):
+        self._branch1_branches_max = value
+
+        if value < self.branch1_branches_min:
+            self.branch1_branches_min = value
+
+    def set_branch3_branches_min(self, value):
+        self._branch1_branches_min = value
+        
+        if value > self.branch1_branches_max:
+            self.branch1_branches_max = value
 
 
 class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
@@ -1111,5 +1167,5 @@ def gen_def_set(name):
 
 def initialize_attributes(obj, attr_list):
     for attr in attr_list:
-        setattr(obj, attr, 0)
+        setattr(obj, attr, 0.01)
 

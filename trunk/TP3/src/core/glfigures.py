@@ -108,7 +108,7 @@ def generate_trunk_leaf(values, generate_trunk, trunk_endpoint, trunk_color, lea
     transformation = translation(trunk_endpoint)*rotation(degree2radians(angle_z), "Z")*rotation(degree2radians(angle_x), "X")
     trunk = generate_trunk(leaf_trunk_radio,leaf_trunk_radio,values["branch_height"])
     node = GLSceneNode(transformation, trunk, trunk_color)
-    leaf_node = GLSceneNode(transformation, generate_leaf(0.1,0.1,0.3), leaves_color)
+    leaf_node = GLSceneNode(transformation, generate_leaf(0.1,0.07,0.2), leaves_color)
     node.add_child(leaf_node)
     return node
            

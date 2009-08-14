@@ -29,6 +29,7 @@
                                             <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                             <border>5</border>
                                             <object class="wxStaticText" name="wxID_STATIC">
+                                                <enabled>0</enabled>
                                                 <label>Altura (niveles):</label>
                                             </object>
                                         </object>
@@ -46,6 +47,7 @@
                                                     <border>5</border>
                                                     <object class="wxSlider" name="ID_HEIGHT">
                                                         <size>100,-1</size>
+                                                        <enabled>0</enabled>
                                                         <value>0</value>
                                                         <min>0</min>
                                                         <max>360</max>
@@ -57,6 +59,7 @@
                                                     <object class="wxTextCtrl" name="ID_HEIGHT_TEXT">
                                                         <size>50,-1</size>
                                                         <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                        <enabled>0</enabled>
                                                     </object>
                                                 </object>
                                             </object>
@@ -393,6 +396,7 @@
                                                                         <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                         <border>5</border>
                                                                         <object class="wxStaticText" name="wxID_STATIC">
+                                                                            <enabled>0</enabled>
                                                                             <label>Radio inferior:</label>
                                                                         </object>
                                                                     </object>
@@ -409,6 +413,7 @@
                                                                                 <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                                 <border>5</border>
                                                                                 <object class="wxSlider" name="ID_BRANCH2_RADIUS">
+                                                                                    <enabled>0</enabled>
                                                                                     <value>0</value>
                                                                                     <min>0</min>
                                                                                     <max>360</max>
@@ -420,6 +425,7 @@
                                                                                 <object class="wxTextCtrl" name="ID_BRANCH2_RADIUS_TEXT">
                                                                                     <size>50,-1</size>
                                                                                     <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                                    <enabled>0</enabled>
                                                                                 </object>
                                                                             </object>
                                                                         </object>
@@ -654,6 +660,7 @@
                                                                         <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                         <border>5</border>
                                                                         <object class="wxStaticText" name="wxID_STATIC">
+                                                                            <enabled>0</enabled>
                                                                             <label>Radio inferior:</label>
                                                                         </object>
                                                                     </object>
@@ -670,6 +677,7 @@
                                                                                 <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                                 <border>5</border>
                                                                                 <object class="wxSlider" name="ID_BRANCH3_RADIUS">
+                                                                                    <enabled>0</enabled>
                                                                                     <value>0</value>
                                                                                     <min>0</min>
                                                                                     <max>360</max>
@@ -681,6 +689,7 @@
                                                                                 <object class="wxTextCtrl" name="ID_BRANCH3_RADIUS_TEXT">
                                                                                     <size>50,-1</size>
                                                                                     <style>wxTE_READONLY|wxTE_RIGHT</style>
+                                                                                    <enabled>0</enabled>
                                                                                 </object>
                                                                             </object>
                                                                         </object>
@@ -883,7 +892,7 @@
                                                         <object class="sizeritem">
                                                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                             <border>5</border>
-                                                            <object class="wxColourPickerCtrl" name="ID_CPICKER_TREE_TRUNK">
+                                                            <object class="wxTextCtrl" name="ID_CPICKER_TREE_TRUNK">
                                                                 <size>32,-1</size>
                                                             </object>
                                                         </object>
@@ -904,7 +913,7 @@
                                                         <object class="sizeritem">
                                                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                             <border>5</border>
-                                                            <object class="wxColourPickerCtrl" name="ID_CPICKER_TREE_LEAVES">
+                                                            <object class="wxTextCtrl" name="ID_CPICKER_TREE_LEAVES">
                                                                 <size>32,-1</size>
                                                             </object>
                                                         </object>
@@ -1383,7 +1392,7 @@
                                                                         <object class="sizeritem">
                                                                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                             <border>5</border>
-                                                                            <object class="wxColourPickerCtrl" name="ID_CPICKER_NAT_AMBIENT">
+                                                                            <object class="wxTextCtrl" name="ID_CPICKER_NAT_AMBIENT">
                                                                                 <size>32,-1</size>
                                                                             </object>
                                                                         </object>
@@ -1404,7 +1413,7 @@
                                                                         <object class="sizeritem">
                                                                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                             <border>5</border>
-                                                                            <object class="wxColourPickerCtrl" name="ID_CPICKER_NAT_DIFFUSE">
+                                                                            <object class="wxTextCtrl" name="ID_CPICKER_NAT_DIFFUSE">
                                                                                 <size>32,-1</size>
                                                                             </object>
                                                                         </object>
@@ -1425,7 +1434,7 @@
                                                                         <object class="sizeritem">
                                                                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                                                             <border>5</border>
-                                                                            <object class="wxColourPickerCtrl" name="ID_CPICKER_NAT_SPECULAR">
+                                                                            <object class="wxTextCtrl" name="ID_CPICKER_NAT_SPECULAR">
                                                                                 <size>32,-1</size>
                                                                             </object>
                                                                         </object>
