@@ -7,6 +7,7 @@ from numpy import pi, cross, size, sqrt, dot
 
 import random
 
+
 class Drawable:
     """A Drawable is simply something that can be drawn."""
 
@@ -15,11 +16,11 @@ class Drawable:
 
 
 class SceneNode:
-    
-    def __init__(self, transformation, obj, color):
+
+    def __init__(self, transformation, obj):
         self.transformation = transformation
         self.obj = obj
-        self.color = color
+
         self.children = []
 
     def add_child(self, child):
@@ -27,18 +28,22 @@ class SceneNode:
 
     def paint(self):
 
-        glPushMatrix()
+        self.push_matrix()
 
         self.apply_transformation()
         
-        glColor3f(self.color[0], self.color[1], self.color[2])
-	
         self.obj.draw()
 
         for s in self.children:
             s.paint()
 
-        glPopMatrix()
+        self.pop_matrix()
+
+    def push_matrix(self):
+        raise NotImplementedError
+
+    def pop_matrix(self):
+        raise NotImplementedError
 
     def apply_transformation(self):
         raise NotImplementedError
@@ -47,10 +52,22 @@ class SceneNode:
 class GLSceneNode(SceneNode):
     
     def __init__(self, transformation, obj, color):
-        SceneNode.__init__(self, transformation, obj, color)
+        SceneNode.__init__(self, transformation, obj)
+
+        self.color = color
+
+    def push_matrix(self):
+        glPushMatrix()
+
+    def pop_matrix(self):
+        glPopMatrix()
 
     def apply_transformation(self):
+        glColor3f(self.color[0], self.color[1], self.color[2])
+
         glMultMatrixd(self.transformation.transpose())
+
+
 
         
 def generate_tree(actual_level, height, primary_values, secondary_values, tertiary_values, transformation, generate_trunk, generate_leaf, seed, trunk_color, leaves_color):

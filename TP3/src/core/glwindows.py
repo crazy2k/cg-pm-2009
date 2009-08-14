@@ -745,7 +745,7 @@ class TreeSettings(object):
         # a special setter, called set_<property name>
         for p in full_troubled:
             setattr(TreeSettings, p, property(fget = gen_def_get(p),
-                fset = getattr(self, "set_" + p)))
+                fset = getattr(TreeSettings, "set_" + p)))
 
         initialize_attributes(self, ["_" + p for p in \
             full_trouble_free + full_troubled])
@@ -776,33 +776,31 @@ class TreeSettings(object):
         self.branch3_branches_min = 1
         self.branch3_branches_max = 3
 
-    def set_branch1_radius(self, s, value):
-
-        print vars()
+    def set_branch1_radius(self, value):
 
         self._branch1_radius = value
 
         self.branch2_radius = self.branch1_radius - self.branch1_narrowing
 
-    def set_branch2_radius(self, s, value):
+    def set_branch2_radius(self, value):
         self._branch2_radius = value
 
         self.branch3_radius = self.branch2_radius - self.branch2_narrowing
 
-    def set_branch3_radius(self, s, value):
+    def set_branch3_radius(self, value):
         self._branch3_radius = value
 
-    def set_branch1_narrowing(self, s, value):
+    def set_branch1_narrowing(self, value):
         self._branch1_narrowing = value
 
         self.branch2_radius = self.branch1_radius - self.branch1_narrowing
 
-    def set_branch2_narrowing(self, s, value):
+    def set_branch2_narrowing(self, value):
         self._branch2_narrowing = value
 
         self.branch3_radius = self.branch2_radius - self.branch2_narrowing
 
-    def set_branch3_narrowing(self, s, value):
+    def set_branch3_narrowing(self, value):
         self._branch3_narrowing = value
 
 
@@ -853,7 +851,7 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
         # a special setter, called set_<property name>
         for p in troubled:
             setattr(DrawingGLCanvas, p, property(fget = gen_def_get(p),
-                fset = getattr(self, "set_" + p)))
+                fset = getattr(DrawingGLCanvas, "set_" + p)))
 
         initialize_attributes(self, ["_" + p for p in trouble_free + troubled])
 
@@ -917,14 +915,14 @@ class DrawingGLCanvas(wx.glcanvas.GLCanvas, object):
                     lighting_default_values[p])
 
 
-    def set_perspective_projection_enabled(self, s, value):
+    def set_perspective_projection_enabled(self, value):
         self._perspective_projection_enabled = value
 
         nvalue = not value
         if self.ortho_projection_enabled != nvalue:
             self.ortho_projection_enabled = not value
 
-    def set_ortho_projection_enabled(self, s, value):
+    def set_ortho_projection_enabled(self, value):
         self._ortho_projection_enabled = value
 
         nvalue = not value
@@ -1115,8 +1113,3 @@ def initialize_attributes(obj, attr_list):
     for attr in attr_list:
         setattr(obj, attr, 0)
 
-def int_col_to_fp(col):
-    return tuple([float(x)/255 for x in col])
-
-def fp_col_to_int(col):
-    return tuple([int(x*255) for x in col])
