@@ -56,9 +56,16 @@ class GLFrame(wx.Frame):
         self.checkboxes_settings = {}
         self.load_checkboxes_settings()
 
-        # .cuurent_light represents the light that is currently selected in
+        self.trunk_surfaces = [GLCylinder, GLBezier, GLNURBS, GLSweptSurface,
+            GLSurfaceOfRevolution]
+
+        # .current_light represents the light that is currently selected in
         # the dialog (valid values are 0 to 7)
         self.current_light = 0
+
+        # .current_trunk_surface is an index in .trunk_surfaces; represents
+        # the surface that is currently being used for trunks
+        self.current_trunk_surface = 0
 
         # panel loading from XRC
         res = xrc.XmlResource("view/panel.xrc")
@@ -115,7 +122,8 @@ class GLFrame(wx.Frame):
         bind(sliders_names, wx.EVT_SCROLL, self.on_scroll_slider)
 
         # bind choice's event
-        choices_names = ["ID_CHOICE_LIGHT_SOURCE"]
+        choices_names = ["ID_CHOICE_LIGHT_SOURCE",
+            "ID_CHOICE_TREE_TRUNK_SURFACE"]
         bind(choices_names, wx.EVT_CHOICE, self.on_choice)
 
         # bind colour pickers' events
@@ -162,6 +170,9 @@ class GLFrame(wx.Frame):
 
     def _set_tree_attr(self, attr_name, attr_value):
         setattr(self.tree_settings, attr_name, attr_value)
+        self._refill_canvas()
+
+    def _refill_canvas(self):
         self.glcanvas.clear()
         self.fill_canvas()
         self.glcanvas.Refresh()
@@ -217,6 +228,10 @@ class GLFrame(wx.Frame):
         if name == "ID_CHOICE_LIGHT_SOURCE":
             self.current_light = event.GetInt()
             self.fill_panel()
+
+        if name == "ID_CHOICE_TREE_TRUNK_SURFACE":
+            self.current_trunk_surface = event.GetInt()
+            self._refill_canvas()
 
     def on_scroll_slider(self, event):
         "Attend sliders' events."
@@ -286,13 +301,20 @@ class GLFrame(wx.Frame):
             
             cb.SetValue(value)
 
-        # set values to the choice control
+        # set values to the choice controls
         light_sources = self.glcanvas.get_light_sources()
 
         choice = xrc.XRCCTRL(self, "ID_CHOICE_LIGHT_SOURCE")
         choice.Clear()
         choice.AppendItems(light_sources)
         choice.SetSelection(self.current_light)
+
+        trunk_surfaces = [s.name for s in self.trunk_surfaces]
+
+        choice = xrc.XRCCTRL(self, "ID_CHOICE_TREE_TRUNK_SURFACE")
+        choice.Clear()
+        choice.AppendItems(trunk_surfaces)
+        choice.SetSelection(self.current_trunk_surface)
 
         # set values to colour pickers
 
@@ -678,7 +700,8 @@ class GLFrame(wx.Frame):
         
         """
         
-        generate_trunk = GLCylinder.generate_trunk
+        trunk_surface = self.trunk_surfaces[self.current_trunk_surface]
+        generate_trunk = trunk_surface.generate_trunk
         generate_leaf = GLBezier.generate_leaf
 
         s = self.tree_settings
