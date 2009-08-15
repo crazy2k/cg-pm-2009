@@ -68,27 +68,27 @@ class GLSceneNode(SceneNode):
         glMultMatrixd(self.transformation.transpose())
 
 
-def generate_tree(actual_level, height, primary_values, secondary_values, tertiary_values, transformation, generate_trunk, generate_leaf, seed, trunk_color, leaves_color):
-    # generate a node with a new trunk into it, and make
-    # initial_transformation its associated transformation
+def generate_tree(height, primary_values, secondary_values, tertiary_values,
+    transformation, generate_trunk, generate_leaf, seed, trunk_color,
+    leaves_color, current_level = 0):
     
     #caso: rama primaria
-    if actual_level == 0:
+    if current_level == 0:
         values = primary_values
         bottom_radius = values["initial_radius"]
         random.seed(seed)
         
     #caso: rama secundaria
-    elif actual_level == 1:
+    elif current_level == 1:
         values = secondary_values
         bottom_radius = values["initial_radius"]
     
     #caso: rama terciaria
-    else: #actual_level >= 2
+    else: #current_level >= 2
         values = tertiary_values
         initial_radius = values["initial_radius"]
         diff = values["radius_diff"]
-        actual_terciary_level = actual_level-2
+        actual_terciary_level = current_level-2
         bottom_radius = initial_radius - diff*actual_terciary_level
     
     #armamos el tronco y lo metemos en un nodo de la escena
@@ -98,11 +98,11 @@ def generate_tree(actual_level, height, primary_values, secondary_values, tertia
     endpoint = trunk.endpoint()
     
     #caso ramas terciarias
-    if actual_level >= 2:    
+    if current_level >= 2:    
         leaf = generate_leaf_node(values, endpoint, generate_leaf, leaves_color)
         node.add_child(leaf)
                 
-    if actual_level < height - 1:
+    if current_level < height - 1:
         
         #cantidad aleatoria de troncos hijos
         max_cant = values["max_cant"]
@@ -116,9 +116,10 @@ def generate_tree(actual_level, height, primary_values, secondary_values, tertia
             transformation = generate_random_transformation(endpoint, values["angle"]) 
             
             #armamos el arbol y lo agregamos a un nodo de escena
-            tree = generate_tree(actual_level + 1, height, primary_values, 
-                secondary_values, tertiary_values, transformation, 
-                generate_trunk, generate_leaf, None, trunk_color, leaves_color)
+            tree = generate_tree(height, primary_values, secondary_values,
+                tertiary_values, transformation, generate_trunk,
+                generate_leaf, None, trunk_color, leaves_color,
+                current_level + 1)
             node.add_child(tree)
     
     return node
@@ -204,9 +205,6 @@ class GLBezier(Drawable):
 
     def endpoint(self):
         return (0, self.height, 0)
-    
-    def get_end(self):
-        return self.c_points[0]
     
     @classmethod
     def generate_trunk(cls, top_radius, bottom_radius, height):
