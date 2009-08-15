@@ -735,10 +735,10 @@ class GLFrame(wx.Frame):
 
         self.glcanvas.add_figure(
             generate_tree(
-                0, s.height, primary_values,
+                s.height, primary_values,
                 secondary_values, tertiary_values,
                 IDENTITY_4, generate_trunk, generate_leaf, s.current_seed,
-                s.trunk_color, s.leaves_color
+                s.trunk_color, s.leaves_color, 0
             )
         )
 
