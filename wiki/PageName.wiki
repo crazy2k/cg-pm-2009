@@ -1,10 +1,6 @@
 #summary TODO list
 
 = TODO list =
-  * Mejorar el código de generate_tree y sus amigas.
-  * Reducir el acoplamiento en las clases que corresponden a las superficies.
-  * Encontrar un uso para cada una de las superficies, y crear lo que falte en la interfaz de usuario para mostrarlas (en caso de ser necesario)
   * Ajustar todos los parámetros del panel.
-  * ¿Quitar "altura" del panel? Terminar de definir todas las dependencias entre atributos.
   * Hacer algún tipo de testing para asegurarnos que todo anda bien.
   * Preparar algo para la clase del martes. (Esto involucra leer más del libro ABOP.)
