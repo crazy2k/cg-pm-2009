@@ -786,7 +786,7 @@ class TreeSettings(object):
         self.height = 6
 
         self.trunk_color = int_col_to_fp((55, 35, 0))
-        self.leaves_color = int_col_to_fp((50, 200, 50))
+        self.leaves_color = int_col_to_fp((0, 95, 0))
 
         self._branch1_size = 1.2
         self._branch1_radius = 0.06
