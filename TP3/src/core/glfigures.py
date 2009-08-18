@@ -213,10 +213,10 @@ class GLBezier(Drawable):
             return [(-r,a,0),(-r,a,-r),(r,a,-r),(r,a,r),(-r,a,r),(-r,a,0)]
     
         c1 = circle(0, bottom_radius)
-        c2 = circle(height*0.2, bottom_radius*4)
-        c3 = circle(height*0.4, bottom_radius)
-        c4 = circle(height*0.6, bottom_radius*4)
-        c5 = circle(height*0.8, bottom_radius)
+        c2 = circle(height*0.2, bottom_radius*2)
+        c3 = circle(height*0.4, bottom_radius/2)
+        c4 = circle(height*0.6, bottom_radius*2)
+        c5 = circle(height*0.8, bottom_radius/2)
         c6 = circle(height, top_radius)
         
         m = [c1, c2, c3, c4, c5, c6]
