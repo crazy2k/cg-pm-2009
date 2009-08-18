@@ -1,0 +1,99 @@
+#LyX 1.6.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\language spanish
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset Formula \[
+P(n)=\frac{1}{(Bmax_{n}-Bmin_{n})\cdot Amax_{n}}\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+n=1\,|\, n=2\begin{cases}
+\begin{cases}
+A(n):(n=1\,|\, n=2)\rightarrow^{P(n)}\, T_{n}I_{0}A^{Bmin_{n}}\\
+\vdots\\
+A(n):(n=1\,|\, n=2)\rightarrow^{P(n)}\, T_{n}I_{Amax_{n}}A^{Bmin_{n}}\end{cases}\\
+\vdots\\
+\begin{cases}
+A(n):(n=1\,|\, n=2)\rightarrow^{P(n)}\, T_{n}I_{0}A^{Bmax_{n}}\\
+\vdots\\
+A(n):(n=1\,|\, n=2)\rightarrow^{P(n)}\, T_{n}I_{Amax_{n}}A^{Bmax_{n}}\end{cases}\end{cases}\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+n\geq3\begin{cases}
+\begin{cases}
+A(n):(n\geq3\&n<h)\rightarrow^{P(3)}\, T_{3}I_{0}A^{Bmin_{3}}H\\
+\vdots\\
+A(n):(n\geq3\,\&\, n<h)\rightarrow^{P(3)}\, T_{3}I_{Amax_{3}}A^{Bmin_{3}}H\end{cases}\\
+\vdots\\
+\begin{cases}
+A(n):(n\geq3\,\&\, n<h)\rightarrow^{P(3)}\, T_{3}I_{0}A^{Bmax_{3}}H\\
+\vdots\\
+A(n):(n\geq3\,\&\, n<h)\rightarrow^{P(3)}\, T_{3}I_{Amax_{3}}A^{Bmax_{3}}H\end{cases}\end{cases}\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+A(n):n=h\rightarrow T_{3}H\]
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
