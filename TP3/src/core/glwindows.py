@@ -9,6 +9,8 @@ from core.glfigures import *
 
 from math import sin, cos, pi
 
+import time
+
 from utils.transformations import IDENTITY_4
 
 
@@ -132,6 +134,9 @@ class GLFrame(wx.Frame):
         pickers_names = ["ID_CPICKER_" + p for p in pickers_suffixes]
         bind(pickers_names, wx.EVT_COLOURPICKER_CHANGED, self.on_pick)
 
+        # bind "regenerate" button event
+        bind(("ID_REGENERATE",), wx.EVT_BUTTON, self.on_click_button)
+
     def _get_final_attr_name(self, settings):
         """Get final attribute's name from settings dictionary.
 
@@ -218,6 +223,13 @@ class GLFrame(wx.Frame):
 
             normalised_color = int_col_to_fp(col.Get())
             self._set_tree_attr(attr_name, normalised_color)
+
+    def on_click_button(self, event):
+        button = event.EventObject
+        button_name = button.GetName()
+
+        if button_name == "ID_REGENERATE":
+            self._set_tree_attr("current_seed", time.time())
 
     def on_choice(self, event):
         "Attend choice controls' events."
@@ -744,7 +756,6 @@ class GLFrame(wx.Frame):
 
 class TreeSettings(object):
     def __init__(self):
-        import time
         self.current_seed = time.time()
 
         # properties that don't have dependents
