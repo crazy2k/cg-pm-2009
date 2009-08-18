@@ -93,7 +93,8 @@ def generate_tree(height, primary_values, secondary_values, tertiary_values,
     
     #armamos el tronco y lo metemos en un nodo de la escena
     top_radius = bottom_radius - values["radius_diff"]
-    trunk = generate_trunk(top_radius, bottom_radius, values["branch_height"])
+    trunk = generate_trunk(top_radius = top_radius,
+        bottom_radius = bottom_radius, height = values["branch_height"])
     node = GLSceneNode(transformation, trunk, trunk_color)
     endpoint = trunk.endpoint()
     
@@ -172,7 +173,7 @@ class GLCylinder(Drawable):
         
         glRotatef(-90, 1, 0, 0)
         
-        gluCylinder(quad, self.top_radius, self.bottom_radius, self.height, 26, 4)
+        gluCylinder(quad, self.bottom_radius, self.top_radius, self.height, 26, 4)
         
         gluDeleteQuadric(quad)
 
@@ -213,10 +214,10 @@ class GLBezier(Drawable):
             return [(-r,a,0),(-r,a,-r),(r,a,-r),(r,a,r),(-r,a,r),(-r,a,0)]
     
         c1 = circle(0, bottom_radius)
-        c2 = circle(height*0.2, bottom_radius*2)
-        c3 = circle(height*0.4, bottom_radius/2)
-        c4 = circle(height*0.6, bottom_radius*2)
-        c5 = circle(height*0.8, bottom_radius/2)
+        c2 = circle(height*0.2, bottom_radius*4)
+        c3 = circle(height*0.4, bottom_radius)
+        c4 = circle(height*0.6, bottom_radius*4)
+        c5 = circle(height*0.8, bottom_radius)
         c6 = circle(height, top_radius)
         
         m = [c1, c2, c3, c4, c5, c6]
@@ -530,7 +531,7 @@ class GLSweptSurface(Drawable):
         circle_function = lambda x: (r*cos(x*2*pi), r*sin(x*2*pi))
 
         def direction_function(x):
-            return translation((0, height*x, 0))
+            return translation((sin(x*pi/2)*0.2, height*x, 0))
 
         def rotation_function(x):
             return IDENTITY_4
@@ -687,7 +688,7 @@ class GLSurfaceOfRevolution(Drawable):
 
     @classmethod
     def generate_trunk(cls, bottom_radius, top_radius, height):
-        function = lambda x: (bottom_radius, x*height)
+        function = lambda x: (bottom_radius*cos(x*pi/2) + sin(x*pi/2)*top_radius, x*height)
 
         c = GLSurfaceOfRevolution(function, 5, 5)
         return c
