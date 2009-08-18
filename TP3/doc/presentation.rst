@@ -17,6 +17,41 @@ Computación Gráfica: Presentación Final
 .. contents:: Tabla de contenidos
    :class: handout
 
+Árboles (I)
+===========
+
+.. image:: tree1.jpg
+    :scale: 100
+    :align: center
+
+Árboles (II)
+============
+
+.. image:: tree2.jpg
+    :scale: 100
+    :align: center
+
+Árboles (II prima)
+==================
+
+.. image:: tree2-1.jpg
+    :scale: 100
+    :align: center
+
+Árboles (III)
+=============
+
+.. image:: tree3.jpg
+    :scale: 100
+    :align: center
+
+Árboles (IV)
+============
+
+.. image:: tree4.jpg
+    :scale: 100
+    :align: center
+
 Características morfológicas de los árboles 
 ===========================================
 
@@ -154,4 +189,9 @@ Extensiones posibles
     .. class:: handout
 
         No pertenecen a una especie en particular.
+
+¡Fin!
+=====
+
+Muchas gracias :)
 
