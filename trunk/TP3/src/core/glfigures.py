@@ -531,7 +531,7 @@ class GLSweptSurface(Drawable):
         circle_function = lambda x: (r*cos(x*2*pi), r*sin(x*2*pi))
 
         def direction_function(x):
-            return translation((sin(x*pi/2)*0.2, height*x, 0))
+            return translation((sin(x*pi/2)*0.1, height*x, 0))
 
         def rotation_function(x):
             return IDENTITY_4
