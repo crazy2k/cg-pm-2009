@@ -1,0 +1,127 @@
+
+Unlike trunk/TP1, trunk/TP3 is a little more organized (at least, it's not the
+mixture of two "TPs" ("Trabajos Prácticos", something like a "special
+assignment" in English).
+
+I'd dare to say the code in here is somewhat more polished too, since more
+time has been devoted to it. Oh! And all the comments in the code are (or
+should be) in English.
+
+However, bear in mind that this code was written as a "special assignment" for
+a subject ("Computación Gráfica", or Computer Graphics in English) of the
+Computer Science Department of the University of Buenos Aires, with all that
+that means:
+
+    * Development time was limited: The assignment has to be completed in less
+      than two months.
+    * We learned as we made: This may justify some of our naive errors (not
+      all, of course)
+    * The main objective was learning: Although we tried to write good code
+      (readable, robust, extensible), that wasn't one of our main objectives.
+
+Beyond all this, I wouldn't mind maintaining this code and/or discussing
+improvements for it. 
+
+Pablo Antonio (pabloa at gmail dot com)
+
+----
+
+Computer Graphics: Final Special Assignment
+===========================================
+
+The present application is the result of the development of the Final
+Special Assignment for the "Computación Gráfica" (Computer Graphics, in
+English) subject of the Computer Science Department of the University of
+Buenos Aires (UBA).
+
+This application was developed in the first half of the year 2009 by:
+
+* Pablo Antonio (pabloa AT gmail DOT com)
+* Marta Ponzoni (martaponzoni AT gmail DOT com)
+
+Installation
+------------
+
+This application was written entirely in Python. Thus, the Python
+compiler/virtual machine is necessary to run it. Most of GNU/Linux
+distributions already come with Python out of the box.
+
+If you need to download Python, or want to get more information about its
+installation procedure, refer to Python's official website:
+http://www.python.org/
+
+Besides Python, the application requires the following components to be
+installed on the system:
+
+1. wxPython
+2. NumPy
+3. PyOpenGL
+
+wxPython is a wrapper for the API/toolkit wxWidgets (written in C++). When
+testing, version 2.8.8.0, provided by Ubuntu's repositories (2.8.8.8-ubuntu2),
+was used. To install it on Debian/Ubuntu, just invoke the command
+``sudo apt-get install python-wxgtk2.8`` in the terminal. On Windows (or other
+platforms) you have to get wxPython from its official site:
+http://www.wxpython.org/
+
+NumPy provides a large library with data structures and high-level mathematical
+functions to Python. The most used components here were the matrices and its
+associated operations, and the trigonometric functions sine and cosine. When
+testing, version 1.2.1 was used.
+
+PIL (Python Imaging Library) es la biblioteca que utilizamos para crear
+fácil y eficientemente los bitmaps que mostramos por pantalla. En las
+pruebas se utilizó la versión 1.1.6 provista por los repositorios de
+Ubuntu (1.1.6-3). Para instalar la biblioteca en Debian/Ubuntu sólo hace
+falta usar el comando ``sudo apt-get install python-imaging``. Información
+sobre la instalación en otras plataformas puede obtenerse en el sitio
+oficial de la biblioteca: http://www.pythonware.com/products/pil/
+
+
+Sobre la aplicación
+-------------------
+
+Ejecución
+~~~~~~~~~
+
+Para ejecutar la aplicación, debe ejecutarse el archivo main.py (que debería
+hallarse en el directorio raíz de la aplicación) con el compilador/máquina
+virtual de Python. En GNU/Linux, probablemente baste usar el comando
+``python main.py``, encontrándonos en la ubicación del archivo en el árbol
+de directorios.
+
+
+Organización del código
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Ubicándonos en el directorio raíz de la aplicación (en la ubicación de
+main.py) podemos observar los siguientes archivos/directorios:
+
+* *./main.py*: En este archivo se encuentra el programa principal. Aquí
+  se crea la aplicación de wxPython. En el mismo archivo se halla la
+  clase que define a la ventana que se observará en pantalla.
+* *./algorithms/*: En este directorio se hallan los algoritmos de Bresenham
+  y DDA para la graficación de segmentos de rectas. También se encuentran
+  los algoritmos de scan y clipping de polígonos.
+* *./core/*: Aquí están las partes principales de la aplicación. En
+  scenes.py se halla la estructura creada para albergar las escenas,
+  incluyendo la representación de las primitivas de segmento de recta y
+  polígonos. En windows.py se halla la definición de una ventana genérica,
+  la que sirve como base a cualquier ventana presente en la aplicación.
+  Aquí se encuentra encapsulado el procedimiento de *double buffering*
+  utilizado, y lo básico concerniente a la animación en la ventana.
+* *./README*: Este archivo es el archivo de ayuda que estás leyendo
+  (directamente, o indirectamente a través de su versión en HTML).
+* *./docs/*: En este directorio se hallan archivos de documentación de
+  la aplicación. Entre ellos, una versión en HTML del archivo README.
+* *./utils/*: En este directorio se hallan, por un lado, los algoritmos
+  necesarios para la aplicación de transformaciones a puntos de la
+  pantalla y, por el otro, funciones de conversión entre distintas
+  representaciones utilizadas para las imágenes. (Estas funciones de
+  conversión fueron tomadas del wiki de wxPython:
+  http://wiki.wxpython.org/).
+* *./segments_test.py*: Este programa realiza tests de performance
+  para los algoritmos de graficación de rectas de Bresenham y DDA. Los
+  resultados de dichos tests se detallan en el archivo INFORME en ./docs/.
+
+
