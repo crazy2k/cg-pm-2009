@@ -16,8 +16,20 @@ class Drawable:
 
 
 class SceneNode:
+    "A SceneNode represents a node in a scene graph."
 
     def __init__(self, transformation, obj):
+        """A transformation and an object (obj) are needed in order to create
+        the SceneNode.
+        
+        There's no special requirement for the transformation,
+        since the .apply_transformation() method is not implemented here, but
+        it's supposed to be a matrix which represents a translation, rotation
+        and/or scaling transformation.
+
+        As for the object, it should be a Drawable.
+        
+        """
         self.transformation = transformation
         self.obj = obj
 
@@ -50,8 +62,17 @@ class SceneNode:
 
 
 class GLSceneNode(SceneNode):
-    
+    "A SceneNode for an OpenGL application."
+
     def __init__(self, transformation, obj, color):
+        """transformation and obj are the same two parameters that
+        SceneNode.__init__() receives. color is supposed to be a
+        subscriptable object whose 3 first items represent a value for
+        red, green a blue respectively. They can be integers from 0 to 255
+        or floats from 0 to 1, depending on the settings for the current OpenGL
+        context.
+        
+        """
         SceneNode.__init__(self, transformation, obj)
 
         self.color = color
@@ -72,51 +93,49 @@ def generate_tree(height, primary_values, secondary_values, tertiary_values,
     transformation, generate_trunk, generate_leaf, seed, trunk_color,
     leaves_color, current_level = 0):
     
-    #caso: rama primaria
+    # case: primary branch
     if current_level == 0:
         values = primary_values
         bottom_radius = values["initial_radius"]
         random.seed(seed)
         
-    #caso: rama secundaria
+    # case: secondary branch
     elif current_level == 1:
         values = secondary_values
         bottom_radius = values["initial_radius"]
     
-    #caso: rama terciaria
-    else: #current_level >= 2
+    # case: tertiary branch
+    else: # current_level >= 2
         values = tertiary_values
         initial_radius = values["initial_radius"]
         diff = values["radius_diff"]
         actual_terciary_level = current_level-2
         bottom_radius = initial_radius - diff*actual_terciary_level
     
-    #armamos el tronco y lo metemos en un nodo de la escena
+    # trunk is generated and put into a scene node
     top_radius = bottom_radius - values["radius_diff"]
     trunk = generate_trunk(top_radius = top_radius,
         bottom_radius = bottom_radius, height = values["branch_height"])
     node = GLSceneNode(transformation, trunk, trunk_color)
     endpoint = trunk.endpoint()
     
-    #caso ramas terciarias
+    # tertiary branches will have a leaf
     if current_level >= 2:    
         leaf = generate_leaf_node(values, endpoint, generate_leaf, leaves_color)
         node.add_child(leaf)
                 
     if current_level < height - 1:
-        
-        #cantidad aleatoria de troncos hijos
+        # random number of children
         max_cant = values["max_cant"]
         min_cant = values["min_cant"]
         cant = int(random.random()*float(max_cant - min_cant)) + min_cant
         
-        #para cada arbol hijo
+        # for every child tree
         for i in range (cant):
         
-            #creamos una transformacion random para el arbol
-            transformation = generate_random_transformation(endpoint, values["angle"]) 
+            transformation = generate_random_transformation(endpoint,
+                values["angle"])
             
-            #armamos el arbol y lo agregamos a un nodo de escena
             tree = generate_tree(height, primary_values, secondary_values,
                 tertiary_values, transformation, generate_trunk,
                 generate_leaf, None, trunk_color, leaves_color,
@@ -130,24 +149,19 @@ def generate_random_transformation(height, max_angle):
     def generate_random_angle(max_angle):
         return int(random.random()*float(2*max_angle) - float(max_angle))    
  
-    #angulo de rotacion en x al azar
     angle_x = generate_random_angle(max_angle)
     
-    #angulo de rotacion en y al azar
     angle_z = generate_random_angle(max_angle)
     
-    #armamos la transformacion que ira asociada a la nueva hoja
+    # a new transformation is created for the leaf
     z_rotation = rotation(degree2radians(angle_z), "Z")
     x_rotation = rotation(degree2radians(angle_x), "X")
     return translation(height)*z_rotation*x_rotation    
     
-   
 def generate_leaf_node(values, trunk_endpoint, generate_leaf, leaves_color):
     
-    #armamos una transformacion al azar
     transformation = generate_random_transformation(trunk_endpoint, values["angle"])
     
-    #creamos la hoja y la metemos en un nodo de la escena
     leaf = generate_leaf(0.1,0.07,0.2)
     leaf_node = GLSceneNode(transformation, leaf, leaves_color)
     
@@ -170,7 +184,7 @@ class GLCylinder(Drawable):
         quad = gluNewQuadric()
         # quadrics rendered with quad will not have texturing
         gluQuadricTexture(quad, False)
-        
+
         glRotatef(-90, 1, 0, 0)
         
         gluCylinder(quad, self.bottom_radius, self.top_radius, self.height, 26, 4)
