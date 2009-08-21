@@ -44,7 +44,7 @@ Installation
 
 This application was written entirely in Python. Thus, the Python
 compiler/virtual machine is necessary to run it. Most of GNU/Linux
-distributions already come with Python out of the box.
+distributions already come with Python installed out of the box.
 
 If you need to download Python, or want to get more information about its
 installation procedure, refer to Python's official website:
@@ -67,61 +67,51 @@ http://www.wxpython.org/
 NumPy provides a large library with data structures and high-level mathematical
 functions to Python. The most used components here were the matrices and its
 associated operations, and the trigonometric functions sine and cosine. When
-testing, version 1.2.1 was used.
+testing, version 1.2.1, provided by Ubuntu's repositories (1:1.2.1-1ubuntu1)
+was used. To install it on Debian/Ubuntu, just invoke the command
+``sudo apt-get install python-numpy`` in the terminal. On Windows (or other
+platforms) you have to get NumPy from its official site:
+http://numpy.scipy.org/
 
-PIL (Python Imaging Library) es la biblioteca que utilizamos para crear
-fácil y eficientemente los bitmaps que mostramos por pantalla. En las
-pruebas se utilizó la versión 1.1.6 provista por los repositorios de
-Ubuntu (1.1.6-3). Para instalar la biblioteca en Debian/Ubuntu sólo hace
-falta usar el comando ``sudo apt-get install python-imaging``. Información
-sobre la instalación en otras plataformas puede obtenerse en el sitio
-oficial de la biblioteca: http://www.pythonware.com/products/pil/
-
-
-Sobre la aplicación
--------------------
-
-Ejecución
-~~~~~~~~~
-
-Para ejecutar la aplicación, debe ejecutarse el archivo main.py (que debería
-hallarse en el directorio raíz de la aplicación) con el compilador/máquina
-virtual de Python. En GNU/Linux, probablemente baste usar el comando
-``python main.py``, encontrándonos en la ubicación del archivo en el árbol
-de directorios.
+PyOpenGL is the binding to OpenGL. It's needed to do anything related to
+OpenGL in Python. Version 3.0.0b6, provided by Ubuntu's repositories
+(3.0.0~b6-3), was used when testing. Again, to install it on Debian/Ubuntu,
+just invoke ``sudo apt-get install python-opengl`` in the terminal. If you're
+on Windows (or other platforms), probably you have to get PyOpenGL from its
+official site: http://pyopengl.sourceforge.net/
 
 
-Organización del código
-~~~~~~~~~~~~~~~~~~~~~~~
+About the application
+---------------------
 
-Ubicándonos en el directorio raíz de la aplicación (en la ubicación de
-main.py) podemos observar los siguientes archivos/directorios:
+How to run it
+~~~~~~~~~~~~~
 
-* *./main.py*: En este archivo se encuentra el programa principal. Aquí
-  se crea la aplicación de wxPython. En el mismo archivo se halla la
-  clase que define a la ventana que se observará en pantalla.
-* *./algorithms/*: En este directorio se hallan los algoritmos de Bresenham
-  y DDA para la graficación de segmentos de rectas. También se encuentran
-  los algoritmos de scan y clipping de polígonos.
-* *./core/*: Aquí están las partes principales de la aplicación. En
-  scenes.py se halla la estructura creada para albergar las escenas,
-  incluyendo la representación de las primitivas de segmento de recta y
-  polígonos. En windows.py se halla la definición de una ventana genérica,
-  la que sirve como base a cualquier ventana presente en la aplicación.
-  Aquí se encuentra encapsulado el procedimiento de *double buffering*
-  utilizado, y lo básico concerniente a la animación en la ventana.
-* *./README*: Este archivo es el archivo de ayuda que estás leyendo
-  (directamente, o indirectamente a través de su versión en HTML).
-* *./docs/*: En este directorio se hallan archivos de documentación de
-  la aplicación. Entre ellos, una versión en HTML del archivo README.
-* *./utils/*: En este directorio se hallan, por un lado, los algoritmos
-  necesarios para la aplicación de transformaciones a puntos de la
-  pantalla y, por el otro, funciones de conversión entre distintas
-  representaciones utilizadas para las imágenes. (Estas funciones de
-  conversión fueron tomadas del wiki de wxPython:
-  http://wiki.wxpython.org/).
-* *./segments_test.py*: Este programa realiza tests de performance
-  para los algoritmos de graficación de rectas de Bresenham y DDA. Los
-  resultados de dichos tests se detallan en el archivo INFORME en ./docs/.
+In order to run the application, the file main.py (which should be in
+trunk/TP3/src/) must be executed using Python's compiler/virtual machine.
+On GNU/Linux, invoking the command ``python main.py`` (when in the
+path to main.py in the directory tree) will pretty likely be enough.
 
+Organization of code (and documentation)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+When situated in trunk/TP3/, we can see the following files/directories:
+
+* *./src/*
+    * *./main.py*: This is the main program. The wxPython application is created
+      here.
+    * *./core/*: Here we have the main parts of the application. The code for the
+      main frame and its two most important parts (the canvas and the panel) is in
+      glwindows.py. glfigures.py has the code for the different figures/surfaces
+      that can be used, and the algorithm that generates the tree.
+    * *./utils/transformations.py*: This is the place where some auxiliary
+      functions (most are matrix-related) are defined.
+    * *./view/panel.xrc*: This file has the XML which describes the user interface
+      of our main panel.
+
+* *./doc/*
+    * *./README(.html)*: This file is the help file you're just reading.
+    * *./presentation/*: Here are the files used for the presentation we gave
+      for this final Special Assignment. It's mainly an index.html which
+      contains the slides, and a PDF/PS that describes our implementation in
+      terms of L-Systems.
