@@ -1,6 +1,0 @@
-#summary TODO list
-
-= TODO list =
-  * Ajustar todos los parámetros del panel.
-  * Hacer algún tipo de testing para asegurarnos que todo anda bien.
-  * Preparar algo para la clase del martes. (Esto involucra leer más del libro ABOP.)
