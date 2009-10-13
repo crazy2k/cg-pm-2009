@@ -115,3 +115,32 @@ When situated in trunk/TP3/, we can see the following files/directories:
       for this final Special Assignment. It's mainly an index.html which
       contains the slides, and a PDF/PS that describes our implementation in
       terms of L-Systems.
+
+Legal stuff
+~~~~~~~~~~~
+
+Programs in this project are Copyright 2009 Pablo Antonio and Marta Ponzoni.
+
+The programs in this project are free software: you can redistribute
+it and/or modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation, either version 2 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+The presentation is also licensed under GNU GPL v2 (or later).
+
+tree1.jpg's original by Rich Niewiroski Jr.
+    http://commons.wikimedia.org/wiki/File:HotelDelCoronado-DragonTree.jpg
+tree2.jpg and tree2-1.jpg's original by snowmanradio
+    http://commons.wikimedia.org/wiki/File:Baginton_oak_tree_in_winter_18f07.JPG
+tree3.jpg's original by Ed Schipul
+    http://commons.wikimedia.org/wiki/File:Century_Tree.jpg
+tree4.jpg's original by Ondřej Žváček
+    http://commons.wikimedia.org/wiki/File:Pam%C3%A1tn%C3%BD_dub_v_Broumov%C4%9B.jpg
